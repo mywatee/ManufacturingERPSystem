@@ -1,0 +1,175 @@
+<UserControl x:Class="ManufacturingERP.Views.LoginView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:core="clr-namespace:ManufacturingERP.Core"
+             mc:Ignorable="d" 
+             d:DesignHeight="720" d:DesignWidth="1280">
+    <Grid Background="White">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="450"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- Left Side: Visual Branding -->
+        <Border Grid.Column="0" Background="{StaticResource LoginBackgroundGradient}">
+            <Grid Margin="50">
+                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Left" MaxWidth="500">
+                    <Border Width="60" Height="60" Background="White" CornerRadius="12" Margin="0,0,0,20">
+                        <TextBlock Text="⚙️" FontSize="32" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                    </Border>
+                    <TextBlock Text="MANUFACTURING ERP" FontSize="42" FontWeight="Bold" Foreground="White" Margin="0,0,0,10"/>
+                    <TextBlock Text="Giải pháp quản trị sản xuất thông minh thế hệ mới" 
+                               FontSize="18" Foreground="#BFDBFE" TextWrapping="Wrap" Opacity="0.9"/>
+                    
+                    <StackPanel Orientation="Horizontal" Margin="0,60,0,0">
+                        <Border Width="4" Height="30" Background="#60A5FA" CornerRadius="2" Margin="0,0,15,0"/>
+                        <TextBlock Text="Tối ưu hóa quy trình. Nâng cao năng suất. Tự động hóa vận hành." 
+                                   FontSize="15" Foreground="White" VerticalAlignment="Center" Opacity="0.8"/>
+                    </StackPanel>
+                </StackPanel>
+                
+                <!-- Subtle Decorative Circles -->
+                <Ellipse Width="300" Height="300" Fill="White" Opacity="0.05" Margin="-150,0,0,-150" HorizontalAlignment="Left" VerticalAlignment="Bottom"/>
+                <Ellipse Width="150" Height="150" Fill="White" Opacity="0.05" Margin="0,-50,-50,0" HorizontalAlignment="Right" VerticalAlignment="Top"/>
+            </Grid>
+        </Border>
+
+        <!-- Right Side: Login Form -->
+        <Border Grid.Column="1" HorizontalAlignment="Stretch">
+            <StackPanel VerticalAlignment="Center" Margin="50,0">
+                <TextBlock Text="Đăng nhập" FontSize="28" FontWeight="Bold" Foreground="{StaticResource PrimaryTextBrush}" Margin="0,0,0,8"/>
+                <TextBlock Text="Vui lòng nhập thông tin tài khoản để truy cập hệ thống" 
+                           FontSize="14" Foreground="{StaticResource SecondaryTextBrush}" Margin="0,0,0,40"/>
+
+                <!-- Error Message -->
+                <Border Background="#FEF2F2" BorderBrush="#FEE2E2" BorderThickness="1" CornerRadius="8" Padding="12" Margin="0,0,0,20">
+                    <Border.Style>
+                        <Style TargetType="Border">
+                            <Setter Property="Visibility" Value="Visible"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding ErrorMessage}" Value="{x:Null}">
+                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding ErrorMessage}" Value="">
+                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Border.Style>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="⚠️" Margin="0,0,10,0" VerticalAlignment="Center"/>
+                        <TextBlock Text="{Binding ErrorMessage}" Foreground="#DC2626" FontSize="13" TextWrapping="Wrap"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- Username -->
+                <StackPanel Margin="0,0,0,20">
+                    <TextBlock Text="Tên đăng nhập" Style="{StaticResource LoginLabelStyle}"/>
+                    <TextBox Text="{Binding Username}" Style="{StaticResource LoginTextBoxStyle}"/>
+                </StackPanel>
+
+                <!-- Password -->
+                <StackPanel Margin="0,0,0,30">
+                    <TextBlock Text="Mật khẩu" Style="{StaticResource LoginLabelStyle}"/>
+                    <Grid>
+                        <!-- Hidden Mode (PasswordBox) -->
+                        <PasswordBox core:PasswordHelper.Attach="True" 
+                                     core:PasswordHelper.Password="{Binding Password, Mode=TwoWay}">
+                            <PasswordBox.Style>
+                                <Style TargetType="PasswordBox" BasedOn="{StaticResource LoginPasswordBoxStyle}">
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsPasswordVisible}" Value="True">
+                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </PasswordBox.Style>
+                        </PasswordBox>
+
+                        <!-- Visible Mode (TextBox) -->
+                        <TextBox Text="{Binding Password, UpdateSourceTrigger=PropertyChanged}">
+                            <TextBox.Style>
+                                <Style TargetType="TextBox" BasedOn="{StaticResource LoginTextBoxStyle}">
+                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsPasswordVisible}" Value="True">
+                                            <Setter Property="Visibility" Value="Visible"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBox.Style>
+                        </TextBox>
+
+                        <!-- Toggle Visibility Button -->
+                        <CheckBox IsChecked="{Binding IsPasswordVisible}"
+                                  HorizontalAlignment="Right"
+                                  VerticalAlignment="Center"
+                                  Margin="0,0,15,0"
+                                  Cursor="Hand">
+                            <CheckBox.Template>
+                                <ControlTemplate TargetType="CheckBox">
+                                    <Grid Background="Transparent">
+                                        <!-- Eye Icon (Open) -->
+                                        <Path x:Name="EyeOn" Data="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z M12 17a5 5 0 1 0 0-10 5 5 0 0 0 0 10z M12 14.5a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5z" 
+                                              Stroke="{StaticResource SecondaryTextBrush}" StrokeThickness="1.5" Visibility="Collapsed"/>
+                                        <!-- Eye Icon (Closed) -->
+                                        <Path x:Name="EyeOff" Data="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24 M1 1l22 22" 
+                                              Stroke="{StaticResource SecondaryTextBrush}" StrokeThickness="1.5" Visibility="Visible"/>
+                                    </Grid>
+                                    <ControlTemplate.Triggers>
+                                        <Trigger Property="IsChecked" Value="True">
+                                            <Setter TargetName="EyeOn" Property="Visibility" Value="Visible"/>
+                                            <Setter TargetName="EyeOff" Property="Visibility" Value="Collapsed"/>
+                                        </Trigger>
+                                    </ControlTemplate.Triggers>
+                                </ControlTemplate>
+                            </CheckBox.Template>
+                        </CheckBox>
+                    </Grid>
+                </StackPanel>
+
+                <!-- Remember & Forgot -->
+                <Grid Margin="0,0,0,30">
+                    <CheckBox Content="Ghi nhớ đăng nhập" VerticalAlignment="Center" Foreground="{StaticResource SecondaryTextBrush}"/>
+                    <TextBlock Text="Quên mật khẩu?" Foreground="#2563EB" FontWeight="SemiBold" HorizontalAlignment="Right" Cursor="Hand" VerticalAlignment="Center"/>
+                </Grid>
+
+                <!-- Login Button -->
+                <Button Command="{Binding LoginCommand}" Style="{StaticResource PrimaryLoginButtonStyle}">
+                    <Grid>
+                        <TextBlock Text="Đăng nhập hệ thống">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsLoading}" Value="True">
+                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                            <StackPanel.Style>
+                                <Style TargetType="StackPanel">
+                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsLoading}" Value="True">
+                                            <Setter Property="Visibility" Value="Visible"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </StackPanel.Style>
+                            <TextBlock Text="Đang xử lý..." VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Grid>
+                </Button>
+
+                <TextBlock Text="© 2026 Manufacturing ERP System. Phiên bản 1.0.0" 
+                           FontSize="12" Foreground="#9CA3AF" Margin="0,60,0,0" HorizontalAlignment="Center"/>
+            </StackPanel>
+        </Border>
+    </Grid>
+</UserControl>
