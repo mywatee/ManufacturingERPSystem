@@ -1,0 +1,53 @@
+<UserControl x:Class="ManufacturingERP.Views.FinanceView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:ManufacturingERP.Views"
+             xmlns:finance="clr-namespace:ManufacturingERP.Views.Finance"
+             mc:Ignorable="d" 
+             d:DesignHeight="1200" d:DesignWidth="1100"
+             Background="White">
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+        <Grid Margin="32">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <!-- Header -->
+            <StackPanel Grid.Row="0" Margin="0,0,0,24">
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,0,4">
+                    <Path Data="{StaticResource IconDollar}" Fill="#1e3a5f" Width="24" Height="24" Margin="0,0,12,0" Stretch="Uniform"/>
+                    <TextBlock Text="Tài chính &amp; Công nợ" FontSize="28" FontWeight="Bold" Foreground="#1e3a5f"/>
+                </StackPanel>
+                <TextBlock Text="Quản lý công nợ, dòng tiền và phân tích giá thành sản xuất" FontSize="14" Foreground="#64748b"/>
+            </StackPanel>
+
+            <!-- Custom Tab Navigation (Pills) -->
+            <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,32">
+                <RadioButton x:Name="TabDebt" Content="Quản lý công nợ" IsChecked="True" Style="{StaticResource RoleChipStyle}" Margin="0,0,12,0"/>
+                <RadioButton x:Name="TabCashFlow" Content="Theo dõi dòng tiền" Style="{StaticResource RoleChipStyle}" Margin="0,0,12,0"/>
+                <RadioButton x:Name="TabCosting" Content="Phân tích giá thành" Style="{StaticResource RoleChipStyle}" Margin="0,0,12,0"/>
+                <RadioButton x:Name="TabReport" Content="Xuất báo cáo" Style="{StaticResource RoleChipStyle}"/>
+            </StackPanel>
+
+            <!-- Main Content Area -->
+            <Grid Grid.Row="2">
+                <!-- Tab 1: Debt Management -->
+                <finance:DebtManagementView Visibility="{Binding IsChecked, ElementName=TabDebt, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+
+                <!-- Tab 2: Cash Flow -->
+                <finance:CashFlowView Visibility="{Binding IsChecked, ElementName=TabCashFlow, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+
+                <!-- Tab 3: Cost Analysis -->
+                <finance:CostAnalysisView Visibility="{Binding IsChecked, ElementName=TabCosting, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+
+                <!-- Tab 4: Export Reports -->
+                <finance:FinanceReportView Visibility="{Binding IsChecked, ElementName=TabReport, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+            </Grid>
+        </Grid>
+    </ScrollViewer>
+</UserControl>

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 
@@ -15,6 +15,8 @@ public partial class ManufacturingContext : DbContext
     {
     }
 
+    public virtual DbSet<ActivityLog> ActivityLogs { get; set; }
+    
     public virtual DbSet<AuditLog> AuditLogs { get; set; }
 
     public virtual DbSet<Bom> Boms { get; set; }
@@ -31,26 +33,53 @@ public partial class ManufacturingContext : DbContext
 
     public virtual DbSet<Role> Roles { get; set; }
 
+    public virtual DbSet<RolePermission> RolePermissions { get; set; }
+
     public virtual DbSet<Routing> Routings { get; set; }
 
     public virtual DbSet<Shift> Shifts { get; set; }
 
     public virtual DbSet<StockTransaction> StockTransactions { get; set; }
 
+    public virtual DbSet<Employee> Employees { get; set; }
     public virtual DbSet<User> Users { get; set; }
+    public virtual DbSet<Attendance> Attendances { get; set; }
 
     public virtual DbSet<Warehouse> Warehouses { get; set; }
 
     public virtual DbSet<WorkOrder> WorkOrders { get; set; }
 
     public virtual DbSet<WorkOrderProgress> WorkOrderProgresses { get; set; }
+    
+    public virtual DbSet<WorkOrderItem> WorkOrderItems { get; set; }
+    
+    public virtual DbSet<SystemSetting> SystemSettings { get; set; }
+
+    public virtual DbSet<Partner> Partners { get; set; }
+    public virtual DbSet<PasswordResetRequest> PasswordResetRequests { get; set; }
+    public virtual DbSet<FinancialTransaction> FinancialTransactions { get; set; }
+    public virtual DbSet<Invoice> Invoices { get; set; }
+    public virtual DbSet<InvoiceItem> InvoiceItems { get; set; }
+    public virtual DbSet<Payroll> Payrolls { get; set; }
+
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
-        => optionsBuilder.UseSqlServer("Server=.\\SQLEXPRESS;Database=ManufacturingERP;Trusted_Connection=True;TrustServerCertificate=True;");
+        => optionsBuilder.UseSqlServer("Server=.\\SQLEXPRESS;Database=ManufacturingERP_New;Trusted_Connection=True;TrustServerCertificate=True;");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.Entity<ActivityLog>(entity =>
+        {
+            entity.ToTable("ActivityLogs");
+            entity.HasKey(e => e.LogId);
+            entity.Property(e => e.LogId).ValueGeneratedOnAdd();
+            entity.Property(e => e.ActivityType).HasMaxLength(50).IsRequired();
+            entity.Property(e => e.Content).IsRequired();
+            entity.Property(e => e.PerformedBy).HasMaxLength(100);
+            entity.Property(e => e.Timestamp).HasDefaultValueSql("(getdate())");
+        });
+
         modelBuilder.Entity<AuditLog>(entity =>
         {
             entity.HasKey(e => e.LogId).HasName("PK__AuditLog__5E5499A8B49707C8");
@@ -62,6 +91,8 @@ public partial class ManufacturingContext : DbContext
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime");
             entity.Property(e => e.UserId).HasColumnName("UserID");
+            entity.Property(e => e.OldValue).HasColumnType("nvarchar(max)");
+            entity.Property(e => e.NewValue).HasColumnType("nvarchar(max)");
 
             entity.HasOne(d => d.User).WithMany(p => p.AuditLogs)
                 .HasForeignKey(d => d.UserId)
@@ -108,13 +139,15 @@ public partial class ManufacturingContext : DbContext
 
         modelBuilder.Entity<Inventory>(entity =>
         {
-            entity.HasKey(e => e.MaterialId).HasName("PK__Inventor__C5061317FF78F2FD");
+            entity.HasKey(e => new { e.MaterialId, e.WarehouseId }).HasName("PK_Inventory");
 
             entity.ToTable("Inventory");
 
             entity.Property(e => e.MaterialId)
-                .ValueGeneratedNever()
                 .HasColumnName("MaterialID");
+            
+            entity.Property(e => e.WarehouseId)
+                .HasColumnName("WarehouseID");
             entity.Property(e => e.CurrentStock)
                 .HasDefaultValue(0m)
                 .HasColumnType("decimal(18, 2)");
@@ -124,10 +157,10 @@ public partial class ManufacturingContext : DbContext
             entity.Property(e => e.WarehouseId).HasColumnName("WarehouseID");
             entity.Property(e => e.WarehouseLocation).HasMaxLength(50);
 
-            entity.HasOne(d => d.Material).WithOne(p => p.Inventory)
-                .HasForeignKey<Inventory>(d => d.MaterialId)
+            entity.HasOne(d => d.Material).WithMany(p => p.Inventories)
+                .HasForeignKey(d => d.MaterialId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__Inventory__Mater__778AC167");
+                .HasConstraintName("FK_Inventory_Material");
 
             entity.HasOne(d => d.Warehouse).WithMany(p => p.Inventories)
                 .HasForeignKey(d => d.WarehouseId)
@@ -148,6 +181,7 @@ public partial class ManufacturingContext : DbContext
             entity.Property(e => e.MaterialCode).HasMaxLength(50);
             entity.Property(e => e.MaterialName).HasMaxLength(200);
             entity.Property(e => e.MinStock).HasDefaultValue(10);
+            entity.Property(e => e.Status).HasMaxLength(50).HasDefaultValue("Đang sử dụng");
             entity.Property(e => e.Unit).HasMaxLength(20);
         });
 
@@ -195,6 +229,10 @@ public partial class ManufacturingContext : DbContext
             entity.HasOne(d => d.Wo).WithMany(p => p.QualityControls)
                 .HasForeignKey(d => d.Woid)
                 .HasConstraintName("FK__QualityCon__WOID__0C85DE4D");
+
+            entity.HasOne(d => d.WorkOrderItem).WithMany(p => p.QualityControls)
+                .HasForeignKey(d => d.WorkOrderItemId)
+                .HasConstraintName("FK_QualityControl_WorkOrderItems");
         });
 
         modelBuilder.Entity<Role>(entity =>
@@ -213,7 +251,9 @@ public partial class ManufacturingContext : DbContext
 
             entity.Property(e => e.RoutingId).HasColumnName("RoutingID");
             entity.Property(e => e.ProductId).HasColumnName("ProductID");
-            entity.Property(e => e.StepName).HasMaxLength(100);
+            entity.Property(e => e.StepName).HasMaxLength(200);
+            entity.Property(e => e.WorkCenter).HasMaxLength(100);
+            entity.Property(e => e.OutputDescription).HasMaxLength(500);
 
             entity.HasOne(d => d.Product).WithMany(p => p.Routings)
                 .HasForeignKey(d => d.ProductId)
@@ -225,8 +265,11 @@ public partial class ManufacturingContext : DbContext
             entity.HasKey(e => e.ShiftId).HasName("PK__Shifts__C0A838E1B1902443");
 
             entity.Property(e => e.ShiftId).HasColumnName("ShiftID");
-            entity.Property(e => e.ShiftName).HasMaxLength(50);
+            entity.Property(e => e.ShiftName).HasMaxLength(100).IsRequired();
+            entity.Property(e => e.ColorHex).HasMaxLength(7);
+            entity.Property(e => e.IsActive).HasDefaultValue(true);
         });
+
 
         modelBuilder.Entity<StockTransaction>(entity =>
         {
@@ -252,6 +295,7 @@ public partial class ManufacturingContext : DbContext
 
         modelBuilder.Entity<User>(entity =>
         {
+            entity.ToTable("Users");
             entity.HasKey(e => e.UserId).HasName("PK__Users__1788CCACD5200C46");
 
             entity.HasIndex(e => e.Username, "UQ__Users__536C85E418C8924B").IsUnique();
@@ -260,11 +304,9 @@ public partial class ManufacturingContext : DbContext
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime");
-            entity.Property(e => e.Email).HasMaxLength(100);
-            entity.Property(e => e.FullName).HasMaxLength(100);
             entity.Property(e => e.IsActive).HasDefaultValue(true);
-            entity.Property(e => e.Phone).HasMaxLength(20);
             entity.Property(e => e.Username).HasMaxLength(50);
+            entity.Property(e => e.EmployeeId).HasColumnName("EmployeeId");
 
             entity.HasMany(d => d.Roles).WithMany(p => p.Users)
                 .UsingEntity<Dictionary<string, object>>(
@@ -286,13 +328,22 @@ public partial class ManufacturingContext : DbContext
                     });
         });
 
-        modelBuilder.Entity<Warehouse>(entity =>
-        {
-            entity.HasKey(e => e.WarehouseId).HasName("PK__Warehous__2608AFD9A6EB8906");
-
-            entity.Property(e => e.WarehouseId).HasColumnName("WarehouseID");
-            entity.Property(e => e.Location).HasMaxLength(200);
-            entity.Property(e => e.WarehouseName).HasMaxLength(100);
+        modelBuilder.Entity<Warehouse>(entity => 
+        { 
+            entity.HasKey(e => e.WarehouseId).HasName("PK__Warehous__2608AFD9A6EB8906"); 
+            entity.Property(e => e.WarehouseId).HasColumnName("WarehouseID"); 
+            entity.Property(e => e.Code).HasMaxLength(50); 
+            entity.Property(e => e.Location).HasMaxLength(200); 
+            entity.Property(e => e.WarehouseName).HasMaxLength(100); 
+            entity.Property(e => e.Status).HasMaxLength(50).HasDefaultValue("Hoạt động"); 
+            entity.Property(e => e.Capacity).HasColumnType("decimal(18, 2)"); 
+            entity.Property(e => e.CapacityUnit).HasMaxLength(20).HasDefaultValue("m²");
+            entity.Property(e => e.WarehouseType).HasMaxLength(50);
+            entity.Property(e => e.ContactPhone).HasMaxLength(50);
+            entity.Property(e => e.ContactEmail).HasMaxLength(100);
+            entity.Property(e => e.SafetyThreshold).HasColumnType("decimal(5, 2)").HasDefaultValue(90m);
+            entity.Property(e => e.ManagerId).HasColumnName("ManagerID"); 
+            entity.HasOne(d => d.Manager).WithMany().HasForeignKey(d => d.ManagerId).HasConstraintName("FK_Warehouse_User"); 
         });
 
         modelBuilder.Entity<WorkOrder>(entity =>
@@ -302,16 +353,15 @@ public partial class ManufacturingContext : DbContext
             entity.HasIndex(e => e.Wocode, "UQ__WorkOrde__94AAFED9725446CE").IsUnique();
 
             entity.Property(e => e.Woid).HasColumnName("WOID");
-            entity.Property(e => e.ActualQty).HasDefaultValue(0);
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime");
             entity.Property(e => e.EndDate).HasColumnType("datetime");
-            entity.Property(e => e.ProductId).HasColumnName("ProductID");
             entity.Property(e => e.StartDate).HasColumnType("datetime");
             entity.Property(e => e.Status)
                 .HasMaxLength(20)
                 .HasDefaultValue("Planned");
+            entity.Property(e => e.IsUrgent).HasDefaultValue(false);
             entity.Property(e => e.Wocode)
                 .HasMaxLength(50)
                 .HasColumnName("WOCode");
@@ -319,10 +369,24 @@ public partial class ManufacturingContext : DbContext
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.WorkOrders)
                 .HasForeignKey(d => d.CreatedBy)
                 .HasConstraintName("FK__WorkOrder__Creat__04E4BC85");
+        });
 
-            entity.HasOne(d => d.Product).WithMany(p => p.WorkOrders)
+        modelBuilder.Entity<WorkOrderItem>(entity =>
+        {
+            entity.ToTable("WorkOrderItems");
+            entity.HasKey(e => e.ItemId);
+            entity.Property(e => e.ItemId).ValueGeneratedOnAdd();
+            entity.Property(e => e.Status).HasMaxLength(50).HasDefaultValue("Planned");
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getdate())");
+
+            entity.HasOne(d => d.WorkOrder).WithMany(p => p.WorkOrderItems)
+                .HasForeignKey(d => d.WorkOrderId)
+                .OnDelete(DeleteBehavior.Cascade)
+                .HasConstraintName("FK_WorkOrderItems_WorkOrders");
+
+            entity.HasOne(d => d.Product).WithMany(p => p.WorkOrderItemNavigations) // Assuming I'll add this to Material or use default
                 .HasForeignKey(d => d.ProductId)
-                .HasConstraintName("FK__WorkOrder__Produ__02084FDA");
+                .HasConstraintName("FK_WorkOrderItems_Materials");
         });
 
         modelBuilder.Entity<WorkOrderProgress>(entity =>
@@ -348,10 +412,150 @@ public partial class ManufacturingContext : DbContext
             entity.HasOne(d => d.Worker).WithMany(p => p.WorkOrderProgresses)
                 .HasForeignKey(d => d.WorkerId)
                 .HasConstraintName("FK__WorkOrder__Worke__09A971A2");
+
+            entity.HasOne(d => d.WorkOrderItem).WithMany(p => p.WorkOrderProgresses)
+                .HasForeignKey(d => d.WorkOrderItemId)
+                .HasConstraintName("FK_WorkOrderProgress_WorkOrderItems");
+        });
+
+        modelBuilder.Entity<SystemSetting>(entity =>
+        {
+            entity.HasKey(e => e.SettingId);
+            entity.Property(e => e.SettingKey).HasMaxLength(50).IsRequired();
+            entity.HasIndex(e => e.SettingKey).IsUnique();
+        });
+
+        modelBuilder.Entity<RolePermission>(entity =>
+        {
+            entity.ToTable("RolePermissions");
+            entity.HasKey(e => new { e.RoleId, e.ModuleKey });
+            entity.Property(e => e.ModuleKey).HasMaxLength(100).IsRequired();
+
+            entity.HasOne(e => e.Role)
+                .WithMany()
+                .HasForeignKey(e => e.RoleId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<PasswordResetRequest>(entity =>
+        {
+            entity.HasKey(e => e.RequestId);
+            entity.Property(e => e.Username).HasMaxLength(50);
+            entity.Property(e => e.Status).HasMaxLength(20);
+
+            entity.HasOne(d => d.User)
+                .WithMany(p => p.PasswordResetRequests)
+                .HasForeignKey(d => d.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(d => d.Admin)
+                .WithMany()
+                .HasForeignKey(d => d.ProcessedByAdminId);
+        });
+
+        modelBuilder.Entity<StockTransaction>(entity =>
+        {
+            entity.HasKey(e => e.TransactionId).HasName("PK__StockTra__55433A4B1AE83A43");
+            entity.ToTable("StockTransactions");
+
+            entity.Property(e => e.TransactionId).HasColumnName("TransactionID");
+            entity.Property(e => e.MaterialId).HasColumnName("MaterialID");
+            entity.Property(e => e.WarehouseId).HasColumnName("WarehouseID");
+            entity.Property(e => e.Type).HasMaxLength(20);
+            entity.Property(e => e.ReferenceCode).HasMaxLength(50);
+            entity.Property(e => e.TransBy).HasColumnName("TransBy");
+            entity.Property(e => e.TransDate).HasColumnType("datetime").HasDefaultValueSql("(getdate())");
+            entity.Property(e => e.Notes).HasMaxLength(500);
+            entity.Property(e => e.PartnerId).HasColumnName("PartnerID");
+
+            entity.HasOne(d => d.Material).WithMany(p => p.StockTransactions)
+                .HasForeignKey(d => d.MaterialId)
+                .HasConstraintName("FK__StockTran__Mater__7C494794");
+
+            entity.HasOne(d => d.TransByNavigation).WithMany(p => p.StockTransactions)
+                .HasForeignKey(d => d.TransBy)
+                .HasConstraintName("FK__StockTran__Trans__7D439ABD");
+
+            entity.HasOne(d => d.Warehouse).WithMany(p => p.StockTransactions)
+                .HasForeignKey(d => d.WarehouseId)
+                .HasConstraintName("FK_StockTransactions_Warehouses");
+
+            entity.HasOne(d => d.Partner).WithMany().HasForeignKey(d => d.PartnerId).HasConstraintName("FK_StockTransactions_Partners");
+        });
+
+
+        modelBuilder.Entity<Partner>(entity =>
+        {
+            entity.HasKey(e => e.PartnerId);
+            entity.Property(e => e.PartnerCode).HasMaxLength(50).IsRequired();
+            entity.Property(e => e.PartnerName).HasMaxLength(255).IsRequired();
+            entity.Property(e => e.PartnerType).HasMaxLength(50);
+            entity.Property(e => e.Status).HasMaxLength(50).HasDefaultValue("Hoạt động");
+        });
+
+        modelBuilder.Entity<Attendance>(entity =>
+        {
+            entity.ToTable("Attendances");
+            entity.HasKey(e => e.AttendanceId);
+            entity.Property(e => e.Date).HasColumnType("date").IsRequired();
+            entity.Property(e => e.Status).HasMaxLength(50);
+            entity.Property(e => e.Note).HasMaxLength(500);
+
+            entity.HasOne(d => d.Employee)
+                .WithMany(p => p.Attendances)
+                .HasForeignKey(d => d.EmployeeId)
+                .OnDelete(DeleteBehavior.Cascade)
+                .HasConstraintName("FK_Attendances_Employees");
         });
 
         OnModelCreatingPartial(modelBuilder);
+
+        modelBuilder.Entity<Employee>(entity =>
+        {
+            entity.Property(e => e.BasicSalary).HasColumnType("decimal(18, 2)");
+            entity.HasOne(e => e.UserAccount)
+                  .WithOne(u => u.Employee)
+                  .HasForeignKey<User>(u => u.EmployeeId);
+        });
+
+        modelBuilder.Entity<FinancialTransaction>(entity =>
+        {
+            entity.Property(e => e.Amount).HasColumnType("decimal(18, 2)");
+        });
+
+        modelBuilder.Entity<Invoice>(entity =>
+        {
+            entity.Property(e => e.TotalAmount).HasColumnType("decimal(18, 2)");
+            entity.Property(e => e.PaidAmount).HasColumnType("decimal(18, 2)");
+            entity.Property(e => e.VatRate).HasColumnType("decimal(18, 2)");
+            entity.Property(e => e.VatAmount).HasColumnType("decimal(18, 2)");
+        });
+
+        modelBuilder.Entity<InvoiceItem>(entity =>
+        {
+            entity.ToTable("InvoiceItems");
+            entity.HasKey(e => e.InvoiceItemId);
+            entity.Property(e => e.Quantity).HasColumnType("decimal(18, 2)");
+            entity.Property(e => e.UnitPrice).HasColumnType("decimal(18, 2)");
+
+            entity.HasOne(d => d.Invoice)
+                .WithMany(p => p.Items)
+                .HasForeignKey(d => d.InvoiceId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+        modelBuilder.Entity<Payroll>(entity =>
+        {
+            entity.ToTable("Payrolls");
+            entity.HasKey(e => e.PayrollId);
+            entity.Property(e => e.Month).IsRequired();
+            entity.Property(e => e.Year).IsRequired();
+            entity.HasOne(d => d.Employee)
+                .WithMany()
+                .HasForeignKey(d => d.EmployeeId)
+                .OnDelete(DeleteBehavior.Restrict);
+        });
     }
 
     partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
 }
+

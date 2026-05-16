@@ -1,0 +1,69 @@
+<Window x:Class="ManufacturingERP.Views.Dialogs.UserDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Thông tin người dùng" Height="500" Width="500"
+        WindowStartupLocation="CenterOwner"
+        AllowsTransparency="True" WindowStyle="None" Background="Transparent">
+    <Border Background="White" CornerRadius="15" BorderBrush="#E2E8F0" BorderThickness="1">
+        <Border.Effect>
+            <DropShadowEffect BlurRadius="20" Opacity="0.1" ShadowDepth="0"/>
+        </Border.Effect>
+        <Grid Margin="30">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <!-- Header -->
+            <StackPanel Grid.Row="0" Margin="0,0,0,25">
+                <TextBlock x:Name="TitleText" Text="CHỈNH SỬA NGƯỜI DÙNG" FontSize="18" FontWeight="Bold" Foreground="#1E293B"/>
+                <TextBlock Text="Cập nhật thông tin chi tiết cho tài khoản nhân viên" FontSize="12" Foreground="#64748B" Margin="0,5,0,0"/>
+            </StackPanel>
+
+            <!-- Form -->
+            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                <StackPanel>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="20"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        
+                        <StackPanel>
+                            <TextBlock Text="Tên đăng nhập" FontWeight="SemiBold" Margin="0,0,0,8" Foreground="#334155"/>
+                            <TextBox x:Name="UsernameTextBox" IsEnabled="False" Height="40" Style="{StaticResource LoginTextBoxStyle}"/>
+                        </StackPanel>
+
+                        <StackPanel Grid.Column="2">
+                            <TextBlock Text="Vai trò" FontWeight="SemiBold" Margin="0,0,0,8" Foreground="#334155"/>
+                            <ComboBox x:Name="RoleComboBox" Height="40" Style="{StaticResource ModernComboBoxStyle}"/>
+                        </StackPanel>
+                    </Grid>
+
+                    <TextBlock Text="Họ và tên" FontWeight="SemiBold" Margin="0,15,0,8" Foreground="#334155"/>
+                    <TextBox x:Name="FullNameTextBox" Height="40" Style="{StaticResource LoginTextBoxStyle}"/>
+
+                    <TextBlock Text="Email" FontWeight="SemiBold" Margin="0,15,0,8" Foreground="#334155"/>
+                    <TextBox x:Name="EmailTextBox" Height="40" Style="{StaticResource LoginTextBoxStyle}"/>
+
+                    <TextBlock Text="Số điện thoại" FontWeight="SemiBold" Margin="0,15,0,8" Foreground="#334155"/>
+                    <TextBox x:Name="PhoneTextBox" Height="40" Style="{StaticResource LoginTextBoxStyle}"/>
+                </StackPanel>
+            </ScrollViewer>
+
+            <!-- Actions -->
+            <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,25,0,0">
+                <Button Content="Hủy bỏ" Click="Cancel_Click" Width="100" Height="42" Background="Transparent" BorderThickness="0" Foreground="#64748B" Margin="0,0,10,0"/>
+                <Button Content="Lưu thay đổi" Click="Save_Click" Width="140" Height="42" Background="#2563EB" Foreground="White" FontWeight="Bold">
+                    <Button.Resources>
+                        <Style TargetType="Border">
+                            <Setter Property="CornerRadius" Value="8"/>
+                        </Style>
+                    </Button.Resources>
+                </Button>
+            </StackPanel>
+        </Grid>
+    </Border>
+</Window>

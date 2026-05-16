@@ -1,23 +1,39 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace ManufacturingERP.Models;
 
-public partial class User
+public partial class User : ObservableObject
 {
-    public int UserId { get; set; }
+    [ObservableProperty]
+    private int _userId;
 
-    public string Username { get; set; } = null!;
+    [ObservableProperty]
+    private string _username = null!;
 
-    public string PasswordHash { get; set; } = null!;
+    [NotMapped]
+    public string FullName => Employee?.FullName ?? Username;
 
-    public string? FullName { get; set; }
+    [ObservableProperty]
+    private string _passwordHash = null!;
 
-    public string? Email { get; set; }
+    [ObservableProperty]
+    private bool? _isActive;
 
-    public string? Phone { get; set; }
+    [ObservableProperty]
+    private int _failedLoginAttempts;
 
-    public bool? IsActive { get; set; }
+    [ObservableProperty]
+    private DateTime? _lockoutEnd;
+
+    [ObservableProperty]
+    private int? _employeeId;
+
+    [ForeignKey("EmployeeId")]
+    public virtual Employee? Employee { get; set; }
 
     public DateTime? CreatedAt { get; set; }
 
@@ -36,4 +52,6 @@ public partial class User
     public virtual ICollection<WorkOrder> WorkOrders { get; set; } = new List<WorkOrder>();
 
     public virtual ICollection<Role> Roles { get; set; } = new List<Role>();
+
+    public virtual ICollection<PasswordResetRequest> PasswordResetRequests { get; set; } = new List<PasswordResetRequest>();
 }

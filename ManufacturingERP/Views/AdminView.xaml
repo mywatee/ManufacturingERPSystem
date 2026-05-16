@@ -35,6 +35,20 @@
                              Style="{StaticResource AdminTabButtonStyle}"
                              IsChecked="{Binding ActiveTab, Converter={StaticResource StringToBooleanConverter}, ConverterParameter=roles}"
                              Command="{Binding ChangeTabCommand}" CommandParameter="roles"/>
+                <Grid>
+                    <RadioButton Content="Yêu cầu Reset"
+                                 Tag="{StaticResource IconKey}"
+                                 Style="{StaticResource AdminTabButtonStyle}"
+                                 IsChecked="{Binding ActiveTab, Converter={StaticResource StringToBooleanConverter}, ConverterParameter=resets}"
+                                 Command="{Binding ChangeTabCommand}" CommandParameter="resets"/>
+                    <Border Background="#EF4444" Width="18" Height="18" CornerRadius="9" 
+                            HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,4,10,0"
+                            IsHitTestVisible="False"
+                            Visibility="{Binding DataContext.PendingRequestsCount, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource CountToVisibilityConverter}}">
+                        <TextBlock Text="{Binding DataContext.PendingRequestsCount, RelativeSource={RelativeSource AncestorType=UserControl}}" 
+                                   Foreground="White" FontSize="10" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                </Grid>
                 <RadioButton Content="Nhật ký Hệ thống" 
                              Tag="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"
                              Style="{StaticResource AdminTabButtonStyle}"
@@ -65,48 +79,78 @@
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
                 
                 <!-- Toolbar -->
                 <Grid Margin="0,0,0,25">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    
                     <StackPanel VerticalAlignment="Center">
                         <TextBlock Text="Quản lý Tài khoản Người dùng" FontSize="19" FontWeight="SemiBold" Foreground="{StaticResource PrimaryTextBrush}"/>
                         <TextBlock Text="Quản lý danh sách người dùng và phân quyền truy cập hệ thống" FontSize="13" Foreground="{StaticResource SecondaryTextBrush}" Margin="0,4,0,0"/>
                     </StackPanel>
                     
-                    <Button Content="+ Thêm người dùng mới" 
-                            Style="{StaticResource PrimaryButtonStyle}" 
-                            HorizontalAlignment="Right"
-                            VerticalAlignment="Center"
-                            Padding="24,12"
-                            FontSize="13" FontWeight="SemiBold"/>
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                        <Border Background="White" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="8" Height="42" Width="250" Margin="0,0,10,0">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="40"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Path Data="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" 
+                                      Fill="#9CA3AF" Width="16" Height="16" Stretch="Uniform" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                <TextBox Grid.Column="1" Text="{Binding UserSearchTerm, UpdateSourceTrigger=PropertyChanged}" Background="Transparent" BorderThickness="0" VerticalContentAlignment="Center" Foreground="#9CA3AF" FontSize="13" />
+                            </Grid>
+                        </Border>
+                        <Button Content="Tìm kiếm" Style="{StaticResource SecondaryButtonStyle}" Margin="0,0,10,0" Command="{Binding SearchUsersCommand}"/>
+                        <Button Content="+ Thêm người dùng mới" 
+                                Style="{StaticResource PrimaryButtonStyle}" 
+                                Command="{Binding AddUserCommand}"
+                                Padding="24,12"
+                                FontSize="13" FontWeight="SemiBold"/>
+                    </StackPanel>
                 </Grid>
 
                 <Border Grid.Row="1" Style="{StaticResource CardStyle}" Padding="0">
-                    <DataGrid ItemsSource="{Binding Users}" Style="{StaticResource ModernDataGridStyle}" ScrollViewer.VerticalScrollBarVisibility="Disabled">
+                    <DataGrid ItemsSource="{Binding Users}" 
+                              Style="{StaticResource ModernDataGridStyle}" 
+                              IsReadOnly="True"
+                              ScrollViewer.VerticalScrollBarVisibility="Disabled">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="Mã NV" Binding="{Binding UserId, StringFormat=NV-{0:D3}}" Width="100"/>
                             <DataGridTextColumn Header="Tên đăng nhập" Binding="{Binding Username}" Width="150"/>
-                            <DataGridTextColumn Header="Họ tên" Binding="{Binding FullName}" Width="180"/>
-                            <DataGridTextColumn Header="Email" Binding="{Binding Email}" Width="200"/>
-                            <DataGridTextColumn Header="Số điện thoại" Binding="{Binding Phone}" Width="150"/>
+                            <DataGridTextColumn Header="Họ tên" Binding="{Binding Employee.FullName}" Width="180"/>
+                            <DataGridTextColumn Header="Email" Binding="{Binding Employee.Email}" Width="200"/>
+                            <DataGridTextColumn Header="Số điện thoại" Binding="{Binding Employee.Phone}" Width="150"/>
                             
                             <DataGridTemplateColumn Header="Vai trò" Width="150">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
                                         <Border x:Name="badge" Style="{StaticResource RoleOperatorBadgeStyle}" Padding="10,4" CornerRadius="6" HorizontalAlignment="Left">
-                                            <TextBlock x:Name="roleText" Text="Nhân viên vận hành"/>
+                                            <TextBlock x:Name="roleText" Text="Nhân viên"/>
                                         </Border>
                                         <DataTemplate.Triggers>
-                                            <DataTrigger Binding="{Binding UserId}" Value="1">
+                                            <DataTrigger Binding="{Binding Roles[0].RoleName}" Value="Administrator">
                                                 <Setter TargetName="badge" Property="Style" Value="{StaticResource RoleAdminBadgeStyle}"/>
-                                                <Setter TargetName="roleText" Property="Text" Value="Admin"/>
+                                                <Setter TargetName="roleText" Property="Text" Value="Quản trị viên"/>
                                             </DataTrigger>
-                                            <DataTrigger Binding="{Binding UserId}" Value="45">
+                                            <DataTrigger Binding="{Binding Roles[0].RoleName}" Value="Admin">
+                                                <Setter TargetName="badge" Property="Style" Value="{StaticResource RoleAdminBadgeStyle}"/>
+                                                <Setter TargetName="roleText" Property="Text" Value="Quản trị viên"/>
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding Roles[0].RoleName}" Value="Staff">
+                                                <Setter TargetName="badge" Property="Style" Value="{StaticResource RoleOperatorBadgeStyle}"/>
+                                                <Setter TargetName="roleText" Property="Text" Value="Nhân viên"/>
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding Roles[0].RoleName}" Value="QC">
                                                 <Setter TargetName="badge" Property="Style" Value="{StaticResource RoleQCBadgeStyle}"/>
                                                 <Setter TargetName="roleText" Property="Text" Value="QC"/>
                                             </DataTrigger>
-                                            <DataTrigger Binding="{Binding UserId}" Value="89">
+                                            <DataTrigger Binding="{Binding Roles[0].RoleName}" Value="Kế toán">
                                                 <Setter TargetName="badge" Property="Style" Value="{StaticResource RoleAccountingBadgeStyle}"/>
                                                 <Setter TargetName="roleText" Property="Text" Value="Kế toán"/>
                                             </DataTrigger>
@@ -135,13 +179,56 @@
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
 
-                            <DataGridTemplateColumn Header="Thao tác" Width="140">
+                            <DataGridTemplateColumn Header="Thao tác" Width="180">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
                                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="10,0,0,0">
-                                            <Button Style="{StaticResource GhostButtonStyle}" Tag="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" Foreground="{StaticResource PrimaryBrush}" ToolTip="Sửa nhân viên" Margin="0,0,5,0"/>
-                                            <Button Style="{StaticResource GhostButtonStyle}" Tag="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zM9 6c0-1.66 1.34-3 3-3s3 1.34 3 3v2H9V6zm9 14H6V10h12v10zm-6-3c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2z" Foreground="#F59E0B" ToolTip="Khóa tài khoản" Margin="0,0,5,0"/>
-                                            <Button Style="{StaticResource GhostButtonStyle}" Tag="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z" Foreground="{StaticResource ErrorBrush}" ToolTip="Xóa nhân viên"/>
+                                            <!-- Edit Button -->
+                                            <Button Style="{StaticResource GhostButtonStyle}" 
+                                                    Tag="{StaticResource IconEdit}" 
+                                                    Foreground="{StaticResource PrimaryBrush}" 
+                                                    ToolTip="Sửa nhân viên" 
+                                                    Margin="0,0,5,0"
+                                                    Command="{Binding DataContext.EditUserCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                    CommandParameter="{Binding}"/>
+                                            
+                                            <!-- Reset Password Button -->
+                                            <Button Style="{StaticResource GhostButtonStyle}" 
+                                                    Tag="{StaticResource IconKey}" 
+                                                    Foreground="#EAB308" 
+                                                    ToolTip="Reset mật khẩu" 
+                                                    Margin="0,0,5,0"
+                                                    Command="{Binding DataContext.ResetPasswordCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                    CommandParameter="{Binding}"/>
+
+                                            <!-- Lock/Unlock Button -->
+                                            <Button x:Name="lockBtn" 
+                                                    Command="{Binding DataContext.ToggleUserStatusCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                    CommandParameter="{Binding}"
+                                                    Margin="0,0,5,0">
+                                                <Button.Style>
+                                                    <Style TargetType="Button" BasedOn="{StaticResource GhostButtonStyle}">
+                                                        <Setter Property="Tag" Value="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zM9 6c0-1.66 1.34-3 3-3s3 1.34 3 3v2H9V6zm9 14H6V10h12v10zm-6-3c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2z"/>
+                                                        <Setter Property="Foreground" Value="#F97316"/>
+                                                        <Setter Property="ToolTip" Value="Khóa tài khoản"/>
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding IsActive}" Value="False">
+                                                                 <Setter Property="Tag" Value="{StaticResource IconLockOpen}"/>
+                                                                <Setter Property="Foreground" Value="{StaticResource SuccessBrush}"/>
+                                                                <Setter Property="ToolTip" Value="Mở khóa tài khoản"/>
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </Button.Style>
+                                            </Button>
+                                            
+                                            <!-- Delete Button -->
+                                            <Button Style="{StaticResource GhostButtonStyle}" 
+                                                    Tag="{StaticResource IconDelete}" 
+                                                    Foreground="{StaticResource ErrorBrush}" 
+                                                    ToolTip="Xóa nhân viên"
+                                                    Command="{Binding DataContext.DeleteUserCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                    CommandParameter="{Binding}"/>
                                         </StackPanel>
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
@@ -149,6 +236,20 @@
                         </DataGrid.Columns>
                     </DataGrid>
                 </Border>
+                
+                <!-- Pagination Footer cho Users -->
+                <Grid Grid.Row="2" Margin="0,5,0,0">
+                    <TextBlock VerticalAlignment="Center" Foreground="{StaticResource SecondaryTextBrush}" FontSize="13">
+                        <Run Text="Trang "/>
+                        <Run Text="{Binding CurrentUserPage}"/>
+                        <Run Text=" / "/>
+                        <Run Text="{Binding TotalUserPages}"/>
+                    </TextBlock>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                        <Button Content="Trước" Style="{StaticResource SecondaryButtonStyle}" Padding="12,6" FontSize="12" Margin="0,0,5,0" Command="{Binding PreviousUserPageCommand}"/>
+                        <Button Content="Sau" Style="{StaticResource SecondaryButtonStyle}" Padding="12,6" FontSize="12" Command="{Binding NextUserPageCommand}"/>
+                    </StackPanel>
+                </Grid>
             </Grid>
 
             <!-- Roles & Permissions Tab Content -->
@@ -235,7 +336,7 @@
                             <DataGridTemplateColumn Header="Sửa" Width="100">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
-                                        <CheckBox IsChecked="{Binding CanEdit, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource ModernEditCheckBoxStyle}" HorizontalAlignment="Left"/>
+                                        <CheckBox IsChecked="{Binding CanEdit, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource ModernCheckBoxStyle}" HorizontalAlignment="Left"/>
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
@@ -248,22 +349,17 @@
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
 
-                            <DataGridTemplateColumn Header="Ghi đè" Width="100">
-                                <DataGridTemplateColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <CheckBox IsChecked="{Binding CanOverride, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource ModernCheckBoxStyle}" HorizontalAlignment="Left"/>
-                                    </DataTemplate>
-                                </DataGridTemplateColumn.CellTemplate>
-                            </DataGridTemplateColumn>
                         </DataGrid.Columns>
                     </DataGrid>
                 </Border>
 
-                <!-- Actions Footer -->
-                <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,15,0,0">
-                    <Button Content="Đặt lại" Style="{StaticResource SecondaryButtonStyle}" Margin="0,0,10,0"/>
-                    <Button Content="Lưu cấu hình" Style="{StaticResource PrimaryButtonStyle}" Padding="24,12" FontSize="13" FontWeight="Bold"/>
-                </StackPanel>
+                 <!-- Actions Footer -->
+                 <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,15,0,0">
+                     <Button Content="Đặt lại" Style="{StaticResource SecondaryButtonStyle}" Margin="0,0,10,0"
+                             Command="{Binding ResetPermissionsCommand}"/>
+                     <Button Content="Lưu cấu hình" Style="{StaticResource PrimaryButtonStyle}" Padding="24,12" FontSize="13" FontWeight="Bold"
+                             Command="{Binding SavePermissionsCommand}"/>
+                 </StackPanel>
 
                 <!-- Policy Warning Footer -->
                 <Border Grid.Row="4" Style="{StaticResource PermissionInfoBarStyle}" Margin="0,20,0,0">
@@ -274,6 +370,101 @@
                             <Run Text="Các thay đổi về phân quyền sẽ có hiệu lực ngay lập tức đối với tất cả người dùng thuộc vai trò này. Vui lòng kiểm tra kỹ trước khi lưu."/>
                         </TextBlock>
                     </StackPanel>
+                </Border>
+            </Grid>
+
+            <!-- Reset Requests Tab Content -->
+            <Grid x:Name="ResetsTabContent">
+                <Grid.Style>
+                    <Style TargetType="Grid">
+                        <Setter Property="Visibility" Value="Collapsed"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding ActiveTab}" Value="resets">
+                                <Setter Property="Visibility" Value="Visible"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Grid.Style>
+                
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <Grid Margin="0,0,0,25">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel>
+                        <TextBlock Text="Yêu cầu Reset mật khẩu" FontSize="19" FontWeight="SemiBold" Foreground="{StaticResource PrimaryTextBrush}"/>
+                        <TextBlock Text="Danh sách cấp lại mật khẩu từ nhân viên đang chờ phê duyệt" FontSize="13" Foreground="{StaticResource SecondaryTextBrush}" Margin="0,4,0,0"/>
+                    </StackPanel>
+                    
+                    <Button Grid.Column="1" Content="Làm mới" 
+                            Style="{StaticResource SecondaryButtonStyle}" 
+                            Command="{Binding LoadResetRequestsCommand}"
+                            Padding="16,8"
+                            VerticalAlignment="Center">
+                        <Button.Tag>
+                            <Path Data="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z" Width="14" Height="14" Stretch="Uniform" Fill="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}" Margin="0,0,6,0"/>
+                        </Button.Tag>
+                    </Button>
+                </Grid>
+
+                <Border Grid.Row="1" Style="{StaticResource CardStyle}" Padding="0">
+                    <DataGrid ItemsSource="{Binding ResetRequests}" Style="{StaticResource ModernDataGridStyle}" ScrollViewer.VerticalScrollBarVisibility="Disabled">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Thời gian yêu cầu" Binding="{Binding RequestDate, StringFormat=dd/MM/yyyy HH:mm}" Width="180"/>
+                            <DataGridTextColumn Header="Tên đăng nhập" Binding="{Binding Username}" Width="150" FontWeight="SemiBold"/>
+                            <DataGridTextColumn Header="Họ tên" Binding="{Binding User.Employee.FullName}" Width="250"/>
+                             
+                            <DataGridTemplateColumn Header="Trạng thái" Width="140">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Border Style="{StaticResource WarningBadgeStyle}" Padding="10,4" CornerRadius="12" HorizontalAlignment="Left">
+                                            <StackPanel Orientation="Horizontal">
+                                                <Path Data="{StaticResource IconClock}" Fill="#F59E0B" Width="10" Height="10" Stretch="Uniform" Margin="0,0,6,0"/>
+                                                <TextBlock Text="Chờ duyệt" FontSize="11" FontWeight="Medium"/>
+                                            </StackPanel>
+                                        </Border>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+ 
+                            <DataGridTemplateColumn Header="Thao tác" Width="*">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+                                            <Button Style="{StaticResource SecondaryButtonStyle}" 
+                                                    Foreground="{StaticResource SuccessBrush}" 
+                                                    ToolTip="Phê duyệt yêu cầu" 
+                                                    Margin="0,0,10,0"
+                                                    Padding="12,6"
+                                                    Command="{Binding DataContext.ApproveResetCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                    CommandParameter="{Binding}">
+                                                <StackPanel Orientation="Horizontal">
+                                                    <Path Data="{StaticResource IconCheckCircle}" Width="14" Height="14" Stretch="Uniform" Fill="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}" Margin="0,0,6,0"/>
+                                                    <TextBlock Text="Phê duyệt" FontSize="12" FontWeight="SemiBold"/>
+                                                </StackPanel>
+                                            </Button>
+                                            <Button Style="{StaticResource SecondaryButtonStyle}" 
+                                                    Foreground="{StaticResource ErrorBrush}" 
+                                                    ToolTip="Từ chối yêu cầu" 
+                                                    Padding="12,6"
+                                                    Command="{Binding DataContext.RejectResetCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                    CommandParameter="{Binding}">
+                                                <StackPanel Orientation="Horizontal">
+                                                    <Path Data="{StaticResource IconXCircle}" Width="14" Height="14" Stretch="Uniform" Fill="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}" Margin="0,0,6,0"/>
+                                                    <TextBlock Text="Từ chối" FontSize="12" FontWeight="SemiBold"/>
+                                                </StackPanel>
+                                            </Button>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
                 </Border>
             </Grid>
 
@@ -315,19 +506,14 @@
                                 </Grid.ColumnDefinitions>
                                 <Path Data="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" 
                                       Fill="#9CA3AF" Width="16" Height="16" Stretch="Uniform" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                                <TextBox Grid.Column="1" Text="Tìm kiếm theo người dùng hoặc bảng..." Background="Transparent" BorderThickness="0" VerticalContentAlignment="Center" Foreground="#9CA3AF" FontSize="13"/>
+                                <TextBox Grid.Column="1" Text="{Binding LogSearchTerm, UpdateSourceTrigger=PropertyChanged}" Background="Transparent" BorderThickness="0" VerticalContentAlignment="Center" Foreground="#9CA3AF" FontSize="13"/>
                             </Grid>
                         </Border>
 
                         <StackPanel Grid.Column="1" Orientation="Horizontal" Margin="15,0,0,0">
-                            <Button Content="Bộ lọc" Style="{StaticResource SecondaryButtonStyle}" Margin="0,0,10,0">
+                            <Button Content="Tìm kiếm" Style="{StaticResource PrimaryButtonStyle}" Margin="0,0,10,0" Command="{Binding SearchLogCommand}">
                                 <Button.Tag>
                                     <Path Data="{StaticResource IconFilter}" Width="14" Height="14" Stretch="Uniform" Fill="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}" Margin="0,0,8,0"/>
-                                </Button.Tag>
-                            </Button>
-                            <Button Content="Chọn ngày" Style="{StaticResource SecondaryButtonStyle}">
-                                <Button.Tag>
-                                    <Path Data="{StaticResource IconCalendar}" Width="14" Height="14" Stretch="Uniform" Fill="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}" Margin="0,0,8,0"/>
                                 </Button.Tag>
                             </Button>
                         </StackPanel>
@@ -388,13 +574,16 @@
 
                 <!-- Pagination Footer -->
                 <Grid Grid.Row="2" Margin="0,5,0,0">
-                    <TextBlock Text="Hiển thị 8 / 8 bản ghi" VerticalAlignment="Center" Foreground="{StaticResource SecondaryTextBrush}" FontSize="13"/>
+                    <TextBlock VerticalAlignment="Center" Foreground="{StaticResource SecondaryTextBrush}" FontSize="13">
+                        <Run Text="Trang "/>
+                        <Run Text="{Binding CurrentLogPage}"/>
+                        <Run Text=" / "/>
+                        <Run Text="{Binding TotalLogPages}"/>
+                    </TextBlock>
                     
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                        <Button Content="Trước" Style="{StaticResource SecondaryButtonStyle}" Padding="12,6" FontSize="12" Margin="0,0,5,0"/>
-                        <Button Content="1" Style="{StaticResource PrimaryButtonStyle}" Padding="12,6" FontSize="12" Margin="0,0,5,0"/>
-                        <Button Content="2" Style="{StaticResource SecondaryButtonStyle}" Padding="12,6" FontSize="12" Margin="0,0,5,0"/>
-                        <Button Content="Sau" Style="{StaticResource SecondaryButtonStyle}" Padding="12,6" FontSize="12"/>
+                        <Button Content="Trước" Style="{StaticResource SecondaryButtonStyle}" Padding="12,6" FontSize="12" Margin="0,0,5,0" Command="{Binding PreviousLogPageCommand}"/>
+                        <Button Content="Sau" Style="{StaticResource SecondaryButtonStyle}" Padding="12,6" FontSize="12" Command="{Binding NextLogPageCommand}"/>
                     </StackPanel>
                 </Grid>
             </Grid>
@@ -586,7 +775,8 @@
                         <Border Margin="0,30,0,0" Padding="0,20" BorderBrush="{StaticResource BorderBrush}" BorderThickness="0,1,0,0">
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                                 <Button Content="Đặt lại" Style="{StaticResource SecondaryButtonStyle}" Width="100" Margin="0,0,12,0"/>
-                                <Button Content="Lưu cấu hình" Style="{StaticResource PrimaryButtonStyle}" Width="150">
+                                <Button Content="Lưu cấu hình" Style="{StaticResource PrimaryButtonStyle}" Width="150"
+                                        Command="{Binding SaveSecuritySettingsCommand}">
                                     <Button.Background>
                                         <SolidColorBrush Color="#2563EB"/>
                                     </Button.Background>

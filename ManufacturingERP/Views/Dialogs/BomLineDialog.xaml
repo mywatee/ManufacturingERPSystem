@@ -1,0 +1,59 @@
+<Window x:Class="ManufacturingERP.Views.Dialogs.BomLineDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Thêm vật tư vào BOM"
+        Width="560" Height="460"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize"
+        Background="{StaticResource MainBackgroundBrush}">
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0" Margin="0,0,0,16">
+            <TextBlock Text="Thêm vật tư vào BOM" FontSize="20" FontWeight="Bold" Foreground="{StaticResource PrimaryTextBrush}"/>
+            <TextBlock Text="Khai báo thành phần và định mức sử dụng"
+                       FontSize="12" Foreground="{StaticResource SecondaryTextBrush}" Margin="0,6,0,0"/>
+        </StackPanel>
+
+        <Border Grid.Row="1" Style="{StaticResource CardStyle}" Padding="18">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="160"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <TextBlock Grid.Row="0" Grid.Column="0" Text="Mã thành phần" Foreground="{StaticResource SecondaryTextBrush}" VerticalAlignment="Center" Margin="0,0,10,10"/>
+                <TextBox Grid.Row="0" Grid.Column="1" x:Name="TxtCode" Style="{StaticResource LoginTextBoxStyle}" Height="40" Margin="0,0,0,10"/>
+
+                <TextBlock Grid.Row="1" Grid.Column="0" Text="Tên thành phần" Foreground="{StaticResource SecondaryTextBrush}" VerticalAlignment="Center" Margin="0,0,10,10"/>
+                <TextBox Grid.Row="1" Grid.Column="1" x:Name="TxtName" Style="{StaticResource LoginTextBoxStyle}" Height="40" Margin="0,0,0,10"/>
+
+                <TextBlock Grid.Row="2" Grid.Column="0" Text="Số lượng/ĐV" Foreground="{StaticResource SecondaryTextBrush}" VerticalAlignment="Center" Margin="0,0,10,10"/>
+                <TextBox Grid.Row="2" Grid.Column="1" x:Name="TxtQty" Style="{StaticResource LoginTextBoxStyle}" Height="40" Margin="0,0,0,10"/>
+
+                <TextBlock Grid.Row="3" Grid.Column="0" Text="ĐVT" Foreground="{StaticResource SecondaryTextBrush}" VerticalAlignment="Center" Margin="0,0,10,10"/>
+                <TextBox Grid.Row="3" Grid.Column="1" x:Name="TxtUnit" Style="{StaticResource LoginTextBoxStyle}" Height="40" Margin="0,0,0,10"/>
+
+                <TextBlock Grid.Row="4" Grid.Column="0" Text="Hao hụt (%)" Foreground="{StaticResource SecondaryTextBrush}" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                <TextBox Grid.Row="4" Grid.Column="1" x:Name="TxtScrap" Style="{StaticResource LoginTextBoxStyle}" Height="40"/>
+            </Grid>
+        </Border>
+
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,16,0,0">
+            <Button Content="Huỷ" Style="{StaticResource SecondaryButtonStyle}" Width="120" Margin="0,0,10,0" Click="Cancel_Click"/>
+            <Button Content="Thêm" Style="{StaticResource PrimaryButtonStyle}" Width="120" Click="Save_Click"/>
+        </StackPanel>
+    </Grid>
+</Window>
+

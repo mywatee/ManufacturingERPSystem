@@ -1,0 +1,140 @@
+<Window x:Class="ManufacturingERP.Views.Dialogs.MaterialDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Thiết lập vật tư"
+        Width="680" Height="580"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        Background="Transparent">
+    
+    <Border Background="{StaticResource MainBackgroundBrush}" CornerRadius="16" BorderBrush="#E2E8F0" BorderThickness="1">
+        <Border.Effect>
+            <DropShadowEffect BlurRadius="20" ShadowDepth="0" Opacity="0.1"/>
+        </Border.Effect>
+        
+        <Grid Margin="32">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <!-- Header -->
+            <StackPanel Grid.Row="0" Margin="0,0,0,24">
+                <Grid>
+                    <StackPanel Orientation="Horizontal">
+                        <Border Background="#EFF6FF" Width="40" Height="40" CornerRadius="8" Margin="0,0,16,0">
+                            <TextBlock Text="&#xE7B8;" FontFamily="Segoe MDL2 Assets" FontSize="20" Foreground="#2563EB" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <StackPanel VerticalAlignment="Center">
+                            <TextBlock Text="Thông tin vật tư" FontSize="22" FontWeight="Bold" Foreground="#1E293B"/>
+                            <TextBlock Text="Cập nhật hoặc thêm mới vật tư vào hệ thống" FontSize="13" Foreground="#64748B" Margin="0,2,0,0"/>
+                        </StackPanel>
+                    </StackPanel>
+                    <Button HorizontalAlignment="Right" VerticalAlignment="Top" Style="{StaticResource ActionButtonStyle}" Click="Cancel_Click" Margin="0,-10,-10,0">
+                        <TextBlock Text="&#xE711;" FontFamily="Segoe MDL2 Assets" FontSize="14" Foreground="#94A3B8"/>
+                    </Button>
+                </Grid>
+                <Border Height="1" Background="#F1F5F9" Margin="0,24,0,0"/>
+            </StackPanel>
+
+            <!-- Body -->
+            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- Section: Cơ bản -->
+                    <StackPanel Grid.Row="0" Grid.ColumnSpan="2" Margin="0,0,0,20">
+                        <TextBlock Text="THÔNG TIN CƠ BẢN" FontSize="11" FontWeight="Bold" Foreground="#94A3B8" Margin="0,0,0,12"/>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="1.2*"/>
+                                <ColumnDefinition Width="2*"/>
+                            </Grid.ColumnDefinitions>
+                            
+                            <StackPanel Grid.Column="0" Margin="0,0,12,0">
+                                <TextBlock Text="Mã vật tư *" FontSize="13" FontWeight="SemiBold" Foreground="#475569" Margin="0,0,0,8"/>
+                                <TextBox x:Name="TxtId" Style="{StaticResource LoginTextBoxStyle}" Height="42" Padding="12,0" FontWeight="Bold" Foreground="#2563EB"/>
+                            </StackPanel>
+
+                            <StackPanel Grid.Column="1">
+                                <TextBlock Text="Tên vật tư *" FontSize="13" FontWeight="SemiBold" Foreground="#475569" Margin="0,0,0,8"/>
+                                <TextBox x:Name="TxtName" Style="{StaticResource LoginTextBoxStyle}" Height="42" Padding="12,0"/>
+                            </StackPanel>
+                        </Grid>
+                    </StackPanel>
+
+                    <!-- Section: Đặc tính -->
+                    <StackPanel Grid.Row="1" Grid.Column="0" Margin="0,0,12,20">
+                        <TextBlock Text="ĐƠN VỊ TÍNH" FontSize="11" FontWeight="Bold" Foreground="#94A3B8" Margin="0,0,0,12"/>
+                        <TextBox x:Name="TxtUnit" Style="{StaticResource LoginTextBoxStyle}" Height="42" Padding="12,0"/>
+                    </StackPanel>
+
+                    <StackPanel Grid.Row="1" Grid.Column="1" Margin="0,0,0,20">
+                        <TextBlock Text="PHÂN LOẠI" FontSize="11" FontWeight="Bold" Foreground="#94A3B8" Margin="0,0,0,12"/>
+                        <ComboBox x:Name="CmbCategory" Height="42" Padding="12,0" Background="White" BorderBrush="#E2E8F0" BorderThickness="1"/>
+                    </StackPanel>
+
+                    <!-- Section: Trạng thái & Quản lý -->
+                    <StackPanel Grid.Row="2" Grid.ColumnSpan="2" Margin="0,0,0,20">
+                        <Border Height="1" Background="#F1F5F9" Margin="0,10,0,24"/>
+                        <TextBlock Text="QUẢN LÝ TỒN KHO &amp; TRẠNG THÁI" FontSize="11" FontWeight="Bold" Foreground="#94A3B8" Margin="0,0,0,12"/>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <StackPanel Grid.Column="0" Margin="0,0,12,0">
+                                <TextBlock Text="Trạng thái" FontSize="13" FontWeight="SemiBold" Foreground="#475569" Margin="0,0,0,8"/>
+                                <ComboBox x:Name="CmbStatus" Height="42" Padding="12,0" Background="White" BorderBrush="#E2E8F0" BorderThickness="1"/>
+                            </StackPanel>
+
+                            <StackPanel Grid.Column="1" Margin="0,0,12,0">
+                                <TextBlock Text="Tồn thực tế" FontSize="13" FontWeight="SemiBold" Foreground="#475569" Margin="0,0,0,8"/>
+                                <TextBox x:Name="TxtOnHand" Style="{StaticResource LoginTextBoxStyle}" Height="42" Padding="12,0" TextAlignment="Right"/>
+                            </StackPanel>
+
+                            <StackPanel Grid.Column="2" Margin="0,0,12,0">
+                                <TextBlock Text="Tồn tối thiểu" FontSize="13" FontWeight="SemiBold" Foreground="#475569" Margin="0,0,0,8"/>
+                                <TextBox x:Name="TxtMinStock" Style="{StaticResource LoginTextBoxStyle}" Height="42" Padding="12,0" TextAlignment="Right"/>
+                            </StackPanel>
+                            
+                            <StackPanel Grid.Column="3">
+                                <TextBlock Text="Đơn giá (đ)" FontSize="13" FontWeight="SemiBold" Foreground="#475569" Margin="0,0,0,8"/>
+                                <TextBox x:Name="TxtUnitPrice" Style="{StaticResource LoginTextBoxStyle}" Height="42" Padding="12,0" TextAlignment="Right"/>
+                            </StackPanel>
+                        </Grid>
+                    </StackPanel>
+
+                    <!-- Tips -->
+                    <Border Grid.Row="3" Grid.ColumnSpan="2" Background="#FFFBEB" BorderBrush="#FEF3C7" BorderThickness="1" CornerRadius="8" Padding="12">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="&#xE946;" FontFamily="Segoe MDL2 Assets" Foreground="#D97706" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                            <TextBlock Text="Lưu ý: Mã vật tư nên đặt theo quy chuẩn của doanh nghiệp để dễ dàng truy xuất." FontSize="12" Foreground="#92400E" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+            </ScrollViewer>
+
+            <!-- Footer -->
+            <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,24,0,0">
+                <Button Content="Hủy bỏ" Style="{StaticResource SecondaryButtonStyle}" Width="100" Height="42" Margin="0,0,12,0" Click="Cancel_Click"/>
+                <Button Content="Lưu thông tin" Style="{StaticResource PrimaryButtonStyle}" Width="160" Height="42" Click="Save_Click"/>
+            </StackPanel>
+        </Grid>
+    </Border>
+</Window>

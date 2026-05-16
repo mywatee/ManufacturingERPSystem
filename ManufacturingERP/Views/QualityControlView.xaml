@@ -1,0 +1,503 @@
+<UserControl x:Class="ManufacturingERP.Views.QualityControlView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:lvc="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf"
+             xmlns:viewmodels="clr-namespace:ManufacturingERP.ViewModels"
+             xmlns:core="clr-namespace:ManufacturingERP.Core"
+             mc:Ignorable="d" 
+             d:DesignHeight="900" d:DesignWidth="1200"
+             Background="#F8FAFC">
+    
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+        <core:StringHasValueToVisibilityConverter x:Key="StringHasValueToVisibilityConverter"/>
+        <core:NullToVisibilityConverter x:Key="NullToVisibilityConverter"/>
+
+        
+        <Style x:Key="StatCardBorder" TargetType="Border">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="CornerRadius" Value="12"/>
+            <Setter Property="Padding" Value="24"/>
+            <Setter Property="Effect">
+                <Setter.Value>
+                    <DropShadowEffect BlurRadius="15" ShadowDepth="2" Opacity="0.05" Color="Black"/>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="HeaderIconBorder" TargetType="Border">
+            <Setter Property="Width" Value="48"/>
+            <Setter Property="Height" Value="48"/>
+            <Setter Property="CornerRadius" Value="24"/>
+            <Setter Property="Margin" Value="0,0,0,16"/>
+        </Style>
+    </UserControl.Resources>
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <Grid Margin="32">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/> <!-- Title -->
+                <RowDefinition Height="Auto"/> <!-- Stats -->
+                <RowDefinition Height="Auto"/> <!-- Charts & Form -->
+                <RowDefinition Height="*"/>    <!-- History -->
+            </Grid.RowDefinitions>
+
+            <!-- Title & Global Filter Section -->
+            <Grid Grid.Row="0" Margin="0,0,0,32">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Column="0">
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                        <TextBlock Text="&#xE73E;" FontFamily="Segoe MDL2 Assets" FontSize="24" VerticalAlignment="Center" Margin="0,0,12,0" Foreground="#1E3A5F"/>
+                        <TextBlock Text="Kiểm soát chất lượng" FontSize="28" FontWeight="Bold" Foreground="#0F172A"/>
+                    </StackPanel>
+                    <TextBlock Text="Phân tích tỷ lệ lỗi, theo dõi xu hướng và đảm bảo tiêu chuẩn sản phẩm" FontSize="14" Foreground="#64748B"/>
+                </StackPanel>
+
+                <!-- Global Filter -->
+                <Border Grid.Column="1" Background="White" CornerRadius="12" Padding="16,12" VerticalAlignment="Center">
+                    <Border.Effect>
+                        <DropShadowEffect BlurRadius="15" ShadowDepth="2" Opacity="0.05" Color="Black"/>
+                    </Border.Effect>
+                    <StackPanel Orientation="Horizontal">
+                        <StackPanel Margin="0,0,16,0">
+                            <TextBlock Text="Thời gian" FontSize="11" Foreground="#64748B" Margin="0,0,0,4"/>
+                            <ComboBox ItemsSource="{Binding TrendPeriods}" SelectedItem="{Binding SelectedTrendPeriod}" Width="120" Height="32" VerticalContentAlignment="Center"/>
+                        </StackPanel>
+
+                        <!-- Custom Dates (Visible when 'Tùy chỉnh' is selected) -->
+                        <StackPanel Orientation="Horizontal" Visibility="{Binding IsCustomRangeVisible, Converter={StaticResource BoolToVis}}">
+                            <StackPanel Margin="0,0,12,0">
+                                <TextBlock Text="Từ ngày" FontSize="11" Foreground="#64748B" Margin="0,0,0,4"/>
+                                <DatePicker SelectedDate="{Binding StartDate}" Width="120" Height="32"/>
+                            </StackPanel>
+                            <StackPanel Margin="0,0,12,0">
+                                <TextBlock Text="Đến ngày" FontSize="11" Foreground="#64748B" Margin="0,0,0,4"/>
+                                <DatePicker SelectedDate="{Binding EndDate}" Width="120" Height="32"/>
+                            </StackPanel>
+                            <Button Command="{Binding ApplyCustomFilterCommand}" Content="Lọc" 
+                                    Background="#1E293B" Foreground="White" Padding="12,0" Height="32" 
+                                    VerticalAlignment="Bottom" FontWeight="SemiBold">
+                                <Button.Resources><Style TargetType="Border"><Setter Property="CornerRadius" Value="6"/></Style></Button.Resources>
+                            </Button>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+            </Grid>
+
+            <!-- Stats Grid -->
+            <Grid Grid.Row="1" Margin="0,0,0,32">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Total Samples -->
+                <Border Grid.Column="0" Style="{StaticResource StatCardBorder}" Margin="0,0,20,0">
+                    <StackPanel>
+                        <Border Style="{StaticResource HeaderIconBorder}" Background="#EFF6FF">
+                            <TextBlock Text="&#xE9D5;" FontFamily="Segoe MDL2 Assets" Foreground="#2563EB" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <TextBlock Text="Tổng mẫu kiểm tra" FontSize="14" Foreground="#64748B" Margin="0,0,0,4"/>
+                        <TextBlock Text="{Binding TotalSamples}" FontSize="32" FontWeight="Bold" Foreground="#0F172A"/>
+                        <TextBlock Text="Mẫu đã hoàn thành" FontSize="12" Foreground="#94A3B8" Margin="0,4,0,0"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- Passed Rate -->
+                <Border Grid.Column="1" Style="{StaticResource StatCardBorder}" Margin="0,0,20,0">
+                    <StackPanel>
+                        <Border Style="{StaticResource HeaderIconBorder}" Background="#F0FDF4">
+                            <TextBlock Text="&#xE73E;" FontFamily="Segoe MDL2 Assets" Foreground="#16A34A" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <TextBlock Text="Tỷ lệ đạt chuẩn" FontSize="14" Foreground="#64748B" Margin="0,0,0,4"/>
+                        <TextBlock Text="{Binding PassedRate}" FontSize="32" FontWeight="Bold" Foreground="#16A34A"/>
+                        <TextBlock Text="{Binding PassedSamples, StringFormat={}{0} mẫu đạt}" FontSize="12" Foreground="#94A3B8" Margin="0,4,0,0"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- Defect Rate -->
+                <Border Grid.Column="2" Style="{StaticResource StatCardBorder}" Margin="0,0,20,0">
+                    <StackPanel>
+                        <Border Style="{StaticResource HeaderIconBorder}" Background="#FEF2F2">
+                            <TextBlock Text="&#xE7BA;" FontFamily="Segoe MDL2 Assets" Foreground="#EF4444" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <TextBlock Text="Tỷ lệ lỗi hệ thống" FontSize="14" Foreground="#64748B" Margin="0,0,0,4"/>
+                        <TextBlock Text="{Binding DefectRate}" FontSize="32" FontWeight="Bold" Foreground="#EF4444"/>
+                        <TextBlock Text="{Binding FailedSamples, StringFormat={}{0} mẫu lỗi}" FontSize="12" Foreground="#94A3B8" Margin="0,4,0,0"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- Pending -->
+                <Border Grid.Column="3" Style="{StaticResource StatCardBorder}">
+                    <StackPanel>
+                        <Border Style="{StaticResource HeaderIconBorder}" Background="#FFFBEB">
+                            <TextBlock Text="&#xE823;" FontFamily="Segoe MDL2 Assets" Foreground="#D97706" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <TextBlock Text="Lô hàng chờ QC" FontSize="14" Foreground="#64748B" Margin="0,0,0,4"/>
+                        <TextBlock Text="{Binding PendingBatches}" FontSize="32" FontWeight="Bold" Foreground="#D97706"/>
+                        <TextBlock Text="Đang xếp hàng" FontSize="12" Foreground="#94A3B8" Margin="0,4,0,0"/>
+                    </StackPanel>
+                </Border>
+            </Grid>
+
+            <!-- Charts & Form Section -->
+            <Grid Grid.Row="2" Margin="0,0,0,32">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1.8*"/>
+                    <ColumnDefinition Width="1.2*"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Trend Chart -->
+                <Border Grid.Column="0" Style="{StaticResource StatCardBorder}" Margin="0,0,20,0">
+                    <StackPanel>
+                        <Grid Margin="0,0,0,20">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="Xu hướng tỷ lệ lỗi" FontSize="18" FontWeight="Bold" Foreground="#0F172A" VerticalAlignment="Center"/>
+                                <Border Background="#F1F5F9" CornerRadius="4" Padding="8,2" Margin="12,0,0,0" VerticalAlignment="Center">
+                                    <TextBlock Text="{Binding SelectedTrendPeriod}" FontSize="11" Foreground="#475569" FontWeight="SemiBold"/>
+                                </Border>
+                            </StackPanel>
+                        </Grid>
+
+                        <lvc:CartesianChart Height="300" Hoverable="True" DisableAnimations="False" LegendLocation="None" Margin="0,0,0,10">
+                            <lvc:CartesianChart.Series>
+                                <lvc:ColumnSeries Values="{Binding TotalSamplesTrendValues}" 
+                                                Title="Số lượng kiểm tra" 
+                                                Fill="#F1F5F9" 
+                                                Stroke="#E2E8F0"
+                                                StrokeThickness="1"
+                                                MaxColumnWidth="35"/>
+                                <lvc:LineSeries Values="{Binding DefectTrendValues}" 
+                                              Title="Tỷ lệ lỗi (%)" 
+                                              StrokeThickness="3" 
+                                              Stroke="#EF4444" 
+                                              PointGeometrySize="10"
+                                              PointForeground="#EF4444"
+                                              Fill="Transparent"
+                                              ScalesYAt="1"/>
+                            </lvc:CartesianChart.Series>
+                            <lvc:CartesianChart.AxisX>
+                                <lvc:Axis Labels="{Binding TrendLabels}" Foreground="#64748B" LabelsRotation="0">
+                                    <lvc:Axis.Separator>
+                                        <lvc:Separator Step="1" IsEnabled="False"/>
+                                    </lvc:Axis.Separator>
+                                </lvc:Axis>
+                            </lvc:CartesianChart.AxisX>
+                            <lvc:CartesianChart.AxisY>
+                                <lvc:Axis Title="Mẫu" Foreground="#64748B" MinValue="0"/>
+                                <lvc:Axis Title="%" Foreground="#EF4444" MinValue="0" MaxValue="100" Position="RightTop">
+                                    <lvc:Axis.Separator>
+                                        <lvc:Separator IsEnabled="False"/>
+                                    </lvc:Axis.Separator>
+                                </lvc:Axis>
+                            </lvc:CartesianChart.AxisY>
+                        </lvc:CartesianChart>
+
+                        <!-- Custom Legend with more spacing -->
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,20,0,0">
+                            <StackPanel Orientation="Horizontal" Margin="0,0,32,0">
+                                <Border Width="14" Height="14" Background="#F1F5F9" BorderBrush="#E2E8F0" BorderThickness="1" CornerRadius="2" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                                <TextBlock Text="Số lượng kiểm tra" FontSize="13" Foreground="#64748B"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal">
+                                <Ellipse Width="12" Height="12" Fill="#EF4444" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                                <TextBlock Text="Tỷ lệ lỗi (%)" FontSize="13" Foreground="#64748B"/>
+                            </StackPanel>
+                        </StackPanel>
+
+
+                    </StackPanel>
+                </Border>
+
+                <!-- Form Section -->
+                <Border Grid.Column="1" Style="{StaticResource StatCardBorder}">
+                    <StackPanel>
+                        <TextBlock Text="Báo cáo kiểm tra nhanh" FontSize="18" FontWeight="Bold" Foreground="#0F172A" Margin="0,0,0,20"/>
+                        
+                        <TextBlock Text="Tìm nhanh Lệnh / Sản phẩm" FontSize="13" Foreground="#64748B" Margin="0,0,0,8"/>
+                        <Grid Margin="0,0,0,10">
+                            <TextBox Text="{Binding OrderSearchText, UpdateSourceTrigger=PropertyChanged}" 
+                                     Height="40" VerticalContentAlignment="Center" Padding="35,0,10,0"
+                                     Background="#F8FAFC" BorderBrush="#E2E8F0" BorderThickness="1">
+                                <TextBox.Resources><Style TargetType="Border"><Setter Property="CornerRadius" Value="6"/></Style></TextBox.Resources>
+                            </TextBox>
+                            <TextBlock Text="🔍" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="12,0,0,0" Foreground="#94A3B8"/>
+                        </Grid>
+
+                        <TextBlock Text="Chọn Lệnh sản xuất" FontSize="13" Foreground="#64748B" Margin="0,0,0,8"/>
+                        <ComboBox ItemsSource="{Binding FilteredAvailableOrders}" 
+                                  SelectedValue="{Binding SelectedOrderId}" 
+                                  SelectedValuePath="Wocode" 
+                                  DisplayMemberPath="Wocode" 
+                                  Height="45" Margin="0,0,0,20">
+                            <ComboBox.Resources><Style TargetType="Border"><Setter Property="CornerRadius" Value="8"/></Style></ComboBox.Resources>
+                        </ComboBox>
+
+                        <StackPanel Visibility="{Binding SelectedOrderId, Converter={StaticResource StringHasValueToVisibilityConverter}}">
+                            <TextBlock Text="Chọn Sản phẩm" FontSize="13" Foreground="#64748B" Margin="0,0,0,8"/>
+                            <ComboBox ItemsSource="{Binding AvailableProducts}" 
+                                      SelectedValue="{Binding SelectedProductId}" 
+                                      SelectedValuePath="ItemId" 
+                                      Height="45" Margin="0,0,0,20">
+                                <ComboBox.Resources><Style TargetType="Border"><Setter Property="CornerRadius" Value="8"/></Style></ComboBox.Resources>
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock Text="{Binding Product.MaterialCode}" FontWeight="Bold" Margin="0,0,8,0"/>
+                                            <TextBlock Text="-" Margin="0,0,8,0"/>
+                                            <TextBlock Text="{Binding Product.MaterialName}"/>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
+                            </ComboBox>
+                        </StackPanel>
+
+                        <!-- Thông tin lô hàng (Tự động hiện khi chọn lệnh và sản phẩm) -->
+                        <Border Background="#F8FAFC" CornerRadius="10" Padding="15" Margin="0,0,0,20" 
+                                BorderBrush="#E2E8F0" BorderThickness="1"
+                                Visibility="{Binding SelectedProductId, Converter={StaticResource NullToVisibilityConverter}}">
+                            <StackPanel>
+                                <TextBlock Text="THÔNG TIN TỪ XƯỞNG" FontSize="11" FontWeight="Bold" Foreground="#64748B" Margin="0,0,0,12"/>
+                                <UniformGrid Columns="2">
+                                    <StackPanel Margin="0,0,0,10">
+                                        <TextBlock Text="Xưởng báo cáo" FontSize="11" Foreground="#94A3B8"/>
+                                        <TextBlock Text="{Binding SelectedOrderProducedQty}" FontSize="15" FontWeight="Bold" Foreground="#2563EB"/>
+                                    </StackPanel>
+                                    <StackPanel Margin="0,0,0,10">
+                                        <TextBlock Text="Lỗi tại xưởng" FontSize="11" Foreground="#94A3B8"/>
+                                        <TextBlock Text="{Binding SelectedOrderInternalDefects}" FontSize="15" FontWeight="Bold" Foreground="#F59E0B"/>
+                                    </StackPanel>
+                                    <StackPanel>
+                                        <TextBlock Text="Đã QC trước" FontSize="11" Foreground="#94A3B8"/>
+                                        <TextBlock Text="{Binding SelectedOrderInspectedQty}" FontSize="15" FontWeight="Bold" Foreground="#64748B"/>
+                                    </StackPanel>
+                                    <StackPanel>
+                                        <TextBlock Text="Còn lại chờ QC" FontSize="11" Foreground="#94A3B8"/>
+                                        <TextBlock Text="{Binding SelectedOrderRemainingQty}" FontSize="15" FontWeight="Bold" Foreground="#16A34A"/>
+                                    </StackPanel>
+                                </UniformGrid>
+                            </StackPanel>
+                        </Border>
+
+
+
+                        <Grid Margin="0,0,0,15">
+                            <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="15"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0">
+                                <TextBlock Text="Số lượng đạt" FontSize="13" Foreground="#64748B" Margin="0,0,0,8"/>
+                                <TextBox Text="{Binding PassedQtyInput}" Height="45" VerticalContentAlignment="Center" Padding="12,0" Background="#F8FAFC" BorderBrush="#E2E8F0" BorderThickness="1">
+                                    <TextBox.Resources><Style TargetType="Border"><Setter Property="CornerRadius" Value="6"/></Style></TextBox.Resources>
+                                </TextBox>
+                            </StackPanel>
+                            <StackPanel Grid.Column="2">
+                                <TextBlock Text="Số lượng lỗi" FontSize="13" Foreground="#64748B" Margin="0,0,0,8"/>
+                                <TextBox Text="{Binding FailedQtyInput}" Height="45" VerticalContentAlignment="Center" Padding="12,0" Background="#F8FAFC" BorderBrush="#E2E8F0" BorderThickness="1">
+                                    <TextBox.Resources><Style TargetType="Border"><Setter Property="CornerRadius" Value="6"/></Style></TextBox.Resources>
+                                </TextBox>
+                            </StackPanel>
+                        </Grid>
+
+                        <StackPanel Margin="0,0,0,20">
+                            <TextBlock Text="Lý do lỗi (nếu có)" FontSize="13" Foreground="#64748B" Margin="0,0,0,8"/>
+                            <TextBox Text="{Binding DefectReasonInput}" Height="45" VerticalContentAlignment="Center" Padding="12,0" Background="#F8FAFC" BorderBrush="#E2E8F0" BorderThickness="1">
+                                <TextBox.Resources><Style TargetType="Border"><Setter Property="CornerRadius" Value="6"/></Style></TextBox.Resources>
+                            </TextBox>
+                        </StackPanel>
+
+                        <Button Command="{Binding SaveQCResultCommand}" Height="50" Background="#1E293B" Foreground="White" FontWeight="Bold" Margin="0,10,0,0">
+                            <Button.Template>
+                                <ControlTemplate TargetType="Button">
+                                    <Border Background="{TemplateBinding Background}" CornerRadius="8">
+                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                            <TextBlock Text="&#xE74E;" FontFamily="Segoe MDL2 Assets" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                                            <TextBlock Text="Lưu kết quả QC" VerticalAlignment="Center"/>
+                                        </StackPanel>
+                                    </Border>
+                                </ControlTemplate>
+                            </Button.Template>
+                        </Button>
+                    </StackPanel>
+                </Border>
+            </Grid>
+
+            <!-- History Section -->
+            <Border Grid.Row="3" Style="{StaticResource StatCardBorder}">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    
+                    <Grid Grid.Row="0" Margin="0,0,0,20">
+                        <TextBlock Text="Danh sách lô hàng" FontSize="18" FontWeight="Bold" Foreground="#0F172A"/>
+                        <Border HorizontalAlignment="Right" Background="#F8FAFC" BorderBrush="#E2E8F0" BorderThickness="1" CornerRadius="8" Padding="12,6" Width="250">
+                            <Grid>
+                                <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="🔍" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                                <TextBox Grid.Column="1" Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" 
+                                         Background="Transparent" BorderThickness="0" VerticalAlignment="Center"/>
+                            </Grid>
+                        </Border>
+                    </Grid>
+
+                    <DataGrid Grid.Row="1" ItemsSource="{Binding QCRecords}" AutoGenerateColumns="False" IsReadOnly="True" 
+                              Background="Transparent" BorderThickness="0" HeadersVisibility="Column" GridLinesVisibility="Horizontal" HorizontalGridLinesBrush="#F1F5F9" RowHeight="64">
+                        <DataGrid.Resources>
+                            <Style TargetType="DataGridColumnHeader">
+                                <Setter Property="Background" Value="#F8FAFC"/>
+                                <Setter Property="Foreground" Value="#64748B"/>
+                                <Setter Property="FontWeight" Value="SemiBold"/>
+                                <Setter Property="Padding" Value="15,12"/>
+                                <Setter Property="BorderThickness" Value="0,0,0,1"/>
+                                <Setter Property="BorderBrush" Value="#E2E8F0"/>
+                                <Setter Property="HorizontalContentAlignment" Value="Left"/>
+                            </Style>
+                            <Style TargetType="DataGridRow">
+                                <Setter Property="Background" Value="Transparent"/>
+                                <Style.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True"><Setter Property="Background" Value="#F8FAFC"/></Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </DataGrid.Resources>
+                        <DataGrid.Columns>
+                            <!-- Mã lô -->
+                            <DataGridTextColumn Header="Mã lô" Binding="{Binding BatchId}" Width="*">
+                                <DataGridTextColumn.ElementStyle>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="FontWeight" Value="Bold"/>
+                                        <Setter Property="VerticalAlignment" Value="Center"/>
+                                        <Setter Property="Padding" Value="15,0"/>
+                                    </Style>
+                                </DataGridTextColumn.ElementStyle>
+                            </DataGridTextColumn>
+
+                            <!-- Sản phẩm -->
+                            <DataGridTextColumn Header="Sản phẩm" Binding="{Binding Product}" Width="1.5*">
+                                <DataGridTextColumn.ElementStyle>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="VerticalAlignment" Value="Center"/>
+                                        <Setter Property="Padding" Value="15,0"/>
+                                    </Style>
+                                </DataGridTextColumn.ElementStyle>
+                            </DataGridTextColumn>
+
+                            <!-- Ngày kiểm tra -->
+                            <DataGridTextColumn Header="Ngày kiểm tra" Binding="{Binding Date}" Width="*">
+                                <DataGridTextColumn.ElementStyle>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="VerticalAlignment" Value="Center"/>
+                                        <Setter Property="Padding" Value="15,0"/>
+                                    </Style>
+                                </DataGridTextColumn.ElementStyle>
+                            </DataGridTextColumn>
+
+                            <!-- Người kiểm tra -->
+                            <DataGridTextColumn Header="Người kiểm tra" Binding="{Binding Inspector}" Width="*">
+                                <DataGridTextColumn.ElementStyle>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="VerticalAlignment" Value="Center"/>
+                                        <Setter Property="Padding" Value="15,0"/>
+                                    </Style>
+                                </DataGridTextColumn.ElementStyle>
+                            </DataGridTextColumn>
+
+                            <!-- Số mẫu -->
+                            <DataGridTextColumn Header="Số mẫu" Binding="{Binding SamplesUsed}" Width="0.8*">
+                                <DataGridTextColumn.ElementStyle>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="VerticalAlignment" Value="Center"/>
+                                        <Setter Property="Padding" Value="15,0"/>
+                                    </Style>
+                                </DataGridTextColumn.ElementStyle>
+                            </DataGridTextColumn>
+
+                            <!-- Kết quả -->
+                            <DataGridTemplateColumn Header="Kết quả" Width="1.2*">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="15,0">
+                                            <!-- Đạt -->
+                                            <Border Background="#F0FDF4" CornerRadius="12" Padding="8,4" Margin="0,0,8,0" Visibility="{Binding Passed, Converter={StaticResource CountToVisibilityConverter}}">
+                                                <StackPanel Orientation="Horizontal">
+                                                    <Border Width="16" Height="16" CornerRadius="8" BorderBrush="#16A34A" BorderThickness="1" Margin="0,0,6,0">
+                                                        <TextBlock Text="&#xE73E;" FontFamily="Segoe MDL2 Assets" Foreground="#16A34A" FontSize="8" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,1,0,0"/>
+                                                    </Border>
+                                                    <TextBlock Text="{Binding Passed}" Foreground="#16A34A" FontSize="11" FontWeight="Bold" VerticalAlignment="Center"/>
+                                                </StackPanel>
+                                            </Border>
+                                            <!-- Lỗi -->
+                                            <Border Background="#FEF2F2" CornerRadius="12" Padding="8,4" Visibility="{Binding Failed, Converter={StaticResource CountToVisibilityConverter}}">
+                                                <StackPanel Orientation="Horizontal">
+                                                    <Border Width="16" Height="16" CornerRadius="8" BorderBrush="#EF4444" BorderThickness="1" Margin="0,0,6,0">
+                                                        <TextBlock Text="&#xE711;" FontFamily="Segoe MDL2 Assets" Foreground="#EF4444" FontSize="8" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                    </Border>
+                                                    <TextBlock Text="{Binding Failed}" Foreground="#EF4444" FontSize="11" FontWeight="Bold" VerticalAlignment="Center"/>
+                                                </StackPanel>
+                                            </Border>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+
+                            <!-- Tỷ lệ lỗi -->
+                            <DataGridTextColumn Header="Tỷ lệ lỗi" Binding="{Binding DefectRateDisplay}" Width="0.8*">
+                                <DataGridTextColumn.ElementStyle>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="VerticalAlignment" Value="Center"/>
+                                        <Setter Property="Padding" Value="15,0"/>
+                                        <Setter Property="FontWeight" Value="Bold"/>
+                                        <Setter Property="Foreground" Value="#EF4444"/>
+                                    </Style>
+                                </DataGridTextColumn.ElementStyle>
+                            </DataGridTextColumn>
+
+                            <!-- Trạng thái -->
+                            <DataGridTemplateColumn Header="Trạng thái" Width="*">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Border CornerRadius="12" Padding="12,4" HorizontalAlignment="Left" Margin="15,0">
+                                            <Border.Style>
+                                                <Style TargetType="Border">
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding Status}" Value="Đạt">
+                                                            <Setter Property="Background" Value="#F0FDF4"/><Setter Property="BorderBrush" Value="#DCFCE7"/><Setter Property="BorderThickness" Value="1"/>
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding Status}" Value="Không đạt">
+                                                            <Setter Property="Background" Value="#FEF2F2"/><Setter Property="BorderBrush" Value="#FEE2E2"/><Setter Property="BorderThickness" Value="1"/>
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding Status}" Value="Đang kiểm tra">
+                                                            <Setter Property="Background" Value="#FFFBEB"/><Setter Property="BorderBrush" Value="#FEF3C7"/><Setter Property="BorderThickness" Value="1"/>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Border.Style>
+                                            <TextBlock Text="{Binding Status}" FontWeight="SemiBold" FontSize="11">
+                                                <TextBlock.Style>
+                                                    <Style TargetType="TextBlock">
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding Status}" Value="Đạt"><Setter Property="Foreground" Value="#16A34A"/></DataTrigger>
+                                                            <DataTrigger Binding="{Binding Status}" Value="Không đạt"><Setter Property="Foreground" Value="#EF4444"/></DataTrigger>
+                                                            <DataTrigger Binding="{Binding Status}" Value="Đang kiểm tra"><Setter Property="Foreground" Value="#D97706"/></DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </TextBlock.Style>
+                                            </TextBlock>
+                                        </Border>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Grid>
+            </Border>
+        </Grid>
+    </ScrollViewer>
+</UserControl>

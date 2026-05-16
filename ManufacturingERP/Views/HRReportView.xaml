@@ -1,0 +1,129 @@
+<UserControl x:Class="ManufacturingERP.Views.HRReportView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" 
+             d:DesignHeight="800" d:DesignWidth="1100">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="350"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- Left Panel: Configuration Form -->
+        <ScrollViewer Grid.Column="0" VerticalScrollBarVisibility="Auto" Padding="0,0,30,0">
+            <StackPanel>
+                <!-- Report Type Selection -->
+                <Border Background="White" CornerRadius="16" Padding="25" Margin="0,0,0,25" Style="{StaticResource CardStyle}">
+                    <StackPanel>
+                        <TextBlock Text="LOẠI BÁO CÁO NHÂN SỰ" FontSize="12" FontWeight="Bold" Foreground="#64748B" Margin="0,0,0,15"/>
+                        <WrapPanel>
+                            <RadioButton Content="Báo cáo hồ sơ nhân viên" IsChecked="{Binding IsEmployeeReportSelected}" Margin="0,0,20,10" FontSize="14" FontWeight="Medium"/>
+                            <RadioButton Content="Báo cáo bảng lương tháng" IsChecked="{Binding IsPayrollReportSelected}" Margin="0,0,20,10" FontSize="14" FontWeight="Medium"/>
+                            <RadioButton Content="Báo cáo chấm công tổng hợp" IsChecked="{Binding IsAttendanceReportSelected}" Margin="0,0,20,10" FontSize="14" FontWeight="Medium"/>
+                            <RadioButton Content="Báo cáo lịch làm việc" IsChecked="{Binding IsScheduleReportSelected}" Margin="0,0,20,10" FontSize="14" FontWeight="Medium"/>
+                        </WrapPanel>
+                    </StackPanel>
+                </Border>
+
+                <!-- Export Configurations -->
+                <Border Background="White" CornerRadius="16" Padding="25" Margin="0,0,0,25" Style="{StaticResource CardStyle}">
+                    <StackPanel>
+                        <TextBlock Text="CẤU HÌNH XUẤT DỮ LIỆU" FontSize="12" FontWeight="Bold" Foreground="#64748B" Margin="0,0,0,20"/>
+                        
+                        <TextBlock Text="Khoảng thời gian báo cáo" FontWeight="SemiBold" Margin="0,0,0,10" Foreground="#1e293b"/>
+                        <Grid Margin="0,0,0,25">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition/>
+                                <ColumnDefinition Width="30"/>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
+                            <DatePicker Grid.Column="0" Height="40" SelectedDate="{Binding ReportStartDate}" Style="{StaticResource ModernDatePickerStyle}"/>
+                            <TextBlock Grid.Column="1" Text="đến" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="#94A3B8"/>
+                            <DatePicker Grid.Column="2" Height="40" SelectedDate="{Binding ReportEndDate}" Style="{StaticResource ModernDatePickerStyle}"/>
+                        </Grid>
+
+                        <TextBlock Text="Phòng ban áp dụng" FontWeight="SemiBold" Margin="0,0,0,10" Foreground="#1e293b"/>
+                        <ComboBox ItemsSource="{Binding DepartmentFilters}" SelectedItem="{Binding SelectedReportDepartment}"
+                                  Style="{StaticResource ModernComboBoxStyle}" Height="40" Margin="0,0,25,25"/>
+
+                        <TextBlock Text="Định dạng tệp tin" FontWeight="SemiBold" Margin="0,0,0,10" Foreground="#1e293b"/>
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,25">
+                            <RadioButton Content="Excel (.xlsx)" IsChecked="{Binding IsExcelReport}" Margin="0,0,30,0"/>
+                            <RadioButton Content="PDF (.pdf)" IsChecked="{Binding IsPdfReport}"/>
+                        </StackPanel>
+
+                        <TextBlock Text="Chọn các thông tin hiển thị" FontWeight="SemiBold" Margin="0,0,0,15" Foreground="#1e293b"/>
+                        <ItemsControl ItemsSource="{Binding ReportColumns}" Margin="0,0,0,20">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <WrapPanel/>
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <CheckBox Content="{Binding Name}" IsChecked="{Binding IsSelected}" Margin="0,0,25,12" FontSize="13" Foreground="#475569"/>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+
+                        <Button Command="{Binding ExportHRReportCommand}" Background="#2563EB" Foreground="White" Padding="0,12" Margin="0,5,0,0" Height="45">
+                            <Button.Resources>
+                                <Style TargetType="Border">
+                                    <Setter Property="CornerRadius" Value="8"/>
+                                </Style>
+                            </Button.Resources>
+                            <StackPanel Orientation="Horizontal">
+                                <Path Data="{StaticResource IconPrint}" Fill="White" Width="16" Height="16" Margin="0,0,10,0" Stretch="Uniform"/>
+                                <TextBlock Text="Tải xuống báo cáo nhân sự" FontWeight="SemiBold"/>
+                            </StackPanel>
+                        </Button>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+        </ScrollViewer>
+
+        <!-- Right Panel: Instructions -->
+        <StackPanel Grid.Column="1">
+            <Border Background="White" CornerRadius="16" Padding="25" Style="{StaticResource CardStyle}">
+                <StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,20">
+                        <Border Background="#DBEAFE" Width="30" Height="30" CornerRadius="15" Margin="0,0,12,0">
+                            <TextBlock Text="?" Foreground="#2563EB" FontWeight="Bold" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                        </Border>
+                        <TextBlock Text="HƯỚNG DẪN BÁO CÁO NHÂN SỰ" FontWeight="Bold" Foreground="#1E293B" VerticalAlignment="Center"/>
+                    </StackPanel>
+
+                    <Border Background="#F8FAFC" CornerRadius="12" Padding="15" Margin="0,0,0,15">
+                        <StackPanel>
+                            <TextBlock Text="Báo cáo hồ sơ" FontWeight="SemiBold" Foreground="#0F172A" Margin="0,0,0,5"/>
+                            <TextBlock Text="Trích xuất danh sách nhân viên kèm theo thông tin chi tiết về trình độ, hợp đồng và bộ phận." FontSize="12" Foreground="#64748B" TextWrapping="Wrap"/>
+                        </StackPanel>
+                    </Border>
+
+                    <Border Background="#F8FAFC" CornerRadius="12" Padding="15" Margin="0,0,0,15">
+                        <StackPanel>
+                            <TextBlock Text="Báo cáo tiền lương" FontWeight="SemiBold" Foreground="#0F172A" Margin="0,0,0,5"/>
+                            <TextBlock Text="Tổng hợp thu nhập từ sản lượng, các khoản phụ cấp và khấu trừ thuế/BHXH." FontSize="12" Foreground="#64748B" TextWrapping="Wrap"/>
+                        </StackPanel>
+                    </Border>
+
+                    <Border Background="#F8FAFC" CornerRadius="12" Padding="15" Margin="0,0,0,15">
+                        <StackPanel>
+                            <TextBlock Text="Báo cáo chấm công" FontWeight="SemiBold" Foreground="#0F172A" Margin="0,0,0,5"/>
+                            <TextBlock Text="Thống kê tỷ lệ đi làm, số giờ tăng ca và các vi phạm nội quy về giờ giấc." FontSize="12" Foreground="#64748B" TextWrapping="Wrap"/>
+                        </StackPanel>
+                    </Border>
+
+                    <Border Background="#F8FAFC" CornerRadius="12" Padding="15" Margin="0,0,0,15">
+                        <StackPanel>
+                            <TextBlock Text="Báo cáo lịch làm việc" FontWeight="SemiBold" Foreground="#0F172A" Margin="0,0,0,5"/>
+                            <TextBlock Text="Chi tiết phân ca, lịch trực của từng nhân viên hoặc toàn bộ phòng ban trong khoảng thời gian chọn." FontSize="12" Foreground="#64748B" TextWrapping="Wrap"/>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </Border>
+        </StackPanel>
+    </Grid>
+</UserControl>

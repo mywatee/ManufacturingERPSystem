@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace ManufacturingERP.Models;
@@ -13,7 +13,11 @@ public partial class Routing
 
     public string? StepName { get; set; }
 
+    public string? WorkCenter { get; set; }
+
     public int? EstimatedTime { get; set; }
+
+    public string? OutputDescription { get; set; }
 
     public virtual Material? Product { get; set; }
 }

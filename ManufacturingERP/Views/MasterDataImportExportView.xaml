@@ -1,0 +1,166 @@
+<UserControl x:Class="ManufacturingERP.Views.MasterDataImportExportView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" 
+             d:DesignHeight="800" d:DesignWidth="1200"
+             Background="#F8FAFC">
+    
+    <Grid Margin="30">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header Section -->
+        <Grid Grid.Row="0" Margin="0,0,0,30">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <Button Grid.Column="0" Command="{Binding BackCommand}" Background="Transparent" BorderThickness="0" Cursor="Hand" VerticalAlignment="Center">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="&#xE112;" FontFamily="Segoe MDL2 Assets" VerticalAlignment="Center" Foreground="#64748B" Margin="0,0,8,0"/>
+                    <TextBlock Text="Quay lại" Foreground="#64748B" VerticalAlignment="Center"/>
+                </StackPanel>
+            </Button>
+
+            <StackPanel Grid.Column="1" HorizontalAlignment="Center">
+                <TextBlock Text="{Binding PageTitle}" FontSize="28" FontWeight="Bold" Foreground="#0F172A" HorizontalAlignment="Center"/>
+                
+                <!-- Mode Switcher -->
+                <Border Background="#F1F5F9" CornerRadius="20" Padding="4" Margin="0,15,0,0" HorizontalAlignment="Center">
+                    <StackPanel Orientation="Horizontal">
+                        <RadioButton Style="{StaticResource ToggleTabStyle}" Content="Nhập dữ liệu" IsChecked="{Binding IsImportMode}"/>
+                        <RadioButton Style="{StaticResource ToggleTabStyle}" Content="Xuất báo cáo" IsChecked="{Binding IsExportMode}"/>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+
+            <Button Grid.Column="2" Command="{Binding ProcessCommand}" Background="#2563EB" Foreground="White" Padding="25,12" FontSize="14" FontWeight="SemiBold">
+                <Button.Resources><Style TargetType="Border"><Setter Property="CornerRadius" Value="10"/></Style></Button.Resources>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="&#xE8B5;" FontFamily="Segoe MDL2 Assets" Margin="0,0,10,0" VerticalAlignment="Center"/>
+                    <TextBlock Text="{Binding ActionButtonText}" VerticalAlignment="Center"/>
+                </StackPanel>
+            </Button>
+        </Grid>
+
+        <!-- Main Body -->
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="350"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Config Panel (Left) -->
+            <ScrollViewer Grid.Column="0" Padding="0,0,30,0" VerticalScrollBarVisibility="Auto">
+                <StackPanel>
+                    <!-- Data Type Selection -->
+                    <Border Background="White" CornerRadius="16" Padding="25" Margin="0,0,0,25">
+                        <Border.Effect><DropShadowEffect BlurRadius="15" Opacity="0.05" ShadowDepth="0"/></Border.Effect>
+                        <StackPanel>
+                            <TextBlock Text="CHỌN LOẠI DỮ LIỆU" FontSize="12" FontWeight="Bold" Foreground="#64748B" Margin="0,0,0,20"/>
+                            <ComboBox ItemsSource="{Binding DataTypes}" SelectedItem="{Binding SelectedDataType}" Style="{StaticResource ModernComboBoxStyle}"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Import Section -->
+                    <Border Background="White" CornerRadius="16" Padding="25" Margin="0,0,0,25" Visibility="{Binding IsImportMode, Converter={StaticResource BooleanToVisibilityConverter}}">
+                        <Border.Effect><DropShadowEffect BlurRadius="15" Opacity="0.05" ShadowDepth="0"/></Border.Effect>
+                        <StackPanel>
+                            <TextBlock Text="CÀI ĐẶT NHẬP DỮ LIỆU" FontSize="12" FontWeight="Bold" Foreground="#64748B" Margin="0,0,0,20"/>
+                            <Grid Margin="0,0,0,25">
+                                <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                                <TextBox Text="{Binding SelectedFilePath}" IsReadOnly="True" Height="45" VerticalContentAlignment="Center" Padding="15,0" Background="#F1F5F9" BorderThickness="0">
+                                    <TextBox.Resources><Style TargetType="Border"><Setter Property="CornerRadius" Value="10"/></Style></TextBox.Resources>
+                                </TextBox>
+                                <Button Grid.Column="1" Command="{Binding SelectFileCommand}" Content="Chọn file..." Margin="12,0,0,0" Padding="20,0" Background="White" BorderBrush="#E2E8F0" Foreground="#1E293B" FontWeight="Medium">
+                                    <Button.Resources><Style TargetType="Border"><Setter Property="CornerRadius" Value="10"/></Style></Button.Resources>
+                                </Button>
+                            </Grid>
+                            <CheckBox IsChecked="{Binding IsUpdateMode}" Content="Chế độ cập nhật (Ghi đè nếu trùng mã vật tư)" FontWeight="SemiBold" Foreground="#1E293B"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Export Section -->
+                    <Border Background="White" CornerRadius="16" Padding="25" Margin="0,0,0,25" Visibility="{Binding IsExportMode, Converter={StaticResource BooleanToVisibilityConverter}}">
+                        <Border.Effect><DropShadowEffect BlurRadius="15" Opacity="0.05" ShadowDepth="0"/></Border.Effect>
+                        <StackPanel>
+                            <TextBlock Text="CẤU HÌNH XUẤT DỮ LIỆU" FontSize="12" FontWeight="Bold" Foreground="#64748B" Margin="0,0,0,20"/>
+                            
+                            <!-- Date Range -->
+                            <TextBlock Text="Khoảng thời gian (Ngày tạo)" FontWeight="SemiBold" Foreground="#1E293B" Margin="0,0,0,8"/>
+                            <Grid Margin="0,0,0,20">
+                                <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                                <DatePicker SelectedDate="{Binding StartDate}" Height="45" VerticalContentAlignment="Center"/>
+                                <TextBlock Text="đến" Grid.Column="1" Margin="15,0" VerticalAlignment="Center" Foreground="#64748B"/>
+                                <DatePicker Grid.Column="2" SelectedDate="{Binding EndDate}" Height="45" VerticalContentAlignment="Center"/>
+                            </Grid>
+
+                            <!-- Status Filter -->
+                            <TextBlock Text="Trạng thái vật tư" FontWeight="SemiBold" Foreground="#1E293B" Margin="0,0,0,8"/>
+                            <ComboBox ItemsSource="{Binding Statuses}" SelectedItem="{Binding SelectedStatus}" Style="{StaticResource ModernComboBoxStyle}" Margin="0,0,0,20"/>
+
+                            <!-- Format Selection -->
+                            <TextBlock Text="Định dạng tệp tin" FontWeight="SemiBold" Foreground="#1E293B" Margin="0,0,0,8"/>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,20">
+                                <RadioButton Content="Excel (.xlsx)" IsChecked="{Binding IsExcelFormat}" Margin="0,0,20,0"/>
+                                <RadioButton Content="PDF (.pdf)" IsChecked="{Binding IsPdfFormat}"/>
+                            </StackPanel>
+
+                            <TextBlock Text="Chọn các cột hiển thị" FontWeight="SemiBold" Foreground="#1E293B" Margin="0,0,0,12"/>
+                            <ItemsControl ItemsSource="{Binding ExportColumns}">
+                                <ItemsControl.ItemsPanel><ItemsPanelTemplate><WrapPanel/></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <CheckBox IsChecked="{Binding IsSelected}" Content="{Binding Name}" Margin="0,0,25,10" FontSize="13"/>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Template Box (Only for Import) -->
+                    <Border Background="White" CornerRadius="16" Padding="25" Visibility="{Binding IsImportMode, Converter={StaticResource BooleanToVisibilityConverter}}">
+                        <Border.Effect><DropShadowEffect BlurRadius="15" Opacity="0.05" ShadowDepth="0"/></Border.Effect>
+                        <Grid>
+                            <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                            <Border Background="#ECFDF5" Width="50" Height="50" CornerRadius="12">
+                                <TextBlock Text="&#xE118;" FontFamily="Segoe MDL2 Assets" Foreground="#10B981" FontSize="20" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                            </Border>
+                            <StackPanel Grid.Column="1" Margin="20,0">
+                                <TextBlock Text="Tải file mẫu nhập liệu" FontWeight="Bold" FontSize="16" Foreground="#1E293B"/>
+                                <TextBlock Text="Sử dụng file mẫu để đảm bảo dữ liệu chuẩn xác." Foreground="#64748B" Margin="0,4,0,0"/>
+                            </StackPanel>
+                            <Button Grid.Column="2" Content="Tải mẫu" Command="{Binding DownloadTemplateCommand}" Background="Transparent" Foreground="#2563EB" FontWeight="Bold" BorderThickness="0" Cursor="Hand"/>
+                        </Grid>
+                    </Border>
+                </StackPanel>
+            </ScrollViewer>
+
+            <!-- Instructions Panel (Right) -->
+            <Border Grid.Column="1" Background="White" CornerRadius="16" Padding="25" VerticalAlignment="Top">
+                <Border.Effect><DropShadowEffect BlurRadius="15" Opacity="0.05" ShadowDepth="0"/></Border.Effect>
+                <StackPanel>
+                    <TextBlock Text="HƯỚNG DẪN &amp; LƯU Ý" FontSize="12" FontWeight="Bold" Foreground="#64748B" Margin="0,0,0,20"/>
+                    <ItemsControl ItemsSource="{Binding Instructions}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border Background="#F8FAFC" CornerRadius="10" Padding="15" Margin="0,0,0,12">
+                                    <StackPanel>
+                                        <TextBlock Text="{Binding Title}" FontWeight="Bold" Foreground="#0F172A" Margin="0,0,0,4"/>
+                                        <TextBlock Text="{Binding Content}" FontSize="12" Foreground="#64748B" TextWrapping="Wrap"/>
+                                    </StackPanel>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+            </Border>
+        </Grid>
+    </Grid>
+</UserControl>

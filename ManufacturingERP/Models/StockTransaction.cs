@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace ManufacturingERP.Models;
@@ -16,10 +16,18 @@ public partial class StockTransaction
     public string? ReferenceCode { get; set; }
 
     public int? TransBy { get; set; }
+    public int? WarehouseId { get; set; }
 
     public DateTime? TransDate { get; set; }
+    public string? Notes { get; set; }
+    public int? PartnerId { get; set; }
+
 
     public virtual Material? Material { get; set; }
 
     public virtual User? TransByNavigation { get; set; }
+
+    public virtual Warehouse? Warehouse { get; set; }
+    public virtual Partner? Partner { get; set; }
+
 }

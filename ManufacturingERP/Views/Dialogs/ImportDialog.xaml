@@ -1,0 +1,94 @@
+<Window x:Class="ManufacturingERP.Views.Dialogs.ImportDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Title="Nhập dữ liệu Excel" Height="480" Width="500"
+        WindowStartupLocation="CenterScreen" WindowStyle="None" AllowsTransparency="True" Background="Transparent">
+
+    <Border Background="White" CornerRadius="20" BorderBrush="#E2E8F0" BorderThickness="1">
+        <Border.Effect>
+            <DropShadowEffect BlurRadius="30" Color="#000000" Opacity="0.1" ShadowDepth="0"/>
+        </Border.Effect>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <!-- Header -->
+            <Border Grid.Row="0" CornerRadius="20,20,0,0" Padding="25,20">
+                <Border.Background>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                        <GradientStop Color="#F0FDF4" Offset="0"/>
+                        <GradientStop Color="#DCFCE7" Offset="1"/>
+                    </LinearGradientBrush>
+                </Border.Background>
+                <Grid>
+                    <StackPanel Orientation="Horizontal">
+                        <Border Background="#16A34A" Width="40" Height="40" CornerRadius="10" Margin="0,0,15,0">
+                            <TextBlock Text="&#xE118;" FontFamily="Segoe MDL2 Assets" Foreground="White" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="20"/>
+                        </Border>
+                        <StackPanel VerticalAlignment="Center">
+                            <TextBlock Text="Nhập dữ liệu từ Excel" FontSize="18" FontWeight="Bold" Foreground="#064E3B"/>
+                            <TextBlock Text="Tự động hóa nạp dữ liệu lệnh sản xuất" FontSize="12" Foreground="#166534"/>
+                        </StackPanel>
+                    </StackPanel>
+                    <Button HorizontalAlignment="Right" VerticalAlignment="Top" Click="Close_Click" Background="Transparent" BorderThickness="0" Cursor="Hand">
+                        <TextBlock Text="&#xE106;" FontFamily="Segoe MDL2 Assets" Foreground="#166534" Opacity="0.5" FontSize="16"/>
+                    </Button>
+                </Grid>
+            </Border>
+
+            <!-- Body -->
+            <StackPanel Grid.Row="1" Margin="25,25">
+                <!-- Drop Zone Visual -->
+                <TextBlock Text="TỆP TIN NGUỒN" FontSize="12" FontWeight="Bold" Foreground="#64748B" Margin="0,0,0,10"/>
+                <Grid>
+                    <Rectangle Stroke="#22C55E" StrokeThickness="2" StrokeDashArray="4 2" RadiusX="16" RadiusY="16" Fill="#F0FDF4"/>
+                    <StackPanel Margin="20">
+                        <TextBlock Text="&#xE8E5;" FontFamily="Segoe MDL2 Assets" Foreground="#16A34A" FontSize="32" HorizontalAlignment="Center" Margin="0,0,0,10"/>
+                        <TextBlock Text="{Binding SelectedFilePath, FallbackValue='Nhấn nút bên dưới để chọn file Excel'}" 
+                                   HorizontalAlignment="Center" TextAlignment="Center" MaxWidth="350"
+                                   FontSize="13" Foreground="#15803D" FontWeight="Medium" Margin="0,0,0,15" TextTrimming="CharacterEllipsis"/>
+                        <Button Content="Chọn tệp tin..." Command="{Binding SelectFileCommand}" 
+                                Background="#16A34A" Foreground="White" Width="150" Height="38">
+                            <Button.Resources><Style TargetType="Border"><Setter Property="CornerRadius" Value="8"/></Style></Button.Resources>
+                        </Button>
+                    </StackPanel>
+                </Grid>
+
+                <!-- Configuration -->
+                <TextBlock Text="TÙY CHỌN XỬ LÝ" FontSize="12" FontWeight="Bold" Foreground="#64748B" Margin="0,25,0,10"/>
+                <Border Background="#F8FAFC" CornerRadius="12" Padding="15">
+                    <StackPanel>
+                        <RadioButton Content="Thêm mới dữ liệu (Giữ nguyên các bản ghi cũ)" IsChecked="True" Margin="0,0,0,12" Foreground="#334155"/>
+                        <RadioButton Content="Ghi đè/Cập nhật (Dựa trên Mã lệnh sản xuất)" Foreground="#334155"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- Instructions/Tip -->
+                <Border Background="#FFF7ED" BorderBrush="#FFEDD5" BorderThickness="1" CornerRadius="12" Padding="15" Margin="0,20,0,0">
+                    <Grid>
+                        <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition/></Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="&#xE946;" FontFamily="Segoe MDL2 Assets" Foreground="#D97706" FontSize="16" Margin="0,0,12,0"/>
+                        <TextBlock Grid.Column="1" FontSize="12" Foreground="#92400E" TextWrapping="Wrap"
+                                   Text="Vui lòng tải file mẫu từ hệ thống để đảm bảo cấu trúc dữ liệu chính xác trước khi thực hiện nhập."/>
+                    </Grid>
+                </Border>
+            </StackPanel>
+
+            <!-- Footer -->
+            <Border Grid.Row="2" Background="#F8FAFC" CornerRadius="0,0,20,20" Padding="25,20">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                    <Button Content="Hủy bỏ" Click="Close_Click" Style="{StaticResource SecondaryButtonStyle}" Margin="0,0,15,0" Width="110" Height="42"/>
+                    <Button Content="Bắt đầu nhập dữ liệu" Command="{Binding ProcessCommand}" Background="#16A34A" Foreground="White" Width="180" Height="42">
+                        <Button.Resources><Style TargetType="Border"><Setter Property="CornerRadius" Value="10"/></Style></Button.Resources>
+                    </Button>
+                </StackPanel>
+            </Border>
+        </Grid>
+    </Border>
+</Window>

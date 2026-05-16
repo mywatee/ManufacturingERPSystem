@@ -1,0 +1,214 @@
+<Window x:Class="ManufacturingERP.Views.Dialogs.RoutingStepDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Thiết lập quy trình sản xuất"
+        Width="850" Height="650"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        Background="Transparent">
+    
+    <Border Background="{StaticResource MainBackgroundBrush}" CornerRadius="16" BorderBrush="#E2E8F0" BorderThickness="1">
+        <Border.Effect>
+            <DropShadowEffect BlurRadius="20" ShadowDepth="0" Opacity="0.1"/>
+        </Border.Effect>
+
+        <Grid Margin="24">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <!-- Header -->
+            <StackPanel Grid.Row="0" Margin="0,0,0,16">
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                    <TextBlock Text="&#xEDAC;" FontFamily="Segoe MDL2 Assets" FontSize="24" VerticalAlignment="Center" Margin="0,0,12,0" Foreground="#2563EB"/>
+                    <TextBlock Text="Thiết lập quy trình sản xuất (Hàng loạt)" FontSize="20" FontWeight="Bold" Foreground="#1E293B"/>
+                </StackPanel>
+                <TextBlock Text="Khai báo các bước thực hiện để hệ thống tính toán thời gian và chi phí sản xuất." FontSize="12" Foreground="#64748B"/>
+                
+                <!-- Extra guidance -->
+                <Grid Margin="0,12,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0" Orientation="Horizontal">
+                        <Border Width="8" Height="8" CornerRadius="4" Background="#2563EB" Margin="0,0,8,0"/>
+                        <TextBlock Text="STT: Thứ tự thực hiện" FontSize="11" Foreground="#64748B"/>
+                    </StackPanel>
+                    <StackPanel Grid.Column="1" Orientation="Horizontal">
+                        <Border Width="8" Height="8" CornerRadius="4" Background="#10B981" Margin="0,0,8,0"/>
+                        <TextBlock Text="TG chuẩn: Phút cho 1 SP" FontSize="11" Foreground="#64748B"/>
+                    </StackPanel>
+                    <StackPanel Grid.Column="2" Orientation="Horizontal">
+                        <Border Width="8" Height="8" CornerRadius="4" Background="#F59E0B" Margin="0,0,8,0"/>
+                        <TextBlock Text="Đầu ra: Kết quả sau bước" FontSize="11" Foreground="#64748B"/>
+                    </StackPanel>
+                </Grid>
+                
+                <Border Height="1" Background="#F1F5F9" Margin="0,12,0,0"/>
+            </StackPanel>
+
+            <!-- Routing Steps Grid -->
+            <DataGrid Grid.Row="1" x:Name="GridSteps" AutoGenerateColumns="False" 
+                      CanUserAddRows="True" SelectionMode="Single"
+                      Background="White" BorderThickness="1" BorderBrush="#E2E8F0"
+                      RowHeight="48" GridLinesVisibility="Horizontal" HorizontalGridLinesBrush="#F1F5F9"
+                      ScrollViewer.VerticalScrollBarVisibility="Auto"
+                      AddingNewItem="GridSteps_AddingNewItem">
+                <DataGrid.Resources>
+                    <Style TargetType="DataGridColumnHeader">
+                        <Setter Property="Background" Value="#F8FAFC"/>
+                        <Setter Property="Foreground" Value="#64748B"/>
+                        <Setter Property="Padding" Value="12,10"/>
+                        <Setter Property="FontWeight" Value="SemiBold"/>
+                        <Setter Property="FontSize" Value="12"/>
+                        <Setter Property="BorderThickness" Value="0,0,0,1"/>
+                        <Setter Property="BorderBrush" Value="#E2E8F0"/>
+                    </Style>
+
+                    <!-- Custom Row Selection Color -->
+                    <Style TargetType="DataGridRow">
+                        <Setter Property="Background" Value="Transparent"/>
+                        <Setter Property="BorderThickness" Value="0"/>
+                        <Style.Resources>
+                            <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="#EFF6FF"/>
+                            <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="#F8FAFC"/>
+                            <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="#1E40AF"/>
+                        </Style.Resources>
+                        <Style.Triggers>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter Property="BorderBrush" Value="#2563EB"/>
+                                <Setter Property="BorderThickness" Value="3,0,0,0"/>
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </DataGrid.Resources>
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="STT" Binding="{Binding StepNo}" Width="60">
+                        <DataGridTextColumn.HeaderStyle>
+                            <Style TargetType="DataGridColumnHeader">
+                                <Setter Property="ToolTip" Value="Số thứ tự công đoạn (Nên cách nhau 10 đơn vị)"/>
+                            </Style>
+                        </DataGridTextColumn.HeaderStyle>
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="HorizontalAlignment" Value="Center"/>
+                                <Setter Property="VerticalAlignment" Value="Center"/>
+                                <Setter Property="FontWeight" Value="Bold"/>
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+                    
+                    <DataGridTextColumn Header="Tên bước sản xuất *" Binding="{Binding StepName}" Width="*">
+                        <DataGridTextColumn.HeaderStyle>
+                            <Style TargetType="DataGridColumnHeader">
+                                <Setter Property="ToolTip" Value="Mô tả ngắn gọn nội dung công việc (VD: Lắp ráp, Kiểm tra...)"/>
+                            </Style>
+                        </DataGridTextColumn.HeaderStyle>
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Padding" Value="12,0"/>
+                                <Setter Property="VerticalAlignment" Value="Center"/>
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+
+                    <DataGridTextColumn Header="Tổ / Thiết bị" Binding="{Binding WorkCenter}" Width="150">
+                        <DataGridTextColumn.HeaderStyle>
+                            <Style TargetType="DataGridColumnHeader">
+                                <Setter Property="ToolTip" Value="Nơi thực hiện công đoạn hoặc máy móc sử dụng"/>
+                            </Style>
+                        </DataGridTextColumn.HeaderStyle>
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Padding" Value="12,0"/>
+                                <Setter Property="VerticalAlignment" Value="Center"/>
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+
+                    <DataGridTextColumn Header="TG chuẩn (phút)" Binding="{Binding StdTimeMinutes}" Width="120">
+                        <DataGridTextColumn.HeaderStyle>
+                            <Style TargetType="DataGridColumnHeader">
+                                <Setter Property="ToolTip" Value="Thời gian định mức để hoàn thành 1 sản phẩm tại bước này"/>
+                            </Style>
+                        </DataGridTextColumn.HeaderStyle>
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="HorizontalAlignment" Value="Right"/>
+                                <Setter Property="VerticalAlignment" Value="Center"/>
+                                <Setter Property="Padding" Value="0,0,12,0"/>
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+
+                    <DataGridTextColumn Header="Mô tả đầu ra" Binding="{Binding Output}" Width="180">
+                        <DataGridTextColumn.HeaderStyle>
+                            <Style TargetType="DataGridColumnHeader">
+                                <Setter Property="ToolTip" Value="Kết quả mong đợi sau khi kết thúc công đoạn này"/>
+                            </Style>
+                        </DataGridTextColumn.HeaderStyle>
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Padding" Value="12,0"/>
+                                <Setter Property="VerticalAlignment" Value="Center"/>
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+
+                    <DataGridTemplateColumn Width="50">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Button Style="{StaticResource ActionButtonStyle}" Click="DeleteRow_Click">
+                                    <TextBlock Text="&#xE74D;" FontFamily="Segoe MDL2 Assets" Foreground="#EF4444" FontSize="12"/>
+                                </Button>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                </DataGrid.Columns>
+            </DataGrid>
+
+            <!-- Error Notification Area -->
+            <Border Grid.Row="2" x:Name="ErrorBorder" 
+                    Background="#FEF2F2" BorderBrush="#FEE2E2" BorderThickness="1" 
+                    CornerRadius="10" Padding="15,12" Margin="0,16,0,0"
+                    Visibility="Collapsed">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="&#xEA39;" FontFamily="Segoe MDL2 Assets" 
+                               Foreground="#EF4444" FontSize="16" VerticalAlignment="Center" Margin="0,0,12,0"/>
+                    <TextBlock Grid.Column="1" x:Name="TxtError" Text="Thông báo lỗi ở đây" 
+                               Foreground="#991B1B" FontSize="13" FontWeight="Medium" VerticalAlignment="Center" TextWrapping="Wrap"/>
+                    <Button Grid.Column="2" Background="Transparent" BorderThickness="0" Cursor="Hand" Click="DismissError_Click">
+                        <TextBlock Text="&#xE711;" FontFamily="Segoe MDL2 Assets" Foreground="#EF4444" FontSize="10"/>
+                    </Button>
+                </Grid>
+            </Border>
+
+            <!-- Tip (Hidden when error is visible to save space) -->
+            <Border Grid.Row="2" x:Name="TipBorder" Background="#F0F9FF" CornerRadius="8" Padding="12" Margin="0,16,0,0">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="&#xE946;" FontFamily="Segoe MDL2 Assets" Foreground="#0284C7" Margin="0,0,10,0" VerticalAlignment="Center"/>
+                    <TextBlock Text="Mẹo: Bạn có thể nhập trực tiếp các bước vào dòng cuối cùng của bảng. Nhấn phím Tab để di chuyển nhanh giữa các ô." 
+                               FontSize="11" Foreground="#0369A1" VerticalAlignment="Center"/>
+                </StackPanel>
+            </Border>
+
+            <!-- Footer -->
+            <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,20,0,0">
+                <Button Content="Hủy bỏ" Style="{StaticResource SecondaryButtonStyle}" Width="90" Height="38" Margin="0,0,10,0" Click="Cancel_Click"/>
+                <Button Content="Lưu toàn bộ quy trình" Style="{StaticResource PrimaryButtonStyle}" Width="180" Height="38" Click="Save_Click"/>
+            </StackPanel>
+        </Grid>
+    </Border>
+</Window>

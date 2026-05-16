@@ -11,9 +11,20 @@
                 <ResourceDictionary Source="Styles/DesignSystem.xaml"/>
             </ResourceDictionary.MergedDictionaries>
 
+            <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+
             <core:StringToBooleanConverter x:Key="StringToBooleanConverter"/>
             <core:ViewModelTypeToBooleanConverter x:Key="ViewModelTypeToBooleanConverter"/>
             <core:EqualityToBooleanConverter x:Key="EqualityToBooleanConverter"/>
+            <core:CountToVisibilityConverter x:Key="CountToVisibilityConverter"/>
+            <core:StringNullOrEmptyToVisibilityConverter x:Key="StringNullOrEmptyToVisibilityConverter"/>
+            <core:BooleanToBrushConverter x:Key="BooleanToBrushConverter"/>
+            <core:InverseBooleanConverter x:Key="InverseBooleanConverter"/>
+            <core:InverseBooleanToVisibilityConverter x:Key="InverseBooleanToVisibilityConverter"/>
+            <core:BooleanToStringConverter x:Key="BooleanToStringConverter"/>
+            <core:GreaterThanZeroToVisibilityConverter x:Key="GreaterThanZeroToVisibilityConverter"/>
+            <core:MultiBindingConverter x:Key="GlobalMultiBindingConverter"/>
+
 
             <DataTemplate DataType="{x:Type viewmodels:DashboardViewModel}">
                 <views:DashboardView/>
@@ -23,9 +34,98 @@
                 <views:AdminView/>
             </DataTemplate>
 
+            <DataTemplate DataType="{x:Type viewmodels:MasterDataViewModel}">
+                <views:MasterDataView/>
+            </DataTemplate>
+
             <DataTemplate DataType="{x:Type viewmodels:LoginViewModel}">
                 <views:LoginView/>
             </DataTemplate>
+
+            <DataTemplate DataType="{x:Type viewmodels:ProductionViewModel}">
+                <views:ProductionView/>
+            </DataTemplate>
+
+            <DataTemplate DataType="{x:Type viewmodels:QualityControlViewModel}">
+                <views:QualityControlView/>
+            </DataTemplate>
+
+            <DataTemplate DataType="{x:Type viewmodels:WarehouseViewModel}">
+                <views:WarehouseView/>
+            </DataTemplate>
+
+            <DataTemplate DataType="{x:Type viewmodels:HRViewModel}">
+                <views:HRView/>
+            </DataTemplate>
+
+            <DataTemplate DataType="{x:Type viewmodels:FinanceViewModel}">
+                <views:FinanceView/>
+            </DataTemplate>
+
+            <DataTemplate DataType="{x:Type viewmodels:CreateWorkOrderViewModel}">
+                <views:CreateWorkOrderView/>
+            </DataTemplate>
+
+            <DataTemplate DataType="{x:Type viewmodels:CreateMaterialViewModel}">
+                <views:CreateMaterialView/>
+            </DataTemplate>
+
+            <DataTemplate DataType="{x:Type viewmodels:CreateWarehouseViewModel}">
+                <views:CreateWarehouseView/>
+            </DataTemplate>
+
+            <DataTemplate DataType="{x:Type viewmodels:ImportExportViewModel}">
+                <views:ImportExportView/>
+            </DataTemplate>
+
+            <DataTemplate DataType="{x:Type viewmodels:ActivitiesViewModel}">
+                <views:ActivitiesView/>
+            </DataTemplate>
+
+            <DataTemplate DataType="{x:Type viewmodels:ActivityDetailViewModel}">
+                <views:ActivityDetailView/>
+            </DataTemplate>
+
+            <DataTemplate DataType="{x:Type viewmodels:ActivityImportExportViewModel}">
+                <views:ActivityImportExportView/>
+            </DataTemplate>
+
+            <DataTemplate DataType="{x:Type viewmodels:MasterDataImportExportViewModel}">
+                <views:MasterDataImportExportView/>
+            </DataTemplate>
+            
+            <DataTemplate DataType="{x:Type viewmodels:WorkOrderDetailViewModel}">
+                <views:WorkOrderDetailView/>
+            </DataTemplate>
+
+            <DataTemplate DataType="{x:Type viewmodels:CreateTransactionViewModel}">
+                <views:CreateTransactionView/>
+            </DataTemplate>
+
+            <DataTemplate DataType="{x:Type viewmodels:WarehouseReportViewModel}">
+                <views:WarehouseReportView/>
+            </DataTemplate>
+
+            <DataTemplate DataType="{x:Type viewmodels:CreateEmployeeViewModel}">
+                <views:CreateEmployeeView/>
+            </DataTemplate>
+
+            <DataTemplate DataType="{x:Type viewmodels:EditEmployeeViewModel}">
+                <views:EditEmployeeView/>
+            </DataTemplate>
+
+            <DataTemplate DataType="{x:Type viewmodels:AttendanceConsoleViewModel}">
+                <views:AttendanceConsoleView/>
+            </DataTemplate>
+
+            <DataTemplate DataType="{x:Type viewmodels:ScheduleImportExportViewModel}">
+                <views:ScheduleImportExportView/>
+            </DataTemplate>
+
+            <DataTemplate DataType="{x:Type viewmodels:CreateInvoiceViewModel}">
+                <views:CreateInvoiceView/>
+            </DataTemplate>
         </ResourceDictionary>
+
     </Application.Resources>
 </Application>

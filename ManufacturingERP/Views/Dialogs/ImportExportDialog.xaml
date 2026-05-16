@@ -1,0 +1,152 @@
+<Window x:Class="ManufacturingERP.Views.Dialogs.ImportExportDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Title="Cấu hình Nhập/Xuất dữ liệu" Height="550" Width="450"
+        WindowStartupLocation="CenterScreen" WindowStyle="None" AllowsTransparency="True" Background="Transparent">
+    
+    <Border Background="White" CornerRadius="16" BorderBrush="#E2E8F0" BorderThickness="1">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <!-- Header -->
+            <Border Grid.Row="0" Background="#F8FAFC" CornerRadius="16,16,0,0" Padding="20,15">
+                <Grid>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="&#xE10C;" FontFamily="Segoe MDL2 Assets" VerticalAlignment="Center" Margin="0,0,12,0" FontSize="18" Foreground="#2563EB"/>
+                        <TextBlock Text="Cấu hình Nhập / Xuất" FontSize="16" FontWeight="Bold" Foreground="#1E293B" VerticalAlignment="Center"/>
+                    </StackPanel>
+                    <Button HorizontalAlignment="Right" Click="Close_Click" Background="Transparent" BorderThickness="0" Cursor="Hand">
+                        <TextBlock Text="&#xE106;" FontFamily="Segoe MDL2 Assets" Foreground="#64748B" FontSize="14"/>
+                    </Button>
+                </Grid>
+            </Border>
+
+            <!-- Content -->
+            <TabControl Grid.Row="1" Background="Transparent" BorderThickness="0" Margin="20,15">
+                <TabControl.Resources>
+                    <Style TargetType="TabItem">
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="TabItem">
+                                    <Border Name="Border" Padding="15,8" Margin="0,0,5,15" CornerRadius="8" Background="Transparent">
+                                        <ContentPresenter ContentSource="Header" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    </Border>
+                                    <ControlTemplate.Triggers>
+                                        <Trigger Property="IsSelected" Value="True">
+                                            <Setter TargetName="Border" Property="Background" Value="#2563EB"/>
+                                            <Setter Property="Foreground" Value="White"/>
+                                        </Trigger>
+                                        <Trigger Property="IsSelected" Value="False">
+                                            <Setter Property="Foreground" Value="#64748B"/>
+                                        </Trigger>
+                                    </ControlTemplate.Triggers>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                </TabControl.Resources>
+
+                <!-- EXPORT TAB -->
+                <TabItem Header="Xuất dữ liệu">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <StackPanel>
+                            <!-- Time Range -->
+                            <TextBlock Text="Khoảng thời gian" FontWeight="SemiBold" Margin="0,0,0,10" Foreground="#475569"/>
+                            <Grid Margin="0,0,0,20">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0" Margin="0,0,5,0">
+                                    <TextBlock Text="Từ ngày" FontSize="12" Foreground="#94A3B8" Margin="0,0,0,5"/>
+                                    <DatePicker Height="35" SelectedDate="{Binding StartDate}"/>
+                                </StackPanel>
+                                <StackPanel Grid.Column="1" Margin="5,0,0,0">
+                                    <TextBlock Text="Đến ngày" FontSize="12" Foreground="#94A3B8" Margin="0,0,0,5"/>
+                                    <DatePicker Height="35" SelectedDate="{Binding EndDate}"/>
+                                </StackPanel>
+                            </Grid>
+
+                            <!-- Status Filter -->
+                            <TextBlock Text="Bộ lọc trạng thái" FontWeight="SemiBold" Margin="0,0,0,10" Foreground="#475569"/>
+                            <ComboBox Height="38" Margin="0,0,0,20" SelectedValue="{Binding SelectedStatus}">
+                                <ComboBoxItem Content="Tất cả trạng thái" IsSelected="True"/>
+                                <ComboBoxItem Content="Đang sản xuất"/>
+                                <ComboBoxItem Content="Hoàn thành"/>
+                                <ComboBoxItem Content="Tạm dừng"/>
+                                <ComboBoxItem Content="Chờ duyệt"/>
+                            </ComboBox>
+
+                            <!-- Columns Selection -->
+                            <TextBlock Text="Các cột dữ liệu" FontWeight="SemiBold" Margin="0,0,0,10" Foreground="#475569"/>
+                            <UniformGrid Columns="2" Margin="0,0,0,20">
+                                <CheckBox Content="Mã lệnh" IsChecked="True" Margin="0,5"/>
+                                <CheckBox Content="Sản phẩm" IsChecked="True" Margin="0,5"/>
+                                <CheckBox Content="Số lượng" IsChecked="True" Margin="0,5"/>
+                                <CheckBox Content="Tiến độ" IsChecked="True" Margin="0,5"/>
+                                <CheckBox Content="Thời gian" IsChecked="True" Margin="0,5"/>
+                                <CheckBox Content="Trạng thái" IsChecked="True" Margin="0,5"/>
+                            </UniformGrid>
+
+                            <!-- Format -->
+                            <TextBlock Text="Định dạng tệp" FontWeight="SemiBold" Margin="0,0,0,10" Foreground="#475569"/>
+                            <StackPanel Orientation="Horizontal">
+                                <RadioButton Content="Excel (.xlsx)" IsChecked="True" Margin="0,0,20,0"/>
+                                <RadioButton Content="PDF (.pdf)"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </ScrollViewer>
+                </TabItem>
+
+                <!-- IMPORT TAB -->
+                <TabItem Header="Nhập dữ liệu">
+                    <StackPanel>
+                        <TextBlock Text="Chọn tệp tin nguồn" FontWeight="SemiBold" Margin="0,0,0,10" Foreground="#475569"/>
+                        <Grid Margin="0,0,0,25">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <Border BorderBrush="#E2E8F0" BorderThickness="1" CornerRadius="8" Padding="10,0">
+                                <TextBlock Text="{Binding SelectedFilePath, FallbackValue='Chưa chọn tệp...'}" VerticalAlignment="Center" Foreground="#94A3B8" FontStyle="Italic"/>
+                            </Border>
+                            <Button Grid.Column="1" Content="Chọn file" Command="{Binding SelectFileCommand}" Style="{StaticResource SecondaryButtonStyle}" Margin="10,0,0,0" Padding="15,8"/>
+                        </Grid>
+
+                        <TextBlock Text="Tùy chọn nhập" FontWeight="SemiBold" Margin="0,0,0,10" Foreground="#475569"/>
+                        <Border Background="#F8FAFC" CornerRadius="12" Padding="15" Margin="0,0,0,20">
+                            <StackPanel>
+                                <RadioButton Content="Thêm mới (Giữ nguyên dữ liệu cũ)" IsChecked="True" Margin="0,0,0,10"/>
+                                <RadioButton Content="Ghi đè (Xóa dữ liệu cũ cùng mã)"/>
+                            </StackPanel>
+                        </Border>
+
+                        <TextBlock Text="Lưu ý" FontWeight="SemiBold" Margin="0,0,0,5" Foreground="#EF4444"/>
+                        <TextBlock Text="Vui lòng sử dụng file theo đúng định dạng mẫu của hệ thống để tránh lỗi mất dữ liệu." FontSize="12" Foreground="#64748B" TextWrapping="Wrap"/>
+                    </StackPanel>
+                </TabItem>
+            </TabControl>
+
+            <!-- Footer -->
+            <Border Grid.Row="2" Background="#F8FAFC" CornerRadius="0,0,16,16" Padding="20,15">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                    <Button Content="Hủy bỏ" Click="Close_Click" Style="{StaticResource SecondaryButtonStyle}" Margin="0,0,12,0" Width="100"/>
+                    <Button Content="Thực hiện" Command="{Binding ProcessCommand}" Background="#2563EB" Foreground="White" Width="120" Height="40">
+                        <Button.Resources>
+                            <Style TargetType="Border">
+                                <Setter Property="CornerRadius" Value="8"/>
+                            </Style>
+                        </Button.Resources>
+                    </Button>
+                </StackPanel>
+            </Border>
+        </Grid>
+    </Border>
+</Window>

@@ -6,5 +6,6 @@ namespace ManufacturingERP.Services;
 public interface INavigationService : INotifyPropertyChanged
 {
     ViewModelBase? CurrentView { get; }
-    void NavigateTo<TViewModel>() where TViewModel : ViewModelBase;
+    TViewModel NavigateTo<TViewModel>() where TViewModel : ViewModelBase;
+    void GoBack();
 }

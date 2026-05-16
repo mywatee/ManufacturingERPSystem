@@ -1,0 +1,188 @@
+<UserControl x:Class="ManufacturingERP.Views.ActivityDetailView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" 
+             d:DesignHeight="850" d:DesignWidth="1200"
+             Background="#F8FAFC">
+    
+    <UserControl.Resources>
+        <Style x:Key="ActivityCardStyle" TargetType="Border">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="CornerRadius" Value="20"/>
+            <Setter Property="BorderBrush" Value="#E2E8F0"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Effect">
+                <Setter.Value>
+                    <DropShadowEffect BlurRadius="30" ShadowDepth="8" Opacity="0.04" Color="#1E293B"/>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="SectionHeaderStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Foreground" Value="#94A3B8"/>
+            <Setter Property="Margin" Value="0,0,0,15"/>
+        </Style>
+    </UserControl.Resources>
+
+    <Grid Margin="50">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/> <!-- Title & Navigation -->
+            <RowDefinition Height="*"/>    <!-- Main Content -->
+        </Grid.RowDefinitions>
+
+        <!-- 1. Header Area -->
+        <Grid Grid.Row="0" Margin="0,0,0,40">
+            <StackPanel>
+                <Button Command="{Binding CloseCommand}" Background="Transparent" BorderThickness="0" HorizontalAlignment="Left" Cursor="Hand" Margin="0,0,0,15">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="&#xE72B;" FontFamily="Segoe MDL2 Assets" FontSize="14" VerticalAlignment="Center" Foreground="#3B82F6"/>
+                        <TextBlock Text="Quay lại danh sách" Margin="8,0,0,0" FontSize="14" FontWeight="SemiBold" Foreground="#3B82F6"/>
+                    </StackPanel>
+                </Button>
+                <TextBlock Text="Chi Tiết Nhật Ký Hoạt Động" FontSize="32" FontWeight="Bold" Foreground="#0F172A"/>
+                <TextBlock Text="Mã nhật ký: #LOG-2026-0042" FontSize="14" Foreground="#64748B" Margin="0,5,0,0"/>
+            </StackPanel>
+        </Grid>
+
+        <!-- 2. Main Content Grid -->
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>   <!-- Main Info -->
+                <ColumnDefinition Width="400"/> <!-- Sidebar Info -->
+            </Grid.ColumnDefinitions>
+
+            <!-- Left Column: Main Details -->
+            <ScrollViewer Grid.Column="0" VerticalScrollBarVisibility="Auto" Margin="0,0,30,0">
+                <StackPanel>
+                    <!-- Status Banner -->
+                    <Border Background="{Binding BadgeColor}" CornerRadius="16" Padding="30" Margin="0,0,0,25">
+                        <Grid>
+                            <StackPanel Orientation="Horizontal">
+                                <Border Width="60" Height="60" CornerRadius="15" Background="White" Opacity="0.9">
+                                    <TextBlock Text="&#xE9D9;" FontFamily="Segoe MDL2 Assets" Foreground="{Binding TextColor}" 
+                                               FontSize="30" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Border>
+                                <StackPanel Margin="25,0,0,0" VerticalAlignment="Center">
+                                    <TextBlock Text="{Binding SelectedActivity.Type}" FontSize="22" FontWeight="Bold" Foreground="#1E293B"/>
+                                    <TextBlock Text="Thao tác đã được hệ thống xác thực và đồng bộ thành công." FontSize="14" Foreground="{Binding TextColor}" Opacity="0.8"/>
+                                </StackPanel>
+                            </StackPanel>
+                            <TextBlock Text="{Binding SelectedActivity.Time}" FontSize="16" FontWeight="SemiBold" Foreground="{Binding TextColor}" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                        </Grid>
+                    </Border>
+
+                    <!-- Activity Content Card -->
+                    <Border Style="{StaticResource ActivityCardStyle}" Padding="40" Margin="0,0,0,25">
+                        <StackPanel>
+                            <TextBlock Text="NỘI DUNG CHI TIẾT" Style="{StaticResource SectionHeaderStyle}"/>
+                            <TextBlock Text="{Binding SelectedActivity.Content}" FontSize="18" Foreground="#334155" LineHeight="28" TextWrapping="Wrap" Margin="0,0,0,30"/>
+                            
+                            <Border Height="1" Background="#F1F5F9" Margin="0,0,0,30"/>
+                            
+                            <!-- Related Object Info (Mockup for project depth) -->
+                            <TextBlock Text="THÔNG TIN ĐỐI TƯỢNG LIÊN QUAN" Style="{StaticResource SectionHeaderStyle}"/>
+                            <Grid Background="#F8FAFC" Margin="0,0,0,10">
+                                <Border Padding="25" CornerRadius="12">
+                                    <Grid>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                        </Grid.RowDefinitions>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        
+                                        <StackPanel Grid.Row="0" Grid.Column="0">
+                                            <TextBlock Text="Mã đối tượng" FontSize="11" Foreground="#94A3B8" Margin="0,0,0,5"/>
+                                            <TextBlock Text="LSX-2026-1710" FontSize="15" FontWeight="Bold" Foreground="#2563EB"/>
+                                        </StackPanel>
+
+                                        <StackPanel Grid.Row="0" Grid.Column="1">
+                                            <TextBlock Text="Loại đối tượng" FontSize="11" Foreground="#94A3B8" Margin="0,0,0,5"/>
+                                            <TextBlock Text="Lệnh sản xuất" FontSize="15" FontWeight="Bold" Foreground="#1E293B"/>
+                                        </StackPanel>
+
+                                        <StackPanel Grid.Row="0" Grid.Column="2">
+                                            <TextBlock Text="Trạng thái" FontSize="11" Foreground="#94A3B8" Margin="0,0,0,5"/>
+                                            <TextBlock Text="Đang xử lý" FontSize="15" FontWeight="Bold" Foreground="#F59E0B"/>
+                                        </StackPanel>
+                                    </Grid>
+                                </Border>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- History Timeline (Mockup) -->
+                    <Border Style="{StaticResource ActivityCardStyle}" Padding="40">
+                        <StackPanel>
+                            <TextBlock Text="TIẾN TRÌNH GHI NHẬN" Style="{StaticResource SectionHeaderStyle}"/>
+                            <Grid Margin="0,10,0,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                
+                                <StackPanel Grid.Column="0" HorizontalAlignment="Center">
+                                    <Border Width="36" Height="36" CornerRadius="18" Background="#DCFCE7">
+                                        <TextBlock Text="&#xE73E;" FontFamily="Segoe MDL2 Assets" Foreground="#166534" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    </Border>
+                                    <TextBlock Text="Khởi tạo" FontSize="12" FontWeight="Bold" Foreground="#1E293B" Margin="0,10,0,0" HorizontalAlignment="Center"/>
+                                    <TextBlock Text="17:09" FontSize="11" Foreground="#94A3B8" HorizontalAlignment="Center"/>
+                                </StackPanel>
+
+                                <Rectangle Grid.Column="1" Width="80" Height="2" Fill="#E2E8F0" VerticalAlignment="Center" Margin="10,0,10,30"/>
+
+                                <StackPanel Grid.Column="2" HorizontalAlignment="Center">
+                                    <Border Width="36" Height="36" CornerRadius="18" Background="#DCFCE7">
+                                        <TextBlock Text="&#xE73E;" FontFamily="Segoe MDL2 Assets" Foreground="#166534" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    </Border>
+                                    <TextBlock Text="Xác thực" FontSize="12" FontWeight="Bold" Foreground="#1E293B" Margin="0,10,0,0" HorizontalAlignment="Center"/>
+                                    <TextBlock Text="17:10" FontSize="11" Foreground="#94A3B8" HorizontalAlignment="Center"/>
+                                </StackPanel>
+
+                                <Rectangle Grid.Column="3" Width="80" Height="2" Fill="#E2E8F0" VerticalAlignment="Center" Margin="10,0,10,30"/>
+
+                                <StackPanel Grid.Column="4" HorizontalAlignment="Center">
+                                    <Border Width="36" Height="36" CornerRadius="18" Background="#DBEAFE">
+                                        <TextBlock Text="&#xE9D9;" FontFamily="Segoe MDL2 Assets" Foreground="#1D4ED8" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    </Border>
+                                    <TextBlock Text="Hoàn tất" FontSize="12" FontWeight="Bold" Foreground="#1E293B" Margin="0,10,0,0" HorizontalAlignment="Center"/>
+                                    <TextBlock Text="Đã lưu nhật ký" FontSize="11" Foreground="#94A3B8" HorizontalAlignment="Center"/>
+                                </StackPanel>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </ScrollViewer>
+
+            <!-- Right Column: Sidebar Info -->
+            <StackPanel Grid.Column="1">
+                <Border Style="{StaticResource ActivityCardStyle}" Padding="35">
+                    <StackPanel>
+                        <TextBlock Text="NGƯỜI THỰC HIỆN" Style="{StaticResource SectionHeaderStyle}"/>
+                        <Border Width="80" Height="80" CornerRadius="40" Background="#F1F5F9" HorizontalAlignment="Center" Margin="0,10,0,20">
+                            <TextBlock Text="&#xE77B;" FontFamily="Segoe MDL2 Assets" Foreground="#64748B" FontSize="40" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <TextBlock Text="{Binding SelectedActivity.User}" FontSize="20" FontWeight="Bold" Foreground="#1E293B" HorizontalAlignment="Center"/>
+                        <TextBlock Text="Nhân viên vận hành" FontSize="13" Foreground="#64748B" HorizontalAlignment="Center" Margin="0,5,0,25"/>
+                        
+                        <Border Height="1" Background="#F1F5F9" Margin="0,0,0,25"/>
+                        
+                        <TextBlock Text="GHI CHÚ HỆ THỐNG" Style="{StaticResource SectionHeaderStyle}"/>
+                        <TextBlock Text="Thao tác này được thực hiện trực tiếp trên giao diện Dashboard. Hệ thống đã tự động sao lưu dữ liệu và thông báo cho bộ phận liên quan." 
+                                   FontSize="13" Foreground="#64748B" LineHeight="20" TextWrapping="Wrap" FontStyle="Italic"/>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+        </Grid>
+    </Grid>
+</UserControl>

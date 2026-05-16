@@ -10,6 +10,8 @@ namespace ManufacturingERP.ViewModels
     {
         private readonly IAuthService _authService;
         private readonly INavigationService _navigationService;
+        private readonly IUserPreferencesService _preferencesService;
+        private System.Threading.CancellationTokenSource? _errorTimerCts;
 
         [ObservableProperty]
         private string _username = string.Empty;
@@ -21,15 +23,29 @@ namespace ManufacturingERP.ViewModels
         private string _errorMessage = string.Empty;
 
         [ObservableProperty]
+        private string _infoMessage = string.Empty;
+
+        [ObservableProperty]
         private bool _isLoading;
 
         [ObservableProperty]
         private bool _isPasswordVisible;
 
-        public LoginViewModel(IAuthService authService, INavigationService navigationService)
+        [ObservableProperty]
+        private bool _isRememberMe;
+
+        public LoginViewModel(
+            IAuthService authService, 
+            INavigationService navigationService,
+            IUserPreferencesService preferencesService)
         {
             _authService = authService;
             _navigationService = navigationService;
+            _preferencesService = preferencesService;
+
+            // Load saved preferences
+            Username = _preferencesService.SavedUsername;
+            IsRememberMe = _preferencesService.IsRememberMe;
         }
 
         [RelayCommand]
@@ -53,6 +69,16 @@ namespace ManufacturingERP.ViewModels
 
                 if (success)
                 {
+                    // Save or clear preferences based on IsRememberMe
+                    _preferencesService.IsRememberMe = IsRememberMe;
+                    _preferencesService.SavedUsername = IsRememberMe ? Username : string.Empty;
+                    
+                    // Simple "token" for auto-login (for security, this should be a real token)
+                    _preferencesService.AutoLoginToken = IsRememberMe ? "valid_session" : string.Empty;
+                    _preferencesService.LastLoginDate = IsRememberMe ? System.DateTime.Now : System.DateTime.MinValue;
+                    
+                    await _preferencesService.SaveAsync();
+
                     _navigationService.NavigateTo<DashboardViewModel>();
                 }
                 else
@@ -60,9 +86,73 @@ namespace ManufacturingERP.ViewModels
                     ErrorMessage = "Tài khoản hoặc mật khẩu không chính xác.";
                 }
             }
+            catch (InvalidOperationException ex)
+            {
+                ErrorMessage = ex.Message;
+            }
             finally
             {
                 IsLoading = false;
+            }
+        }
+
+        [RelayCommand]
+        private async Task RequestReset()
+        {
+            if (string.IsNullOrWhiteSpace(Username))
+            {
+                ErrorMessage = "Vui lòng nhập Tên đăng nhập để yêu cầu cấp lại mật khẩu.";
+                return;
+            }
+
+            IsLoading = true;
+            ErrorMessage = string.Empty;
+
+            try
+            {
+                await Task.Delay(800);
+                bool success = await _authService.RequestPasswordResetAsync(Username);
+                
+                if (success)
+                {
+                    InfoMessage = "Yêu cầu cấp lại mật khẩu đã được gửi.\nVui lòng liên hệ Admin để nhận mật khẩu mới.";
+                }
+                else
+                {
+                    ErrorMessage = "Không tìm thấy tên đăng nhập này trong hệ thống.";
+                }
+            }
+            catch (System.Exception ex)
+            {
+                ErrorMessage = "Lỗi khi gửi yêu cầu: " + ex.Message;
+            }
+            finally
+            {
+                IsLoading = false;
+            }
+        }
+
+        partial void OnErrorMessageChanged(string? value) => StartMessageTimer(ref _errorTimerCts, value, v => ErrorMessage = v);
+
+        partial void OnInfoMessageChanged(string? value) => StartMessageTimer(ref _infoTimerCts, value, v => InfoMessage = v);
+
+        private System.Threading.CancellationTokenSource? _infoTimerCts;
+
+        private void StartMessageTimer(ref System.Threading.CancellationTokenSource? cts, string? value, System.Action<string> clearAction)
+        {
+            cts?.Cancel();
+            if (!string.IsNullOrEmpty(value))
+            {
+                cts = new System.Threading.CancellationTokenSource();
+                var token = cts.Token;
+
+                Task.Delay(5000, token).ContinueWith(t =>
+                {
+                    if (!t.IsCanceled)
+                    {
+                        clearAction(string.Empty);
+                    }
+                }, TaskScheduler.FromCurrentSynchronizationContext());
             }
         }
     }

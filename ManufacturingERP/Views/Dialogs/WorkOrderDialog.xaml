@@ -1,0 +1,119 @@
+<Window x:Class="ManufacturingERP.Views.Dialogs.WorkOrderDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Title="Lệnh sản xuất"
+        Width="620" Height="580"
+        MinWidth="550" MinHeight="500"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        Background="Transparent">
+    <Border Background="White" CornerRadius="12" BorderBrush="#E2E8F0" BorderThickness="1">
+        <Border.Effect>
+            <DropShadowEffect BlurRadius="30" ShadowDepth="0" Opacity="0.20"/>
+        </Border.Effect>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <!-- Header -->
+            <Border Grid.Row="0" CornerRadius="12,12,0,0" Padding="24,20" Background="{StaticResource SidebarBackgroundBrush}">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    
+                    <Viewbox Width="28" Height="28" Grid.Column="0" Margin="0,0,12,0">
+                        <Path Data="M12 2L2 7l10 5 10-5-10-5z M2 17l10 5 10-5 M2 12l10 5 10-5" Fill="#60A5FA"/>
+                    </Viewbox>
+                    
+                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                        <TextBlock x:Name="TxtHeaderTitle" Text="Khởi tạo Lệnh sản xuất" FontSize="16" FontWeight="Bold" Foreground="White"/>
+                        <TextBlock Text="Thiết lập tham số và kế hoạch sản xuất mới" FontSize="11" Foreground="#94A3B8" Margin="0,2,0,0"/>
+                    </StackPanel>
+                    
+                    <Button Grid.Column="2" Click="Cancel_Click" Background="Transparent" BorderThickness="0" Cursor="Hand">
+                        <Viewbox Width="18" Height="18">
+                            <Path Data="M18 6L6 18 M6 6l12 12" Stroke="White" StrokeThickness="2" StrokeStartLineCap="Round" StrokeEndLineCap="Round"/>
+                        </Viewbox>
+                    </Button>
+                </Grid>
+            </Border>
+
+            <!-- Content Body -->
+            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Padding="24,20">
+                <StackPanel>
+                    <!-- Section: Thông tin chung -->
+                    <TextBlock Text="THÔNG TIN CHUNG" FontSize="11" FontWeight="Bold" Foreground="{StaticResource SecondaryTextBrush}" Margin="0,0,0,12"/>
+                    
+                    <Border Style="{StaticResource CardStyle}" Padding="20" Margin="0,0,0,20">
+                        <StackPanel>
+                            <!-- Mã lệnh -->
+                            <TextBlock Text="Mã lệnh hệ thống" Foreground="{StaticResource SecondaryTextBrush}" FontSize="12" Margin="0,0,0,6"/>
+                            <TextBox x:Name="TxtWOCode" Style="{StaticResource LoginTextBoxStyle}" IsReadOnly="True" Background="#F8FAFC" Height="38" Margin="0,0,0,14"/>
+
+                            <!-- Sản phẩm -->
+                            <TextBlock Text="Sản phẩm mục tiêu" Foreground="{StaticResource SecondaryTextBrush}" FontSize="12" Margin="0,0,0,6"/>
+                            <ComboBox x:Name="CmbProduct" Height="38" DisplayMemberPath="MaterialName" 
+                                      Background="White" BorderBrush="#E5E7EB" BorderThickness="1.5" Padding="10,0" VerticalContentAlignment="Center" Margin="0,0,0,14"/>
+
+                            <!-- Số lượng -->
+                            <TextBlock Text="Số lượng kế hoạch" Foreground="{StaticResource SecondaryTextBrush}" FontSize="12" Margin="0,0,0,6"/>
+                            <TextBox x:Name="TxtQuantity" Style="{StaticResource LoginTextBoxStyle}" Height="38" Margin="0,0,0,4" PreviewTextInput="NumberValidationTextBox"/>
+                            <TextBlock Text="Đơn vị tính: Chi tiết/Cái" FontSize="11" Foreground="#94A3B8" FontStyle="Italic"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Section: Kế hoạch & Ưu tiên -->
+                    <TextBlock Text="KẾ HOẠCH &amp; ƯU TIÊN" FontSize="11" FontWeight="Bold" Foreground="{StaticResource SecondaryTextBrush}" Margin="0,0,0,12"/>
+                    
+                    <Border Style="{StaticResource CardStyle}" Padding="20">
+                        <StackPanel>
+                            <!-- Hạn hoàn thành -->
+                            <TextBlock Text="Hạn hoàn thành (Deadline)" Foreground="{StaticResource SecondaryTextBrush}" FontSize="12" Margin="0,0,0,6"/>
+                            <DatePicker x:Name="DpEndDate" Height="38" Margin="0,0,0,16" VerticalContentAlignment="Center" Padding="10,0"/>
+
+                            <!-- Khẩn cấp -->
+                            <Border Background="#FEF2F2" BorderBrush="#FEE2E2" BorderThickness="1" CornerRadius="8" Padding="14,10">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel Grid.Column="0">
+                                        <TextBlock Text="Ưu tiên sản xuất khẩn cấp" FontWeight="SemiBold" Foreground="#DC2626" FontSize="13"/>
+                                        <TextBlock Text="Lệnh sẽ được đẩy lên đầu danh sách điều độ." FontSize="11" Foreground="#EF4444" Opacity="0.8"/>
+                                    </StackPanel>
+                                    <CheckBox Grid.Column="1" x:Name="ChkIsUrgent" Style="{StaticResource ModernCheckBoxStyle}" VerticalAlignment="Center"/>
+                                </Grid>
+                            </Border>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </ScrollViewer>
+
+            <!-- Footer -->
+            <Border Grid.Row="2" Padding="24,16" Background="#F8FAFC" BorderBrush="#E2E8F0" BorderThickness="0,1,0,0" CornerRadius="0,0,12,12">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="1" Orientation="Horizontal">
+                        <Button Content="Hủy bỏ" Click="Cancel_Click" Style="{StaticResource SecondaryButtonStyle}" Width="90" Margin="0,0,10,0"/>
+                        <Button x:Name="BtnSave" Content="Khởi tạo Lệnh" Click="Save_Click" Style="{StaticResource PrimaryButtonStyle}" Width="140" Height="38"/>
+                    </StackPanel>
+                </Grid>
+            </Border>
+        </Grid>
+    </Border>
+</Window>

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace ManufacturingERP.Models;
@@ -9,13 +9,12 @@ public partial class WorkOrder
 
     public string Wocode { get; set; } = null!;
 
-    public int? ProductId { get; set; }
-
-    public int TargetQty { get; set; }
-
-    public int? ActualQty { get; set; }
-
+    public bool IsUrgent { get; set; }
     public string? Status { get; set; }
+
+    public int? ProductId { get; set; }
+    public int? TargetQty { get; set; }
+    public int? ActualQty { get; set; }
 
     public DateTime? StartDate { get; set; }
 
@@ -27,7 +26,7 @@ public partial class WorkOrder
 
     public virtual User? CreatedByNavigation { get; set; }
 
-    public virtual Material? Product { get; set; }
+    public virtual ICollection<WorkOrderItem> WorkOrderItems { get; set; } = new List<WorkOrderItem>();
 
     public virtual ICollection<QualityControl> QualityControls { get; set; } = new List<QualityControl>();
 

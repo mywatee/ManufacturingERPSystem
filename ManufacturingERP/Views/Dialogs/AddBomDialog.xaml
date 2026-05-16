@@ -1,0 +1,141 @@
+<Window x:Class="ManufacturingERP.Views.Dialogs.AddBomDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Thêm linh kiện vào BOM"
+        Width="700" Height="600"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        Background="Transparent">
+    
+    <Border Background="{StaticResource MainBackgroundBrush}" CornerRadius="16" BorderBrush="#E2E8F0" BorderThickness="1">
+        <Border.Effect>
+            <DropShadowEffect BlurRadius="20" ShadowDepth="0" Opacity="0.1"/>
+        </Border.Effect>
+
+        <Grid Margin="24">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <!-- Header -->
+            <StackPanel Grid.Row="0" Margin="0,0,0,16">
+                <TextBlock Text="Thêm linh kiện / nguyên liệu (Hàng loạt)" FontSize="18" FontWeight="Bold" Foreground="#1E293B"/>
+                <TextBlock Text="Tìm kiếm và nhập số lượng cho các linh kiện bạn muốn thêm vào BOM" FontSize="12" Foreground="#64748B" Margin="0,4,0,0"/>
+                <Border Height="1" Background="#F1F5F9" Margin="0,12,0,0"/>
+            </StackPanel>
+
+            <!-- Search & Filters -->
+            <Grid Grid.Row="1" Margin="0,0,0,16">
+                <Border Background="#F8FAFC" CornerRadius="8" BorderBrush="#E2E8F0" BorderThickness="1">
+                    <Grid Margin="12,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="&#xE721;" FontFamily="Segoe MDL2 Assets" Foreground="#94A3B8"
+                                   VerticalAlignment="Center" Margin="0,0,10,0"/>
+                        <TextBox x:Name="TxtSearch" Grid.Column="1" Background="Transparent"
+                                 BorderThickness="0" Height="40" VerticalContentAlignment="Center"
+                                 FontSize="13" Tag="Nhập mã hoặc tên vật tư để lọc danh sách..."
+                                 TextChanged="TxtSearch_TextChanged"/>
+                        <TextBlock Grid.Column="1" Text="Nhập mã hoặc tên vật tư để lọc danh sách..." IsHitTestVisible="False" 
+                                   Foreground="#94A3B8" VerticalAlignment="Center" Margin="2,0,0,0">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding Text, ElementName=TxtSearch}" Value="">
+                                            <Setter Property="Visibility" Value="Visible"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+                    </Grid>
+                </Border>
+            </Grid>
+
+            <!-- Material Selection Grid -->
+            <DataGrid Grid.Row="2" x:Name="GridMaterials" AutoGenerateColumns="False" 
+                      CanUserAddRows="False" SelectionMode="Single"
+                      Background="White" BorderThickness="1" BorderBrush="#E2E8F0"
+                      RowHeight="48" GridLinesVisibility="Horizontal" HorizontalGridLinesBrush="#F1F5F9"
+                      ScrollViewer.VerticalScrollBarVisibility="Auto">
+                <DataGrid.Resources>
+                    <Style TargetType="DataGridColumnHeader">
+                        <Setter Property="Background" Value="#F8FAFC"/>
+                        <Setter Property="Foreground" Value="#64748B"/>
+                        <Setter Property="Padding" Value="12,10"/>
+                        <Setter Property="FontWeight" Value="SemiBold"/>
+                        <Setter Property="FontSize" Value="12"/>
+                        <Setter Property="BorderThickness" Value="0,0,0,1"/>
+                        <Setter Property="BorderBrush" Value="#E2E8F0"/>
+                    </Style>
+                </DataGrid.Resources>
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Mã vật tư" Binding="{Binding MaterialCode}" Width="120" IsReadOnly="True">
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Padding" Value="12,0"/>
+                                <Setter Property="VerticalAlignment" Value="Center"/>
+                                <Setter Property="FontWeight" Value="Bold"/>
+                                <Setter Property="Foreground" Value="#2563EB"/>
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+                    
+                    <DataGridTextColumn Header="Tên vật tư" Binding="{Binding MaterialName}" Width="*" IsReadOnly="True">
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Padding" Value="12,0"/>
+                                <Setter Property="VerticalAlignment" Value="Center"/>
+                                <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+
+                    <DataGridTextColumn Header="Đơn vị" Binding="{Binding Unit}" Width="80" IsReadOnly="True">
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Padding" Value="12,0"/>
+                                <Setter Property="VerticalAlignment" Value="Center"/>
+                                <Setter Property="HorizontalAlignment" Value="Center"/>
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+
+                    <DataGridTemplateColumn Header="Số lượng định mức" Width="140">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Border Background="#EFF6FF" CornerRadius="6" Margin="8,4" BorderBrush="#DBEAFE" BorderThickness="1">
+                                    <TextBox Text="{Binding Quantity, UpdateSourceTrigger=PropertyChanged}" 
+                                             BorderThickness="0" Background="Transparent" Padding="8,4" 
+                                             TextAlignment="Right" VerticalContentAlignment="Center" FontWeight="Bold" Foreground="#1E40AF"/>
+                                </Border>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                </DataGrid.Columns>
+            </DataGrid>
+
+            <!-- Footer -->
+            <Grid Grid.Row="3" Margin="0,20,0,0">
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <TextBlock Text="&#xE946;" FontFamily="Segoe MDL2 Assets" Foreground="#2563EB" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                    <TextBlock Text="Chỉ những mục có số lượng > 0 mới được thêm vào BOM." FontSize="11" Foreground="#64748B" VerticalAlignment="Center"/>
+                </StackPanel>
+                
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                    <Button Content="Hủy bỏ" Style="{StaticResource SecondaryButtonStyle}" Width="90" Height="38" Margin="0,0,10,0" Click="Cancel_Click"/>
+                    <Button Content="Thêm vào danh sách" Style="{StaticResource PrimaryButtonStyle}" Width="160" Height="38" Click="Save_Click"/>
+                </StackPanel>
+            </Grid>
+        </Grid>
+    </Border>
+</Window>

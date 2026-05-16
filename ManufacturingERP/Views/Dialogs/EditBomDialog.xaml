@@ -1,0 +1,137 @@
+<Window x:Class="ManufacturingERP.Views.Dialogs.EditBomDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Chỉnh sửa định mức" Height="400" Width="520"
+        WindowStartupLocation="CenterOwner" ResizeMode="NoResize"
+        SizeToContent="Height"
+        WindowStyle="None" AllowsTransparency="True" Background="Transparent">
+    <Window.Resources>
+        <DropShadowEffect x:Key="DialogShadow" BlurRadius="25" ShadowDepth="0" Color="Black" Opacity="0.15"/>
+    </Window.Resources>
+    
+    <Border CornerRadius="16" Background="White" BorderBrush="#F1F5F9" BorderThickness="1" Effect="{StaticResource DialogShadow}" Margin="15">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <!-- Header -->
+            <Border Grid.Row="0" Background="#F8FAFC" CornerRadius="16,16,0,0" Padding="20,15">
+                <StackPanel Orientation="Horizontal">
+                    <Border Width="32" Height="32" Background="#DBEAFE" CornerRadius="8" Margin="0,0,12,0">
+                        <TextBlock Text="&#xE70F;" FontFamily="Segoe MDL2 Assets" Foreground="#2563EB" 
+                                   HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="14"/>
+                    </Border>
+                    <TextBlock Text="Cấu hình số lượng định mức" FontSize="16" FontWeight="Bold" Foreground="#1E293B" VerticalAlignment="Center"/>
+                </StackPanel>
+            </Border>
+
+            <!-- Content -->
+            <Border Grid.Row="1" Padding="24,20">
+                <StackPanel>
+                <TextBlock Text="Thông tin linh kiện" FontSize="12" FontWeight="SemiBold" Foreground="#94A3B8" Margin="0,0,0,8"/>
+                <Border Background="#F1F5F9" CornerRadius="8" Padding="15,10" Margin="0,0,0,20">
+                    <StackPanel>
+                        <TextBlock Text="{Binding ComponentCode}" FontWeight="Bold" Foreground="#475569" FontSize="13"/>
+                        <TextBlock Text="{Binding ComponentName}" Foreground="#64748B" FontSize="12" TextWrapping="Wrap" Margin="0,2,0,0"/>
+                    </StackPanel>
+                </Border>
+
+                <TextBlock Text="Số lượng sử dụng" FontSize="12" FontWeight="SemiBold" Foreground="#94A3B8" Margin="0,0,0,8"/>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    
+                    <TextBox x:Name="TxtQuantity" Height="44" VerticalContentAlignment="Center" Padding="12,0" 
+                             FontSize="15" FontWeight="SemiBold" Foreground="#1E293B"
+                             BorderThickness="1.5" BorderBrush="#E2E8F0">
+                        <TextBox.Resources>
+                            <Style TargetType="Border">
+                                <Setter Property="CornerRadius" Value="8"/>
+                            </Style>
+                        </TextBox.Resources>
+                        <TextBox.Style>
+                            <Style TargetType="TextBox">
+                                <Style.Triggers>
+                                    <Trigger Property="IsFocused" Value="True">
+                                        <Setter Property="BorderBrush" Value="#2563EB"/>
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBox.Style>
+                    </TextBox>
+                    
+                    <Border Grid.Column="1" Background="#F8FAFC" BorderBrush="#E2E8F0" BorderThickness="0,1.5,1.5,1.5" 
+                            CornerRadius="0,8,8,0" Padding="15,0" Width="70">
+                        <TextBlock Text="{Binding Unit}" VerticalAlignment="Center" HorizontalAlignment="Center" 
+                                   Foreground="#64748B" FontWeight="SemiBold" FontSize="13"/>
+                    </Border>
+                </Grid>
+                <TextBlock Text="* Số lượng này được tính cho 1 đơn vị sản phẩm cha." FontSize="11" Foreground="#94A3B8" Margin="0,8,0,0" FontStyle="Italic"/>
+            </StackPanel>
+            </Border>
+
+            <!-- Footer -->
+            <Border Grid.Row="2" Background="#F8FAFC" CornerRadius="0,0,16,16" Padding="24,15">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    
+                    <Button Grid.Column="1" Content="Hủy bỏ" Width="90" Height="38" Margin="0,0,12,0" Click="Cancel_Click" Cursor="Hand">
+                        <Button.Style>
+                            <Style TargetType="Button">
+                                <Setter Property="Background" Value="Transparent"/>
+                                <Setter Property="Foreground" Value="#64748B"/>
+                                <Setter Property="BorderBrush" Value="Transparent"/>
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="Button">
+                                            <Border Background="{TemplateBinding Background}" CornerRadius="8">
+                                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                            </Border>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                                <Style.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter Property="Background" Value="#F1F5F9"/>
+                                        <Setter Property="Foreground" Value="#1E293B"/>
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                    </Button>
+                    
+                    <Button Grid.Column="2" Content="Cập nhật" Width="120" Height="38" Click="Save_Click" Cursor="Hand"
+                            Background="#2563EB" Foreground="White" FontWeight="SemiBold">
+                        <Button.Style>
+                            <Style TargetType="Button">
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="Button">
+                                            <Border Background="{TemplateBinding Background}" CornerRadius="8">
+                                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                            </Border>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                                <Style.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter Property="Background" Value="#1D4ED8"/>
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                    </Button>
+                </Grid>
+            </Border>
+        </Grid>
+    </Border>
+</Window>
