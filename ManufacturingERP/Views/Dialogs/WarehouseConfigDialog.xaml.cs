@@ -4,24 +4,42 @@ using System.Windows;
 using System.Windows.Controls;
 using Microsoft.EntityFrameworkCore;
 using ManufacturingERP.Models;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace ManufacturingERP.Views.Dialogs;
 
 public partial class WarehouseConfigDialog : Window
 {
     public Warehouse NewWarehouse { get; private set; }
+    private readonly Warehouse? _existing;
 
-    public WarehouseConfigDialog()
+    public WarehouseConfigDialog(Warehouse? existing = null)
     {
         InitializeComponent();
+        _existing = existing;
         LoadManagers();
+        if (_existing != null) PopulateFields();
+    }
+
+    private void PopulateFields()
+    {
+        Title = "Sửa nhà kho";
+        TxtCode.Text = _existing!.Code;
+        TxtWarehouseName.Text = _existing.WarehouseName;
+        TxtLocation.Text = _existing.Location;
+        TxtCapacity.Text = _existing.Capacity?.ToString();
+        foreach (ComboBoxItem item in CmbStatus.Items)
+            if (item.Content?.ToString() == _existing.Status) { CmbStatus.SelectedItem = item; break; }
+        if (_existing.ManagerId.HasValue) CmbManager.SelectedValue = _existing.ManagerId;
     }
 
     private void LoadManagers()
     {
         try
         {
-            using var context = new ManufacturingContext();
+            var factory = ((App)Application.Current).Services
+                .GetRequiredService<IDbContextFactory<ManufacturingContext>>();
+            using var context = factory.CreateDbContext();
             var managers = context.Users.Where(u => u.IsActive == true).ToList();
             CmbManager.ItemsSource = managers;
         }
@@ -57,15 +75,28 @@ public partial class WarehouseConfigDialog : Window
             return;
         }
 
-        NewWarehouse = new Warehouse
+        if (_existing != null)
         {
-            Code = TxtCode.Text?.Trim(),
-            WarehouseName = TxtWarehouseName.Text.Trim(),
-            Location = TxtLocation.Text.Trim(),
-            Capacity = capacity,
-            Status = (CmbStatus.SelectedItem as ComboBoxItem)?.Content?.ToString() ?? "Hoạt động",
-            ManagerId = (int?)CmbManager.SelectedValue
-        };
+            _existing.Code = TxtCode.Text?.Trim();
+            _existing.WarehouseName = TxtWarehouseName.Text.Trim();
+            _existing.Location = TxtLocation.Text.Trim();
+            _existing.Capacity = capacity;
+            _existing.Status = (CmbStatus.SelectedItem as ComboBoxItem)?.Content?.ToString() ?? "Hoạt động";
+            _existing.ManagerId = (int?)CmbManager.SelectedValue;
+            NewWarehouse = _existing;
+        }
+        else
+        {
+            NewWarehouse = new Warehouse
+            {
+                Code = TxtCode.Text?.Trim(),
+                WarehouseName = TxtWarehouseName.Text.Trim(),
+                Location = TxtLocation.Text.Trim(),
+                Capacity = capacity,
+                Status = (CmbStatus.SelectedItem as ComboBoxItem)?.Content?.ToString() ?? "Hoạt động",
+                ManagerId = (int?)CmbManager.SelectedValue
+            };
+        }
 
         DialogResult = true;
         Close();

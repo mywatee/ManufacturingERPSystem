@@ -1,8 +1,9 @@
-﻿
+﻿D:\DoAn\DoAnCoSo\ManufacturingERP\ManufacturingERP\obj\Debug\net10.0-windows\GeneratedInternalTypeHelper.g.cs
 FD:\DoAn\DoAnCoSo\ManufacturingERP\ManufacturingERP\App.xaml;;
 FD:\DoAn\DoAnCoSo\ManufacturingERP\ManufacturingERP\MainWindow.xaml;;
 FD:\DoAn\DoAnCoSo\ManufacturingERP\ManufacturingERP\Views\ActivitiesView.xaml;;
 FD:\DoAn\DoAnCoSo\ManufacturingERP\ManufacturingERP\Views\AdminView.xaml;;
+FD:\DoAn\DoAnCoSo\ManufacturingERP\ManufacturingERP\Views\AIChatView.xaml;;
 FD:\DoAn\DoAnCoSo\ManufacturingERP\ManufacturingERP\Views\AttendanceConsoleView.xaml;;
 FD:\DoAn\DoAnCoSo\ManufacturingERP\ManufacturingERP\Views\AttendanceManagementView.xaml;;
 FD:\DoAn\DoAnCoSo\ManufacturingERP\ManufacturingERP\Views\Components\ToastNotificationView.xaml;;
@@ -16,12 +17,12 @@ FD:\DoAn\DoAnCoSo\ManufacturingERP\ManufacturingERP\Views\CreateWorkOrderView.xa
 FD:\DoAn\DoAnCoSo\ManufacturingERP\ManufacturingERP\Views\DashboardView.xaml;;
 FD:\DoAn\DoAnCoSo\ManufacturingERP\ManufacturingERP\Views\Dialogs\CreateInvoiceDialog.xaml;;
 FD:\DoAn\DoAnCoSo\ManufacturingERP\ManufacturingERP\Views\Dialogs\ScheduleDialog.xaml;;
+FD:\DoAn\DoAnCoSo\ManufacturingERP\ManufacturingERP\Views\DocumentView.xaml;;
 FD:\DoAn\DoAnCoSo\ManufacturingERP\ManufacturingERP\Views\EditEmployeeView.xaml;;
 FD:\DoAn\DoAnCoSo\ManufacturingERP\ManufacturingERP\Views\EmployeeProfilesView.xaml;;
 FD:\DoAn\DoAnCoSo\ManufacturingERP\ManufacturingERP\Views\FinanceView.xaml;;
 FD:\DoAn\DoAnCoSo\ManufacturingERP\ManufacturingERP\Views\HRView.xaml;;
 FD:\DoAn\DoAnCoSo\ManufacturingERP\ManufacturingERP\Views\LoginView.xaml;;
-FD:\DoAn\DoAnCoSo\ManufacturingERP\ManufacturingERP\Views\MasterDataImportView.xaml;;
 FD:\DoAn\DoAnCoSo\ManufacturingERP\ManufacturingERP\Views\MasterDataView.xaml;;
 FD:\DoAn\DoAnCoSo\ManufacturingERP\ManufacturingERP\Views\PayrollManagementView.xaml;;
 FD:\DoAn\DoAnCoSo\ManufacturingERP\ManufacturingERP\Views\ProductionView.xaml;;

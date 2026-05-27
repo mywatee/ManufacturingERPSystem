@@ -347,8 +347,9 @@ public partial class CreateTransactionViewModel : ViewModelBase
             }
             else NewItemDestStock = 0;
         }
-        catch
+        catch (Exception ex)
         {
+            System.Diagnostics.Debug.WriteLine($"GetStockInfo error: {ex.Message}");
             NewItemCurrentStock = 0;
             NewItemDestStock = 0;
         }

@@ -47,9 +47,11 @@ public class HRService : IHRService
     public async Task<List<Attendance>> GetDailyAttendanceAsync(DateTime date)
     {
         using var context = await _contextFactory.CreateDbContextAsync();
+        var start = date.Date;
+        var end = start.AddDays(1);
         return await context.Attendances
             .Include(a => a.Employee)
-            .Where(a => a.Date.Date == date.Date)
+            .Where(a => a.Date >= start && a.Date < end)
             .ToListAsync();
     }
 
@@ -57,8 +59,10 @@ public class HRService : IHRService
     {
         using var context = await _contextFactory.CreateDbContextAsync();
         var now = DateTime.Now;
+        var start = now.Date;
+        var end = start.AddDays(1);
         var record = await context.Attendances
-            .FirstOrDefaultAsync(a => a.EmployeeId == employeeId && a.Date.Date == now.Date);
+            .FirstOrDefaultAsync(a => a.EmployeeId == employeeId && a.Date >= start && a.Date < end);
 
         if (record == null)
         {
@@ -66,7 +70,7 @@ public class HRService : IHRService
             {
                 EmployeeId = employeeId,
                 Date = now.Date,
-                CheckIn = now.TimeOfDay,
+                CheckIn = status == "Vắng" ? null : now.TimeOfDay,
                 Status = status,
                 Note = note
             };
@@ -143,6 +147,7 @@ public class HRService : IHRService
             var record = new PayrollRecord
             {
                 EmployeeId = emp.EmployeeId,
+                EmployeeCode = emp.EmployeeCode ?? "",
                 Name = emp.FullName,
                 Department = emp.Department ?? "N/A",
                 ProductionQty = producedQty,
@@ -183,7 +188,9 @@ public class HRService : IHRService
                     QualityBonus = rec.QualityBonus,
                     TotalSalary = rec.TotalSalary,
                     Status = rec.Status,
-                    CreatedAt = DateTime.Now
+                    CreatedAt = DateTime.Now,
+                    ApprovedAt = rec.ApprovedAt,
+                    ApprovedBy = rec.ApprovedBy
                 };
                 context.Payrolls.Add(payroll);
             }
@@ -192,8 +199,9 @@ public class HRService : IHRService
             if (success) await _auditLogService.LogActionAsync("LƯU BẢNG LƯƠNG", $"Đã lưu bảng lương tháng {month}/{year} cho {records.Count} nhân viên", "Payrolls");
             return success;
         }
-        catch (Exception)
+        catch (Exception ex)
         {
+            System.Diagnostics.Debug.WriteLine($"SavePayrollAsync error: {ex}");
             return false;
         }
     }
@@ -209,6 +217,7 @@ public class HRService : IHRService
         return saved.Select(p => new PayrollRecord
         {
             EmployeeId = p.EmployeeId,
+            EmployeeCode = p.Employee?.EmployeeCode ?? "",
             Name = p.Employee?.FullName ?? "N/A",
             Department = p.Employee?.Department ?? "N/A",
             ProductionQty = p.ProductionQty,
@@ -216,7 +225,9 @@ public class HRService : IHRService
             BasicSalary = p.BasicSalary,
             AttendanceBonus = p.AttendanceBonus,
             QualityBonus = p.QualityBonus,
-            Status = p.Status
+            Status = p.Status,
+            ApprovedAt = p.ApprovedAt,
+            ApprovedBy = p.ApprovedBy
         }).ToList();
     }
 

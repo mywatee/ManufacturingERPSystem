@@ -113,6 +113,10 @@
                     <Setter Property="Background" Value="#FEF2F2"/>
                     <Setter Property="BorderBrush" Value="#FEE2E2"/>
                 </DataTrigger>
+                <DataTrigger Binding="{Binding Status}" Value="Đã hủy">
+                    <Setter Property="Background" Value="#F1F5F9"/>
+                    <Setter Property="BorderBrush" Value="#E2E8F0"/>
+                </DataTrigger>
             </Style.Triggers>
         </Style>
 
@@ -134,6 +138,9 @@
                 </DataTrigger>
                 <DataTrigger Binding="{Binding Status}" Value="Tạm dừng">
                     <Setter Property="Foreground" Value="#DC2626"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Status}" Value="Đã hủy">
+                    <Setter Property="Foreground" Value="#94A3B8"/>
                 </DataTrigger>
             </Style.Triggers>
         </Style>
@@ -268,7 +275,8 @@
                     </Expander>
 
                     <!-- Action Buttons -->
-                    <Border BorderBrush="{StaticResource MutedBackgroundBrush}" BorderThickness="0,1,0,0" Padding="0,12,0,0">
+                    <Border BorderBrush="{StaticResource MutedBackgroundBrush}" BorderThickness="0,1,0,0" Padding="0,12,0,0"
+                            Visibility="{Binding DataContext.CanEditProduction, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BooleanToVisibilityConverter}}">
                         <Grid>
                             <!-- Pending / Chờ duyệt - Bắt đầu button -->
                             <Button Content="Bắt đầu" 
@@ -424,7 +432,7 @@
                             <Border Grid.Row="1" Background="#F9FAFB" BorderBrush="#E2E8F0" BorderThickness="1,0,1,1" CornerRadius="0,0,8,8">
                                 <ItemsControl ItemsSource="{Binding CompletedOrders}" ItemTemplate="{StaticResource KanbanCardTemplate}" Padding="12"
                                               Background="Transparent" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
-                                              Tag="Hoàn thành" dd:DragDrop.IsDragSource="True" dd:DragDrop.DropHandler="{Binding}"/>
+                                               Tag="Hoàn thành" dd:DragDrop.IsDragSource="True" dd:DragDrop.IsDropTarget="True" dd:DragDrop.DropHandler="{Binding}"/>
                             </Border>
                         </Grid>
                         <Grid Grid.Column="4">
@@ -433,7 +441,7 @@
                             <Border Grid.Row="1" Background="#F9FAFB" BorderBrush="#E2E8F0" BorderThickness="1,0,1,1" CornerRadius="0,0,8,8">
                                 <ItemsControl ItemsSource="{Binding CancelledOrders}" ItemTemplate="{StaticResource KanbanCardTemplate}" Padding="12"
                                               Background="Transparent" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
-                                              Tag="Đã hủy" dd:DragDrop.IsDragSource="True" dd:DragDrop.DropHandler="{Binding}"/>
+                                               Tag="Đã hủy" dd:DragDrop.IsDragSource="True" dd:DragDrop.IsDropTarget="True" dd:DragDrop.DropHandler="{Binding}"/>
                             </Border>
                         </Grid>
                     </Grid>
@@ -461,14 +469,16 @@
                                 <TextBlock Text="Quản lý, theo dõi và cập nhật trạng thái các lệnh sản xuất" FontSize="14" Foreground="#64748B" Margin="0,4,0,0"/>
                             </StackPanel>
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                                <Button Style="{StaticResource SecondaryButtonStyle}" Margin="0,0,12,0" Padding="15,0">
+                                <Button Style="{StaticResource SecondaryButtonStyle}" Margin="0,0,12,0" Padding="15,0"
+                                        Command="{Binding ToggleAdvancedSearchCommand}">
                                     <StackPanel Orientation="Horizontal">
                                         <TextBlock Text="&#xE721;" FontFamily="Segoe MDL2 Assets" VerticalAlignment="Center" Margin="0,0,10,0" FontSize="12"/>
                                         <TextBlock Text="Tìm kiếm nâng cao" VerticalAlignment="Center"/>
                                     </StackPanel>
                                 </Button>
                                 <Button Background="#2563EB" Foreground="White" FontSize="13" FontWeight="SemiBold"
-                                        Height="42" Padding="20,0" Command="{Binding AddWorkOrderCommand}">
+                                        Height="42" Padding="20,0" Command="{Binding AddWorkOrderCommand}"
+                                        Visibility="{Binding CanAddProduction, Converter={StaticResource BooleanToVisibilityConverter}}">
                                     <Button.Template>
                                         <ControlTemplate TargetType="Button">
                                             <Border Background="{TemplateBinding Background}" CornerRadius="8">
@@ -485,6 +495,7 @@
 
                         <Grid Grid.Row="1">
                             <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="*"/>
                             </Grid.RowDefinitions>
@@ -534,7 +545,25 @@
                                 </Grid>
                             </Border>
 
-                            <Border Grid.Row="1" Background="White" CornerRadius="12" BorderBrush="#E2E8F0" BorderThickness="1">
+                            <!-- Advanced Filter Panel -->
+                            <Border Grid.Row="1" Background="#F8FAFC" CornerRadius="12" BorderBrush="#E2E8F0" BorderThickness="1" Margin="0,0,0,20" Padding="15"
+                                    Visibility="{Binding IsAdvancedFilterVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Column="0" Text="Từ ngày:" VerticalAlignment="Center" Foreground="#64748B" Margin="0,0,8,0" FontSize="13"/>
+                                    <DatePicker Grid.Column="1" Width="140" Height="32" SelectedDate="{Binding FilterFromDate}" BorderBrush="#E2E8F0"/>
+                                    <TextBlock Grid.Column="2" Text="Đến ngày:" VerticalAlignment="Center" Foreground="#64748B" Margin="15,0,8,0" FontSize="13"/>
+                                    <DatePicker Grid.Column="3" Width="140" Height="32" SelectedDate="{Binding FilterToDate}" BorderBrush="#E2E8F0"/>
+                                </Grid>
+                            </Border>
+
+                            <Border Grid.Row="2" Background="White" CornerRadius="12" BorderBrush="#E2E8F0" BorderThickness="1">
                                 <DataGrid ItemsSource="{Binding WorkOrders}" AutoGenerateColumns="False" IsReadOnly="True" 
                                           BorderThickness="0" Background="Transparent" HeadersVisibility="Column" 
                                           GridLinesVisibility="Horizontal" HorizontalGridLinesBrush="#F1F5F9"
@@ -592,7 +621,6 @@
                                                 <DataTemplate>
                                                     <StackPanel VerticalAlignment="Center" Margin="15,0">
                                                         <TextBlock Text="{Binding Product}" FontSize="14" FontWeight="SemiBold" Foreground="#1E293B" TextWrapping="Wrap"/>
-                                                        <TextBlock Text="Cơ khí chính xác" FontSize="11" Foreground="#94A3B8" Margin="0,2,0,0"/>
                                                     </StackPanel>
                                                 </DataTemplate>
                                             </DataGridTemplateColumn.CellTemplate>
@@ -710,18 +738,18 @@
                                         <ColumnDefinition Width="*"/>
                                     </Grid.ColumnDefinitions>
                                     <TextBlock Grid.Column="0" Text="&#xE11A;" FontFamily="Segoe MDL2 Assets" Foreground="#94A3B8" FontSize="14" VerticalAlignment="Center" Margin="0,0,12,0"/>
-                                    <TextBox Grid.Column="1" Background="Transparent" BorderThickness="0" Text="Tìm kiếm theo mã lệnh, người thực hiện, công đoạn..." VerticalAlignment="Center" FontSize="13" Foreground="#94A3B8"/>
+                                    <TextBox Grid.Column="1" Background="Transparent" BorderThickness="0" VerticalAlignment="Center" FontSize="13" Foreground="#475569"
+                                             Text="{Binding ActivityLogSearchText, UpdateSourceTrigger=PropertyChanged}"/>
                                 </Grid>
                             </Border>
 
-                            <Border Grid.Column="1" Background="White" BorderBrush="#E2E8F0" BorderThickness="1" CornerRadius="8" Padding="15,10" Margin="15,0,0,0" Width="150">
-                                <Grid>
-                                    <StackPanel Orientation="Horizontal">
-                                        <TextBlock Text="&#xE71C;" FontFamily="Segoe MDL2 Assets" Foreground="#64748B" FontSize="12" VerticalAlignment="Center" Margin="0,0,10,0"/>
-                                        <TextBlock Text="Tất cả" FontSize="13" Foreground="#0F172A" VerticalAlignment="Center"/>
-                                    </StackPanel>
-                                    <TextBlock Text="&#xE70D;" FontFamily="Segoe MDL2 Assets" Foreground="#94A3B8" FontSize="10" HorizontalAlignment="Right" VerticalAlignment="Center"/>
-                                </Grid>
+                            <Border Grid.Column="1" Background="White" BorderBrush="#E2E8F0" BorderThickness="1" CornerRadius="8" Padding="0" Margin="15,0,0,0" Width="150">
+                                <ComboBox Background="Transparent" BorderThickness="0" Height="38" VerticalContentAlignment="Center" Padding="10,0"
+                                          SelectedValue="{Binding ActivityLogSelectedStatus}" SelectedValuePath="Content">
+                                    <ComboBoxItem Content="Tất cả" IsSelected="True"/>
+                                    <ComboBoxItem Content="Sản xuất"/>
+                                    <ComboBoxItem Content="Kiểm tra chất lượng (QC)"/>
+                                </ComboBox>
                             </Border>
                         </Grid>
 
@@ -756,12 +784,15 @@
                                                                 <Border.Style>
                                                                     <Style TargetType="Border">
                                                                         <Style.Triggers>
-                                                                            <DataTrigger Binding="{Binding Status}" Value="Tiến hành">
-                                                                                <Setter Property="Background" Value="#E0F2FE"/>
-                                                                            </DataTrigger>
-                                                                            <DataTrigger Binding="{Binding Status}" Value="Bắt đầu">
-                                                                                <Setter Property="Background" Value="#E0F2FE"/>
-                                                                            </DataTrigger>
+                                                            <DataTrigger Binding="{Binding Status}" Value="Tiến hành">
+                                                                <Setter Property="Background" Value="#E0F2FE"/>
+                                                            </DataTrigger>
+                                                            <DataTrigger Binding="{Binding Status}" Value="Tiến độ">
+                                                                <Setter Property="Background" Value="#E0F2FE"/>
+                                                            </DataTrigger>
+                                                            <DataTrigger Binding="{Binding Status}" Value="Bắt đầu">
+                                                                <Setter Property="Background" Value="#E0F2FE"/>
+                                                            </DataTrigger>
                                                                             <DataTrigger Binding="{Binding Status}" Value="Hoàn thành">
                                                                                 <Setter Property="Background" Value="#DCFCE7"/>
                                                                             </DataTrigger>
@@ -776,12 +807,15 @@
                                                                         <Ellipse.Style>
                                                                             <Style TargetType="Ellipse">
                                                                                 <Style.Triggers>
-                                                                                    <DataTrigger Binding="{Binding Status}" Value="Tiến hành">
-                                                                                        <Setter Property="Fill" Value="#0EA5E9"/>
-                                                                                    </DataTrigger>
-                                                                                    <DataTrigger Binding="{Binding Status}" Value="Bắt đầu">
-                                                                                        <Setter Property="Fill" Value="#3B82F6"/>
-                                                                                    </DataTrigger>
+                                                                        <DataTrigger Binding="{Binding Status}" Value="Tiến hành">
+                                                                            <Setter Property="Fill" Value="#0EA5E9"/>
+                                                                        </DataTrigger>
+                                                                        <DataTrigger Binding="{Binding Status}" Value="Tiến độ">
+                                                                            <Setter Property="Fill" Value="#0EA5E9"/>
+                                                                        </DataTrigger>
+                                                                        <DataTrigger Binding="{Binding Status}" Value="Bắt đầu">
+                                                                            <Setter Property="Fill" Value="#3B82F6"/>
+                                                                        </DataTrigger>
                                                                                     <DataTrigger Binding="{Binding Status}" Value="Hoàn thành">
                                                                                         <Setter Property="Fill" Value="#22C55E"/>
                                                                                     </DataTrigger>

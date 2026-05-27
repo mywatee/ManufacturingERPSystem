@@ -268,7 +268,7 @@ public partial class CreateMaterialViewModel : ViewModelBase
 
                 foreach (var item in BomItems)
                 {
-                    int childId = int.Parse(item.MaterialId);
+                    if (!int.TryParse(item.MaterialId, out int childId)) continue;
                     if (await _masterDataService.IsCircularReferenceAsync(savedMaterial.MaterialId, childId))
                     {
                         continue; // Skip or notify

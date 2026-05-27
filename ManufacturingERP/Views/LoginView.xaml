@@ -8,336 +8,598 @@
              d:DesignHeight="720" d:DesignWidth="1280">
     <UserControl.Resources>
         <core:StringHasValueToBooleanConverter x:Key="StringHasValueToBooleanConverter"/>
-        
-        <!-- Presentation Storyboards -->
+
+        <!-- Toast Storyboards -->
         <Storyboard x:Key="ShowToast">
-            <DoubleAnimation Storyboard.TargetProperty="Opacity" 
-                             To="1" Duration="0:0:0.4"/>
-            <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.Y)" 
-                             To="0" Duration="0:0:0.5">
-                <DoubleAnimation.EasingFunction>
-                    <QuadraticEase EasingMode="EaseOut"/>
-                </DoubleAnimation.EasingFunction>
+            <DoubleAnimation Storyboard.TargetProperty="Opacity" To="1" Duration="0:0:0.4"/>
+            <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.Y)" To="0" Duration="0:0:0.5">
+                <DoubleAnimation.EasingFunction><QuadraticEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction>
             </DoubleAnimation>
         </Storyboard>
         <Storyboard x:Key="HideToast">
-            <DoubleAnimation Storyboard.TargetProperty="Opacity" 
-                             To="0" Duration="0:0:0.3"/>
-            <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.Y)" 
-                             To="-30" Duration="0:0:0.4">
-                <DoubleAnimation.EasingFunction>
-                    <QuadraticEase EasingMode="EaseIn"/>
-                </DoubleAnimation.EasingFunction>
+            <DoubleAnimation Storyboard.TargetProperty="Opacity" To="0" Duration="0:0:0.3"/>
+            <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.Y)" To="-30" Duration="0:0:0.4">
+                <DoubleAnimation.EasingFunction><QuadraticEase EasingMode="EaseIn"/></DoubleAnimation.EasingFunction>
             </DoubleAnimation>
         </Storyboard>
-
         <Storyboard x:Key="ShowSuccessToast">
-            <DoubleAnimation Storyboard.TargetProperty="Opacity" 
-                             To="1" Duration="0:0:0.4"/>
-            <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.Y)" 
-                             To="0" Duration="0:0:0.5">
-                <DoubleAnimation.EasingFunction>
-                    <QuadraticEase EasingMode="EaseOut"/>
-                </DoubleAnimation.EasingFunction>
+            <DoubleAnimation Storyboard.TargetProperty="Opacity" To="1" Duration="0:0:0.4"/>
+            <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.Y)" To="0" Duration="0:0:0.5">
+                <DoubleAnimation.EasingFunction><QuadraticEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+        </Storyboard>
+        <Storyboard x:Key="HideSuccessToast">
+            <DoubleAnimation Storyboard.TargetProperty="Opacity" To="0" Duration="0:0:0.3"/>
+            <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.Y)" To="-30" Duration="0:0:0.4">
+                <DoubleAnimation.EasingFunction><QuadraticEase EasingMode="EaseIn"/></DoubleAnimation.EasingFunction>
             </DoubleAnimation>
         </Storyboard>
 
-        <Storyboard x:Key="HideSuccessToast">
-            <DoubleAnimation Storyboard.TargetProperty="Opacity" 
-                             To="0" Duration="0:0:0.3"/>
-            <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.Y)" 
-                             To="-30" Duration="0:0:0.4">
-                <DoubleAnimation.EasingFunction>
-                    <QuadraticEase EasingMode="EaseIn"/>
-                </DoubleAnimation.EasingFunction>
-            </DoubleAnimation>
-        </Storyboard>
+        <!-- Input Field with Icon Style -->
+        <Style x:Key="InputWithIconStyle" TargetType="Border">
+            <Setter Property="Background" Value="#F8FAFF"/>
+            <Setter Property="BorderBrush" Value="#E2E8F0"/>
+            <Setter Property="BorderThickness" Value="1.5"/>
+            <Setter Property="CornerRadius" Value="12"/>
+            <Setter Property="Height" Value="52"/>
+        </Style>
+
+        <!-- Premium Login Button Style -->
+        <Style x:Key="PremiumLoginButtonStyle" TargetType="Button">
+            <Setter Property="Height" Value="52"/>
+            <Setter Property="FontSize" Value="15"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="btnBorder" CornerRadius="12">
+                            <Border.Background>
+                                <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                    <GradientStop Color="#2563EB" Offset="0"/>
+                                    <GradientStop Color="#4F46E5" Offset="1"/>
+                                </LinearGradientBrush>
+                            </Border.Background>
+                            <Border.Effect>
+                                <DropShadowEffect BlurRadius="16" ShadowDepth="4" Opacity="0.3" Color="#2563EB"/>
+                            </Border.Effect>
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="btnBorder" Property="Background">
+                                    <Setter.Value>
+                                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                            <GradientStop Color="#1D4ED8" Offset="0"/>
+                                            <GradientStop Color="#4338CA" Offset="1"/>
+                                        </LinearGradientBrush>
+                                    </Setter.Value>
+                                </Setter>
+                                <Setter TargetName="btnBorder" Property="Effect">
+                                    <Setter.Value>
+                                        <DropShadowEffect BlurRadius="24" ShadowDepth="6" Opacity="0.45" Color="#2563EB"/>
+                                    </Setter.Value>
+                                </Setter>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="btnBorder" Property="RenderTransform">
+                                    <Setter.Value>
+                                        <ScaleTransform ScaleX="0.98" ScaleY="0.98" CenterX="175" CenterY="26"/>
+                                    </Setter.Value>
+                                </Setter>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Inline TextBox (no border, for use inside InputWithIconStyle border) -->
+        <Style x:Key="InlineTextBoxStyle" TargetType="TextBox">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Foreground" Value="#1E293B"/>
+            <Setter Property="Padding" Value="4,0"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TextBox">
+                        <ScrollViewer x:Name="PART_ContentHost" VerticalAlignment="Center"/>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Inline PasswordBox style -->
+        <Style x:Key="InlinePasswordBoxStyle" TargetType="PasswordBox">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Foreground" Value="#1E293B"/>
+            <Setter Property="Padding" Value="4,0"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="PasswordBox">
+                        <ScrollViewer x:Name="PART_ContentHost" VerticalAlignment="Center"/>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
     </UserControl.Resources>
 
-    <Grid Background="White">
+    <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="450"/>
+            <ColumnDefinition Width="460"/>
         </Grid.ColumnDefinitions>
 
-        <!-- Left Side: Visual Branding -->
-        <Border Grid.Column="0" Background="{StaticResource LoginBackgroundGradient}">
-            <Grid Margin="50">
-                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" MaxWidth="600">
-                    <Border Width="60" Height="60" Background="White" CornerRadius="12" Margin="0,0,0,25" HorizontalAlignment="Center">
-                        <TextBlock Text="⚙️" FontSize="32" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+        <!-- =================== LEFT SIDE: Branding Panel =================== -->
+        <Border Grid.Column="0">
+            <Border.Background>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                    <GradientStop Color="#0F172A" Offset="0"/>
+                    <GradientStop Color="#1E3A8A" Offset="0.5"/>
+                    <GradientStop Color="#1D4ED8" Offset="1"/>
+                </LinearGradientBrush>
+            </Border.Background>
+
+            <Grid>
+                <!-- Decorative background circles -->
+                <Ellipse Width="500" Height="500" Opacity="0.04" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="-200,0,0,-100">
+                    <Ellipse.Fill><RadialGradientBrush><GradientStop Color="White" Offset="0"/><GradientStop Color="Transparent" Offset="1"/></RadialGradientBrush></Ellipse.Fill>
+                </Ellipse>
+                <Ellipse Width="350" Height="350" Opacity="0.06" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,-100,-80,0">
+                    <Ellipse.Fill><RadialGradientBrush><GradientStop Color="#60A5FA" Offset="0"/><GradientStop Color="Transparent" Offset="1"/></RadialGradientBrush></Ellipse.Fill>
+                </Ellipse>
+                <Ellipse Width="200" Height="200" Opacity="0.08" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="200,-200,0,0">
+                    <Ellipse.Fill><RadialGradientBrush><GradientStop Color="#818CF8" Offset="0"/><GradientStop Color="Transparent" Offset="1"/></RadialGradientBrush></Ellipse.Fill>
+                </Ellipse>
+
+                <!-- Main Content -->
+                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" MaxWidth="560" Margin="60,0">
+
+                    <!-- Logo Badge -->
+                    <Border Width="72" Height="72" CornerRadius="20" HorizontalAlignment="Center" Margin="0,0,0,28">
+                        <Border.Background>
+                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                <GradientStop Color="#3B82F6" Offset="0"/>
+                                <GradientStop Color="#6366F1" Offset="1"/>
+                            </LinearGradientBrush>
+                        </Border.Background>
+                        <Border.Effect>
+                            <DropShadowEffect BlurRadius="20" ShadowDepth="0" Opacity="0.5" Color="#3B82F6"/>
+                        </Border.Effect>
+                        <TextBlock Text="⚙" FontSize="36" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="White"/>
                     </Border>
-                    <TextBlock Text="MANUFACTURING ERP" FontSize="42" FontWeight="Bold" Foreground="White" Margin="0,0,0,10" HorizontalAlignment="Center"/>
-                    <TextBlock Text="Giải pháp quản trị sản xuất thông minh thế hệ mới" 
-                               FontSize="18" Foreground="#BFDBFE" TextWrapping="Wrap" Opacity="0.9" HorizontalAlignment="Center" TextAlignment="Center"/>
-                    
-                    <StackPanel Orientation="Horizontal" Margin="0,40,0,0" HorizontalAlignment="Center">
-                        <Border Width="4" Height="30" Background="#60A5FA" CornerRadius="2" Margin="0,0,15,0"/>
-                        <TextBlock Text="Tối ưu hóa quy trình. Nâng cao năng suất. Tự động hóa vận hành." 
-                                   FontSize="15" Foreground="White" VerticalAlignment="Center" Opacity="0.8"/>
+
+                    <!-- App Title -->
+                    <TextBlock Text="MANUFACTURING ERP" FontSize="38" FontWeight="Black" Foreground="White"
+                               HorizontalAlignment="Center" Margin="0,0,0,12">
+                        <TextBlock.Effect>
+                            <DropShadowEffect BlurRadius="20" ShadowDepth="0" Opacity="0.3" Color="#60A5FA"/>
+                        </TextBlock.Effect>
+                    </TextBlock>
+
+                    <TextBlock Text="Giải pháp quản trị sản xuất thông minh thế hệ mới"
+                               FontSize="16" Foreground="#93C5FD" HorizontalAlignment="Center"
+                               TextAlignment="Center" Opacity="0.9" Margin="0,0,0,8"/>
+
+                    <!-- Separator line -->
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,16,0,40">
+                        <Border Width="30" Height="2" Background="#3B82F6" CornerRadius="1" Margin="0,0,8,0" Opacity="0.6"/>
+                        <Border Width="60" Height="2" CornerRadius="1">
+                            <Border.Background>
+                                <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                    <GradientStop Color="#60A5FA" Offset="0"/>
+                                    <GradientStop Color="#818CF8" Offset="1"/>
+                                </LinearGradientBrush>
+                            </Border.Background>
+                        </Border>
+                        <Border Width="30" Height="2" Background="#6366F1" CornerRadius="1" Margin="8,0,0,0" Opacity="0.6"/>
                     </StackPanel>
 
-                    <!-- Factory Operational Status Widget -->
-                    <Border Background="#20FFFFFF" CornerRadius="16" BorderBrush="#30FFFFFF" BorderThickness="1" Margin="0,50,0,0" Padding="25" HorizontalAlignment="Center" MinWidth="450">
+                    <!-- === Real WorkOrder Stats Widget === -->
+                    <Border CornerRadius="20" Padding="28,22" HorizontalAlignment="Center" MinWidth="480"
+                            Background="#3B63AC" BorderBrush="#608BD8" BorderThickness="1">
+                        <Border.Effect>
+                            <DropShadowEffect BlurRadius="30" ShadowDepth="0" Opacity="0.3" Color="Black"/>
+                        </Border.Effect>
+
                         <StackPanel>
-                            <TextBlock Text="Trạng thái vận hành xưởng" Foreground="White" FontSize="15" FontWeight="SemiBold" Margin="0,0,0,20" HorizontalAlignment="Center"/>
-                            <UniformGrid Columns="2">
-                                <StackPanel Margin="0,0,20,0" HorizontalAlignment="Center">
-                                    <StackPanel Orientation="Horizontal" Margin="0,0,0,8" HorizontalAlignment="Center">
-                                        <Ellipse Width="10" Height="10" Fill="#10B981" Margin="0,0,10,0"/>
-                                        <TextBlock Text="Đang chạy" Foreground="#BFDBFE" FontSize="13"/>
-                                    </StackPanel>
-                                    <TextBlock Text="05 Máy" Foreground="White" FontSize="24" FontWeight="Bold" HorizontalAlignment="Center"/>
+                            <!-- Widget Header -->
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,20">
+                                <Path Data="M9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4zm2.5 2.1h-15v-14h15v14zm0-16.1h-15c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h15c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"
+                                      Fill="#93C5FD" Width="16" Height="16" Stretch="Uniform" Margin="0,0,10,0" VerticalAlignment="Center"/>
+                                <TextBlock Text="Lệnh Sản Xuất Hôm Nay" Foreground="White"
+                                           FontSize="14" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                            </StackPanel>
+
+                            <!-- 3-column stats -->
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="1"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="1"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <!-- InProgress -->
+                                <StackPanel Grid.Column="0" HorizontalAlignment="Center">
+                                    <Border Width="36" Height="36" CornerRadius="10" HorizontalAlignment="Center" Margin="0,0,0,10"
+                                            Background="#0284C7">
+                                        <Ellipse Width="10" Height="10" Fill="#34D399" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    </Border>
+                                    <TextBlock Text="{Binding InProgressCount}" Foreground="White"
+                                               FontSize="28" FontWeight="Black" HorizontalAlignment="Center"/>
+                                    <TextBlock Text="Đang thực hiện" Foreground="#93C5FD"
+                                               FontSize="11" HorizontalAlignment="Center" Margin="0,4,0,0"/>
                                 </StackPanel>
-                                <StackPanel Margin="20,0,0,0" HorizontalAlignment="Center">
-                                    <StackPanel Orientation="Horizontal" Margin="0,0,0,8" HorizontalAlignment="Center">
-                                        <Ellipse Width="10" Height="10" Fill="#F59E0B" Margin="0,0,10,0"/>
-                                        <TextBlock Text="Bảo trì" Foreground="#BFDBFE" FontSize="13"/>
-                                    </StackPanel>
-                                    <TextBlock Text="01 Máy" Foreground="White" FontSize="24" FontWeight="Bold" HorizontalAlignment="Center"/>
+
+                                <!-- Divider -->
+                                <Border Grid.Column="1" Width="1" Height="50" Background="#4A72A8" VerticalAlignment="Center"/>
+
+                                <!-- Planned -->
+                                <StackPanel Grid.Column="2" HorizontalAlignment="Center">
+                                    <Border Width="36" Height="36" CornerRadius="10" HorizontalAlignment="Center" Margin="0,0,0,10"
+                                            Background="#D97706">
+                                        <Ellipse Width="10" Height="10" Fill="#FBBF24" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    </Border>
+                                    <TextBlock Text="{Binding PlannedCount}" Foreground="White"
+                                               FontSize="28" FontWeight="Black" HorizontalAlignment="Center"/>
+                                    <TextBlock Text="Chờ xử lý" Foreground="#93C5FD"
+                                               FontSize="11" HorizontalAlignment="Center" Margin="0,4,0,0"/>
                                 </StackPanel>
-                            </UniformGrid>
-                            
-                            <Border Height="1" Background="#20FFFFFF" Margin="0,15"/>
-                            
+
+                                <!-- Divider -->
+                                <Border Grid.Column="3" Width="1" Height="50" Background="#4A72A8" VerticalAlignment="Center"/>
+
+                                <!-- Completed Today -->
+                                <StackPanel Grid.Column="4" HorizontalAlignment="Center">
+                                    <Border Width="36" Height="36" CornerRadius="10" HorizontalAlignment="Center" Margin="0,0,0,10"
+                                            Background="#059669">
+                                        <Path Data="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"
+                                              Fill="#10B981" Width="14" Height="14" Stretch="Uniform"
+                                              HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    </Border>
+                                    <TextBlock Text="{Binding CompletedTodayCount}" Foreground="White"
+                                               FontSize="28" FontWeight="Black" HorizontalAlignment="Center"/>
+                                    <TextBlock Text="Hoàn thành hôm nay" Foreground="#93C5FD"
+                                               FontSize="11" HorizontalAlignment="Center" Margin="0,4,0,0"/>
+                                </StackPanel>
+                            </Grid>
+
+                            <!-- Bottom status bar -->
+                            <Border Height="1" Background="#4A72A8" Margin="0,20,0,16"/>
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                                <Path Data="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z" 
-                                      Fill="#60A5FA" Width="14" Height="14" Stretch="Uniform" Margin="0,0,8,0" VerticalAlignment="Center"/>
-                                <TextBlock Text="Hệ thống vận hành ổn định" Foreground="#BFDBFE" FontSize="11" FontStyle="Italic"/>
+                                <Ellipse Width="8" Height="8" Margin="0,0,8,0" VerticalAlignment="Center">
+                                    <Ellipse.Fill>
+                                        <SolidColorBrush Color="{Binding SystemStatusColor}"/>
+                                    </Ellipse.Fill>
+                                </Ellipse>
+                                <TextBlock Text="{Binding SystemStatusText}" Foreground="#BFDBFE"
+                                           FontSize="12" FontStyle="Italic" VerticalAlignment="Center"/>
                             </StackPanel>
                         </StackPanel>
                     </Border>
+
+                    <!-- Bottom tagline -->
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,32,0,0">
+                        <Border Width="3" Height="18" Background="#60A5FA" CornerRadius="2" Margin="0,0,12,0"/>
+                        <TextBlock Text="Tối ưu hóa quy trình · Nâng cao năng suất · Tự động hóa vận hành"
+                                   FontSize="13" Foreground="#CBD5E1" VerticalAlignment="Center" Opacity="0.8"/>
+                    </StackPanel>
                 </StackPanel>
-                
-                <!-- Subtle Decorative Circles -->
-                <Ellipse Width="300" Height="300" Fill="White" Opacity="0.05" Margin="-150,0,0,-150" HorizontalAlignment="Left" VerticalAlignment="Bottom"/>
-                <Ellipse Width="150" Height="150" Fill="White" Opacity="0.05" Margin="0,-50,-50,0" HorizontalAlignment="Right" VerticalAlignment="Top"/>
             </Grid>
         </Border>
 
-        <!-- Right Side: Login Form -->
-        <Border Grid.Column="1" HorizontalAlignment="Stretch">
-            <Grid VerticalAlignment="Center" Margin="50,0">
-                <!-- Floating Toast Notification -->
-                <Border x:Name="NotificationToast" 
-                        VerticalAlignment="Top" 
-                        Margin="0,-80,0,0"
-                        Padding="16,12"
-                        Background="#FFF1F2"
-                        BorderBrush="#FECACA"
-                        BorderThickness="1"
-                        CornerRadius="12"
-                        Opacity="0"
-                        IsHitTestVisible="False">
-                    <Border.RenderTransform>
-                        <TranslateTransform Y="-30"/>
-                    </Border.RenderTransform>
-                    <Border.Effect>
-                        <DropShadowEffect BlurRadius="20" ShadowDepth="4" Opacity="0.1" Color="#E11D48"/>
-                    </Border.Effect>
-                    <Border.Style>
-                        <Style TargetType="Border">
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding ErrorMessage, Converter={StaticResource StringHasValueToBooleanConverter}}" Value="True">
-                                    <DataTrigger.EnterActions>
-                                        <BeginStoryboard Storyboard="{StaticResource ShowToast}"/>
-                                    </DataTrigger.EnterActions>
-                                    <DataTrigger.ExitActions>
-                                        <BeginStoryboard Storyboard="{StaticResource HideToast}"/>
-                                    </DataTrigger.ExitActions>
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </Border.Style>
-                    
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-                        <TextBlock Text="⚠️" Margin="0,0,12,0" VerticalAlignment="Center" FontSize="16"/>
-                        <TextBlock Grid.Column="1" Text="{Binding ErrorMessage}" Foreground="#DC2626" FontSize="13" FontWeight="Medium" VerticalAlignment="Center" TextWrapping="Wrap"/>
-                    </Grid>
-                </Border>
-                
-                <!-- Floating Success Toast Notification -->
-                <Border x:Name="SuccessToast" 
-                        VerticalAlignment="Top" 
-                        Margin="0,-80,0,0"
-                        Padding="16,12"
-                        Background="#ECFDF5"
-                        BorderBrush="#10B981"
-                        BorderThickness="1"
-                        CornerRadius="12"
-                        Opacity="0"
-                        IsHitTestVisible="False">
-                    <Border.RenderTransform>
-                        <TranslateTransform Y="-30"/>
-                    </Border.RenderTransform>
-                    <Border.Effect>
-                        <DropShadowEffect BlurRadius="20" ShadowDepth="4" Opacity="0.1" Color="#10B981"/>
-                    </Border.Effect>
-                    <Border.Style>
-                        <Style TargetType="Border">
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding InfoMessage, Converter={StaticResource StringHasValueToBooleanConverter}}" Value="True">
-                                    <DataTrigger.EnterActions>
-                                        <BeginStoryboard Storyboard="{StaticResource ShowSuccessToast}"/>
-                                    </DataTrigger.EnterActions>
-                                    <DataTrigger.ExitActions>
-                                        <BeginStoryboard Storyboard="{StaticResource HideSuccessToast}"/>
-                                    </DataTrigger.ExitActions>
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </Border.Style>
+        <!-- =================== RIGHT SIDE: Login Form =================== -->
+        <Border Grid.Column="1" Background="White">
+            <Border.Effect>
+                <DropShadowEffect BlurRadius="40" ShadowDepth="0" Opacity="0.12" Color="Black" Direction="180"/>
+            </Border.Effect>
 
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-                        <Border Width="24" Height="24" CornerRadius="12" Background="#10B981" Margin="0,0,12,0">
-                            <Path Data="M9,16.17L4.83,12L3.41,13.41L9,19L21,7L19.59,5.59L9,16.17Z" 
-                                  Fill="White" Stretch="Uniform" Margin="5" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                        </Border>
-                        <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                            <TextBlock Text="Thành công" FontWeight="Bold" FontSize="13" Foreground="#065F46"/>
-                            <TextBlock Text="{Binding InfoMessage}" Foreground="#047857" FontSize="12" TextWrapping="Wrap" Margin="0,2,0,0"/>
-                        </StackPanel>
-                    </Grid>
+            <Grid>
+                <!-- Subtle top accent line -->
+                <Border Height="3" VerticalAlignment="Top" HorizontalAlignment="Stretch">
+                    <Border.Background>
+                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                            <GradientStop Color="#2563EB" Offset="0"/>
+                            <GradientStop Color="#6366F1" Offset="1"/>
+                        </LinearGradientBrush>
+                    </Border.Background>
                 </Border>
 
-                <StackPanel>
-                    <TextBlock Text="Đăng nhập hệ thống ERP" FontSize="28" FontWeight="Bold" Foreground="{StaticResource PrimaryTextBrush}" Margin="0,0,0,8"/>
-                    <TextBlock Text="Chào mừng quay lại! Vui lòng nhập thông tin tài khoản." 
-                               FontSize="14" Foreground="{StaticResource SecondaryTextBrush}" Margin="0,0,0,40"/>
-
-                <!-- Username -->
-                <StackPanel Margin="0,0,0,20">
-                    <TextBlock Text="Mã nhân viên / Username" Style="{StaticResource LoginLabelStyle}"/>
-                    <TextBox Text="{Binding Username}" Style="{StaticResource LoginTextBoxStyle}"/>
-                </StackPanel>
-
-                <!-- Password -->
-                <StackPanel Margin="0,0,0,30">
-                    <TextBlock Text="Mật khẩu" Style="{StaticResource LoginLabelStyle}"/>
-                    <Grid>
-                        <!-- Hidden Mode (PasswordBox) -->
-                        <PasswordBox core:PasswordHelper.Attach="True" 
-                                     core:PasswordHelper.Password="{Binding Password, Mode=TwoWay}">
-                            <PasswordBox.Style>
-                                <Style TargetType="PasswordBox" BasedOn="{StaticResource LoginPasswordBoxStyle}">
-                                    <Setter Property="Visibility" Value="Visible"/>
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding IsPasswordVisible}" Value="True">
-                                            <Setter Property="Visibility" Value="Collapsed"/>
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </PasswordBox.Style>
-                        </PasswordBox>
-
-                        <!-- Visible Mode (TextBox) -->
-                        <TextBox Text="{Binding Password, UpdateSourceTrigger=PropertyChanged}">
-                            <TextBox.Style>
-                                <Style TargetType="TextBox" BasedOn="{StaticResource LoginTextBoxStyle}">
-                                    <Setter Property="Visibility" Value="Collapsed"/>
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding IsPasswordVisible}" Value="True">
-                                            <Setter Property="Visibility" Value="Visible"/>
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </TextBox.Style>
-                        </TextBox>
-
-                        <!-- Toggle Visibility Button -->
-                        <CheckBox IsChecked="{Binding IsPasswordVisible}"
-                                  HorizontalAlignment="Right"
-                                  VerticalAlignment="Center"
-                                  Margin="0,0,15,0"
-                                  Cursor="Hand">
-                            <CheckBox.Template>
-                                <ControlTemplate TargetType="CheckBox">
-                                    <Grid Background="Transparent">
-                                        <!-- Eye Icon (Open) -->
-                                        <Path x:Name="EyeOn" Data="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z M12 17a5 5 0 1 0 0-10 5 5 0 0 0 0 10z M12 14.5a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5z" 
-                                              Stroke="{StaticResource SecondaryTextBrush}" StrokeThickness="1.5" Visibility="Collapsed"/>
-                                        <!-- Eye Icon (Closed) -->
-                                        <Path x:Name="EyeOff" Data="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24 M1 1l22 22" 
-                                              Stroke="{StaticResource SecondaryTextBrush}" StrokeThickness="1.5" Visibility="Visible"/>
-                                    </Grid>
-                                    <ControlTemplate.Triggers>
-                                        <Trigger Property="IsChecked" Value="True">
-                                            <Setter TargetName="EyeOn" Property="Visibility" Value="Visible"/>
-                                            <Setter TargetName="EyeOff" Property="Visibility" Value="Collapsed"/>
-                                        </Trigger>
-                                    </ControlTemplate.Triggers>
-                                </ControlTemplate>
-                            </CheckBox.Template>
-                        </CheckBox>
-                    </Grid>
-                </StackPanel>
-
-                <Grid Margin="0,0,0,30">
-                    <CheckBox IsChecked="{Binding IsRememberMe}" 
-                              Content="Ghi nhớ đăng nhập" VerticalAlignment="Center" Foreground="{StaticResource SecondaryTextBrush}"/>
-                    <Button Content="Quên mật khẩu?" 
-                            Command="{Binding RequestResetCommand}"
-                            Background="Transparent"
-                            BorderThickness="0"
-                            Padding="0"
-                            Cursor="Hand"
-                            Foreground="#2563EB" 
-                            FontWeight="SemiBold" 
-                            HorizontalAlignment="Right" 
-                            VerticalAlignment="Center">
-                        <Button.Style>
-                            <Style TargetType="Button">
+                <Grid VerticalAlignment="Center" Margin="50,0">
+                    <!-- Error Toast -->
+                    <Border x:Name="NotificationToast"
+                            VerticalAlignment="Top"
+                            Margin="0,-80,0,0"
+                            Padding="16,12"
+                            Background="#FFF1F2"
+                            BorderBrush="#FECACA"
+                            BorderThickness="1"
+                            CornerRadius="12"
+                            Opacity="0"
+                            IsHitTestVisible="False">
+                        <Border.RenderTransform><TranslateTransform Y="-30"/></Border.RenderTransform>
+                        <Border.Effect>
+                            <DropShadowEffect BlurRadius="20" ShadowDepth="4" Opacity="0.1" Color="#E11D48"/>
+                        </Border.Effect>
+                        <Border.Style>
+                            <Style TargetType="Border">
                                 <Style.Triggers>
-                                    <Trigger Property="IsMouseOver" Value="True">
-                                        <Setter Property="Opacity" Value="0.7"/>
-                                    </Trigger>
+                                    <DataTrigger Binding="{Binding ErrorMessage, Converter={StaticResource StringHasValueToBooleanConverter}}" Value="True">
+                                        <DataTrigger.EnterActions>
+                                            <BeginStoryboard Storyboard="{StaticResource ShowToast}"/>
+                                        </DataTrigger.EnterActions>
+                                        <DataTrigger.ExitActions>
+                                            <BeginStoryboard Storyboard="{StaticResource HideToast}"/>
+                                        </DataTrigger.ExitActions>
+                                    </DataTrigger>
                                 </Style.Triggers>
                             </Style>
-                        </Button.Style>
-                    </Button>
-                </Grid>
+                        </Border.Style>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="⚠️" Margin="0,0,12,0" VerticalAlignment="Center" FontSize="16"/>
+                            <TextBlock Grid.Column="1" Text="{Binding ErrorMessage}" Foreground="#DC2626"
+                                       FontSize="13" FontWeight="Medium" VerticalAlignment="Center" TextWrapping="Wrap"/>
+                        </Grid>
+                    </Border>
 
-                <!-- Login Button -->
-                <Button Command="{Binding LoginCommand}" Style="{StaticResource PrimaryLoginButtonStyle}">
-                    <Grid>
-                        <TextBlock Text="Đăng nhập hệ thống">
-                            <TextBlock.Style>
-                                <Style TargetType="TextBlock">
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding IsLoading}" Value="True">
-                                            <Setter Property="Visibility" Value="Collapsed"/>
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </TextBlock.Style>
-                        </TextBlock>
-                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                            <StackPanel.Style>
-                                <Style TargetType="StackPanel">
-                                    <Setter Property="Visibility" Value="Collapsed"/>
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding IsLoading}" Value="True">
-                                            <Setter Property="Visibility" Value="Visible"/>
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </StackPanel.Style>
-                            <TextBlock Text="Đang xử lý..." VerticalAlignment="Center"/>
+                    <!-- Success Toast -->
+                    <Border x:Name="SuccessToast"
+                            VerticalAlignment="Top"
+                            Margin="0,-80,0,0"
+                            Padding="16,12"
+                            Background="#ECFDF5"
+                            BorderBrush="#10B981"
+                            BorderThickness="1"
+                            CornerRadius="12"
+                            Opacity="0"
+                            IsHitTestVisible="False">
+                        <Border.RenderTransform><TranslateTransform Y="-30"/></Border.RenderTransform>
+                        <Border.Effect>
+                            <DropShadowEffect BlurRadius="20" ShadowDepth="4" Opacity="0.1" Color="#10B981"/>
+                        </Border.Effect>
+                        <Border.Style>
+                            <Style TargetType="Border">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding InfoMessage, Converter={StaticResource StringHasValueToBooleanConverter}}" Value="True">
+                                        <DataTrigger.EnterActions>
+                                            <BeginStoryboard Storyboard="{StaticResource ShowSuccessToast}"/>
+                                        </DataTrigger.EnterActions>
+                                        <DataTrigger.ExitActions>
+                                            <BeginStoryboard Storyboard="{StaticResource HideSuccessToast}"/>
+                                        </DataTrigger.ExitActions>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Border.Style>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Border Width="24" Height="24" CornerRadius="12" Background="#10B981" Margin="0,0,12,0">
+                                <Path Data="M9,16.17L4.83,12L3.41,13.41L9,19L21,7L19.59,5.59L9,16.17Z"
+                                      Fill="White" Stretch="Uniform" Margin="5" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                            </Border>
+                            <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                <TextBlock Text="Thành công" FontWeight="Bold" FontSize="13" Foreground="#065F46"/>
+                                <TextBlock Text="{Binding InfoMessage}" Foreground="#047857" FontSize="12" TextWrapping="Wrap" Margin="0,2,0,0"/>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+
+                    <!-- Form Content -->
+                    <StackPanel>
+                        <!-- Header -->
+                        <StackPanel Margin="0,0,0,36">
+                            <TextBlock Text="Chào mừng trở lại! 👋" FontSize="13" Foreground="#6366F1"
+                                       FontWeight="SemiBold" Margin="0,0,0,8"/>
+                            <TextBlock Text="Đăng nhập hệ thống ERP" FontSize="28" FontWeight="Black"
+                                       Foreground="#0F172A" Margin="0,0,0,8"/>
+                            <TextBlock Text="Vui lòng nhập thông tin tài khoản để tiếp tục."
+                                       FontSize="14" Foreground="#64748B"/>
                         </StackPanel>
-                    </Grid>
-                </Button>
 
-                <TextBlock Text="© 2026 Manufacturing ERP System. Phiên bản 1.0.0" 
-                           FontSize="12" Foreground="#9CA3AF" Margin="0,60,0,0" HorizontalAlignment="Center"/>
-                </StackPanel>
+                        <!-- Username Field -->
+                        <StackPanel Margin="0,0,0,18">
+                            <TextBlock Text="Mã nhân viên / Username" FontSize="13" FontWeight="SemiBold"
+                                       Foreground="#374151" Margin="0,0,0,8"/>
+                            <Border>
+                                <Border.Style>
+                                    <Style TargetType="Border" BasedOn="{StaticResource InputWithIconStyle}">
+                                        <Style.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter Property="BorderBrush" Value="#93C5FD"/>
+                                            </Trigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Border.Style>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="52"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Border Grid.Column="0" Width="52" CornerRadius="10,0,0,10">
+                                        <Path Data="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"
+                                              Fill="#94A3B8" Width="18" Height="18" Stretch="Uniform"
+                                              HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    </Border>
+                                    <TextBox Grid.Column="1" Text="{Binding Username, UpdateSourceTrigger=PropertyChanged}"
+                                             Style="{StaticResource InlineTextBoxStyle}" Margin="0,0,16,0"/>
+                                </Grid>
+                            </Border>
+                        </StackPanel>
+
+                        <!-- Password Field -->
+                        <StackPanel Margin="0,0,0,20">
+                            <TextBlock Text="Mật khẩu" FontSize="13" FontWeight="SemiBold"
+                                       Foreground="#374151" Margin="0,0,0,8"/>
+                            <Border Style="{StaticResource InputWithIconStyle}">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="52"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="48"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <Border Grid.Column="0" Width="52" CornerRadius="10,0,0,10">
+                                        <Path Data="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"
+                                              Fill="#94A3B8" Width="18" Height="18" Stretch="Uniform"
+                                              HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    </Border>
+
+                                    <!-- PasswordBox (hidden mode) -->
+                                    <PasswordBox Grid.Column="1"
+                                                 core:PasswordHelper.Attach="True"
+                                                 core:PasswordHelper.Password="{Binding Password, Mode=TwoWay}"
+                                                 Margin="0,0,0,0">
+                                        <PasswordBox.Style>
+                                            <Style TargetType="PasswordBox" BasedOn="{StaticResource InlinePasswordBoxStyle}">
+                                                <Setter Property="Visibility" Value="Visible"/>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsPasswordVisible}" Value="True">
+                                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </PasswordBox.Style>
+                                    </PasswordBox>
+
+                                    <!-- TextBox (visible mode) -->
+                                    <TextBox Grid.Column="1"
+                                             Text="{Binding Password, UpdateSourceTrigger=PropertyChanged}">
+                                        <TextBox.Style>
+                                            <Style TargetType="TextBox" BasedOn="{StaticResource InlineTextBoxStyle}">
+                                                <Setter Property="Visibility" Value="Collapsed"/>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsPasswordVisible}" Value="True">
+                                                        <Setter Property="Visibility" Value="Visible"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBox.Style>
+                                    </TextBox>
+
+                                    <!-- Eye Toggle -->
+                                    <CheckBox Grid.Column="2" IsChecked="{Binding IsPasswordVisible}"
+                                              HorizontalAlignment="Center" VerticalAlignment="Center" Cursor="Hand">
+                                        <CheckBox.Template>
+                                            <ControlTemplate TargetType="CheckBox">
+                                                <Border x:Name="eyeBorder" Background="Transparent" CornerRadius="8"
+                                                        Width="36" Height="36" Cursor="Hand">
+                                                    <Grid>
+                                                        <Path x:Name="EyeOn"
+                                                              Data="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z M12 17a5 5 0 1 0 0-10 5 5 0 0 0 0 10z M12 14.5a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5z"
+                                                              Stroke="#6366F1" StrokeThickness="1.5"
+                                                              Width="18" Height="18" Stretch="Uniform"
+                                                              HorizontalAlignment="Center" VerticalAlignment="Center"
+                                                              Visibility="Collapsed"/>
+                                                        <Path x:Name="EyeOff"
+                                                              Data="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24 M1 1l22 22"
+                                                              Stroke="#94A3B8" StrokeThickness="1.5"
+                                                              Width="18" Height="18" Stretch="Uniform"
+                                                              HorizontalAlignment="Center" VerticalAlignment="Center"
+                                                              Visibility="Visible"/>
+                                                    </Grid>
+                                                </Border>
+                                                <ControlTemplate.Triggers>
+                                                    <Trigger Property="IsChecked" Value="True">
+                                                        <Setter TargetName="EyeOn" Property="Visibility" Value="Visible"/>
+                                                        <Setter TargetName="EyeOff" Property="Visibility" Value="Collapsed"/>
+                                                    </Trigger>
+                                                    <Trigger Property="IsMouseOver" Value="True">
+                                                        <Setter TargetName="eyeBorder" Property="Background" Value="#F1F5F9"/>
+                                                    </Trigger>
+                                                </ControlTemplate.Triggers>
+                                            </ControlTemplate>
+                                        </CheckBox.Template>
+                                    </CheckBox>
+                                </Grid>
+                            </Border>
+                        </StackPanel>
+
+                        <!-- Remember Me + Forgot Password -->
+                        <Grid Margin="0,0,0,28">
+                            <CheckBox IsChecked="{Binding IsRememberMe}"
+                                      VerticalAlignment="Center" Foreground="#64748B" FontSize="13">
+                                <CheckBox.Content>
+                                    <TextBlock Text="Ghi nhớ đăng nhập" Foreground="#64748B" FontSize="13"/>
+                                </CheckBox.Content>
+                            </CheckBox>
+                            <Button Content="Quên mật khẩu?"
+                                    Command="{Binding RequestResetCommand}"
+                                    Background="Transparent" BorderThickness="0"
+                                    Padding="0" Cursor="Hand"
+                                    Foreground="#6366F1" FontWeight="SemiBold" FontSize="13"
+                                    HorizontalAlignment="Right" VerticalAlignment="Center">
+                                <Button.Style>
+                                    <Style TargetType="Button">
+                                        <Style.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter Property="Opacity" Value="0.7"/>
+                                            </Trigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Button.Style>
+                            </Button>
+                        </Grid>
+
+                        <!-- Login Button -->
+                        <Button Command="{Binding LoginCommand}" Style="{StaticResource PremiumLoginButtonStyle}">
+                            <Grid>
+                                <!-- Normal State -->
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                    <StackPanel.Style>
+                                        <Style TargetType="StackPanel">
+                                            <Setter Property="Visibility" Value="Visible"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsLoading}" Value="True">
+                                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </StackPanel.Style>
+                                    <Path Data="M11 7L9.6 8.4l2.6 2.6H2v2h10.2l-2.6 2.6L11 17l5-5-5-5zm9 12h-8v2h8c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-8v2h8v14z"
+                                          Fill="White" Width="18" Height="18" Stretch="Uniform" Margin="0,0,10,0" VerticalAlignment="Center"/>
+                                    <TextBlock Text="Đăng nhập hệ thống" VerticalAlignment="Center"/>
+                                </StackPanel>
+
+                                <!-- Loading State -->
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                    <StackPanel.Style>
+                                        <Style TargetType="StackPanel">
+                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsLoading}" Value="True">
+                                                    <Setter Property="Visibility" Value="Visible"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </StackPanel.Style>
+                                    <TextBlock Text="⏳" FontSize="16" Margin="0,0,10,0" VerticalAlignment="Center"/>
+                                    <TextBlock Text="Đang xác thực..." VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </Grid>
+                        </Button>
+
+                        <!-- Footer -->
+                        <TextBlock Text="© 2026 Manufacturing ERP System · Phiên bản 1.0.0"
+                                   FontSize="12" Foreground="#CBD5E1" Margin="0,32,0,0"
+                                   HorizontalAlignment="Center"/>
+                    </StackPanel>
+                </Grid>
             </Grid>
         </Border>
     </Grid>

@@ -79,15 +79,6 @@
                         </Grid>
                     </Border>
 
-                    <!-- View Toggle -->
-                    <Border Background="#F1F5F9" CornerRadius="12" Padding="4" Margin="16,0" Height="50">
-                        <StackPanel Orientation="Horizontal">
-                            <RadioButton Content="Dạng Thẻ" IsChecked="{Binding IsTableViewActive, Converter={StaticResource InverseBooleanConverter}}" 
-                                         Style="{StaticResource ToggleTabStyle}" Padding="16,0"/>
-                            <RadioButton Content="Dạng Bảng" IsChecked="{Binding IsTableViewActive}" 
-                                         Style="{StaticResource ToggleTabStyle}" Padding="16,0"/>
-                        </StackPanel>
-                    </Border>
                     
                     <!-- Batch Actions (Only visible if something is selected) -->
                     <StackPanel Orientation="Horizontal" Visibility="{Binding IsAnySelected, Converter={StaticResource BooleanToVisibilityConverter}}">
@@ -142,130 +133,8 @@
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
-            <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="32">
-                <ScrollViewer.Style>
-                    <Style TargetType="ScrollViewer">
-                        <Setter Property="Visibility" Value="Collapsed"/>
-                        <Style.Triggers>
-                            <DataTrigger Binding="{Binding IsTableViewActive}" Value="False">
-                                <Setter Property="Visibility" Value="Visible"/>
-                            </DataTrigger>
-                        </Style.Triggers>
-                    </Style>
-                </ScrollViewer.Style>
-                <ItemsControl ItemsSource="{Binding Employees}">
-                    <ItemsControl.ItemsPanel>
-                        <ItemsPanelTemplate>
-                            <UniformGrid Columns="4" VerticalAlignment="Top"/>
-                        </ItemsPanelTemplate>
-                    </ItemsControl.ItemsPanel>
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate>
-                            <!-- (Existing Card Template - keeping it the same but wrapped in Border for styling) -->
-                            <Border Style="{StaticResource CardStyle}" Margin="8" Padding="16">
-                                <Grid>
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition Height="Auto"/>
-                                        <RowDefinition Height="Auto"/>
-                                        <RowDefinition Height="*"/>
-                                    </Grid.RowDefinitions>
-    
-                                    <!-- Header: Avatar & Info -->
-                                    <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,16">
-                                        <CheckBox IsChecked="{Binding IsSelected}" VerticalAlignment="Top" Margin="0,0,8,0"
-                                                  Command="{Binding DataContext.UpdateSelectionCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:AttendanceConsoleView}}}"/>
-                                        <Border Width="56" Height="56" CornerRadius="28" Background="#EFF6FF">
-                                            <Path Data="{StaticResource IconUser}" Fill="#3B82F6" Width="24" Height="24" Stretch="Uniform"/>
-                                        </Border>
-                                        <StackPanel VerticalAlignment="Center" Margin="12,0,0,0">
-                                             <TextBlock Text="{Binding Employee.FullName}" FontWeight="Bold" FontSize="15" Foreground="#1E293B" TextWrapping="Wrap"/>
-                                             <Grid>
-                                                 <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
-                                                 <TextBlock Text="{Binding Employee.EmployeeCode}" FontSize="12" Foreground="#64748B"/>
-                                                 <Border Grid.Column="1" Background="#F1F5F9" CornerRadius="4" Padding="6,2" Margin="8,0,0,0" HorizontalAlignment="Left">
-                                                     <TextBlock Text="{Binding ShiftDisplay}" FontSize="10" FontWeight="SemiBold" Foreground="#475569"/>
-                                                 </Border>
-                                             </Grid>
-                                             <TextBlock Text="{Binding Employee.Department}" FontSize="11" Foreground="#94A3B8" Margin="0,2,0,0"/>
-                                         </StackPanel>
-                                     </StackPanel>
-    
-                                     <!-- Divider -->
-                                     <Border Grid.Row="1" Height="1" Background="#F1F5F9" Margin="0,0,0,16"/>
-    
-                                     <!-- Action / Status -->
-                                     <Grid Grid.Row="2">
-                                         <!-- Buttons when NOT checked in -->
-                                         <StackPanel x:Name="actionButtons" Orientation="Vertical">
-                                             <!-- Check-in buttons -->
-                                             <StackPanel x:Name="checkInActions">
-                                                 <Button Content="VÀO CA" Style="{StaticResource PrimaryButtonStyle}" Height="40" Background="#10B981"
-                                                         Command="{Binding DataContext.MarkAttendanceCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:AttendanceConsoleView}}}"
-                                                         CommandParameter="{Binding}"/>
-                                                 <Button Content="ĐI MUỘN" Style="{StaticResource PrimaryButtonStyle}" Height="40" Background="#F59E0B" Margin="0,8,0,0"
-                                                         Command="{Binding DataContext.MarkLateCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:AttendanceConsoleView}}}"
-                                                         CommandParameter="{Binding}"/>
-                                                 <Button Content="VẮNG MẶT" Style="{StaticResource PrimaryButtonStyle}" Height="36" Margin="0,8,0,0" Background="#EF4444"
-                                                         Command="{Binding DataContext.MarkAbsentCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:AttendanceConsoleView}}}"
-                                                         CommandParameter="{Binding}"/>
-                                             </StackPanel>
-
-                                             <!-- Check-out button -->
-                                             <Button x:Name="checkOutBtn" Content="RA CA" Style="{StaticResource PrimaryButtonStyle}" Height="40" Background="#3B82F6"
-                                                     Command="{Binding DataContext.MarkCheckOutCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:AttendanceConsoleView}}}"
-                                                     CommandParameter="{Binding}" Visibility="Collapsed"/>
-                                             
-                                             <!-- Reset button (Small, for correcting mistakes) -->
-                                             <Button x:Name="resetBtn" Content="HỦY TRẠNG THÁI (SỬA SAI)" Style="{StaticResource GhostButtonStyle}" Height="30" Margin="0,8,0,0"
-                                                     FontSize="10" Foreground="#94A3B8"
-                                                     Command="{Binding DataContext.ResetAttendanceCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:AttendanceConsoleView}}}"
-                                                     CommandParameter="{Binding}" Visibility="Collapsed"/>
-                                         </StackPanel>
-    
-                                         <!-- Badge when already checked in -->
-                                         <Border x:Name="statusBadge" CornerRadius="8" Padding="12" HorizontalAlignment="Stretch" VerticalAlignment="Center" Visibility="Collapsed">
-                                             <StackPanel HorizontalAlignment="Center">
-                                                 <TextBlock x:Name="statusText" Text="{Binding StatusDisplay}" FontWeight="Bold" FontSize="14" HorizontalAlignment="Center"/>
-                                                 <Border Background="{Binding TimingStatusColor}" CornerRadius="4" Padding="8,2" Margin="0,4,0,0" HorizontalAlignment="Center">
-                                                     <TextBlock Text="{Binding TimingStatus}" FontSize="10" FontWeight="Bold" Foreground="White"/>
-                                                 </Border>
-                                                 <TextBlock Text="{Binding CheckInDisplay}" FontSize="11" Foreground="#64748B" HorizontalAlignment="Center" Margin="0,4,0,0"/>
-                                             </StackPanel>
-                                         </Border>
-                                     </Grid>
-                                </Grid>
-                            </Border>
-                            <DataTemplate.Triggers>
-                                <DataTrigger Binding="{Binding Record}" Value="{x:Null}">
-                                    <Setter TargetName="checkInActions" Property="Visibility" Value="Visible"/>
-                                    <Setter TargetName="checkOutBtn" Property="Visibility" Value="Collapsed"/>
-                                    <Setter TargetName="resetBtn" Property="Visibility" Value="Collapsed"/>
-                                    <Setter TargetName="statusBadge" Property="Visibility" Value="Collapsed"/>
-                                </DataTrigger>
-                                <DataTrigger Binding="{Binding IsCheckedIn}" Value="True">
-                                    <Setter TargetName="checkInActions" Property="Visibility" Value="Collapsed"/>
-                                    <Setter TargetName="checkOutBtn" Property="Visibility" Value="Visible"/>
-                                    <Setter TargetName="resetBtn" Property="Visibility" Value="Visible"/>
-                                    <Setter TargetName="statusBadge" Property="Visibility" Value="Visible"/>
-                                </DataTrigger>
-                                <DataTrigger Binding="{Binding IsCheckedOut}" Value="True">
-                                    <Setter TargetName="checkOutBtn" Property="Visibility" Value="Collapsed"/>
-                                    <Setter TargetName="resetBtn" Property="Visibility" Value="Visible"/>
-                                </DataTrigger>
-                                <DataTrigger Binding="{Binding IsAbsent}" Value="True">
-                                    <Setter TargetName="checkInActions" Property="Visibility" Value="Collapsed"/>
-                                    <Setter TargetName="checkOutBtn" Property="Visibility" Value="Collapsed"/>
-                                    <Setter TargetName="resetBtn" Property="Visibility" Value="Visible"/>
-                                    <Setter TargetName="statusBadge" Property="Visibility" Value="Visible"/>
-                                </DataTrigger>
-                            </DataTemplate.Triggers>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
-            </ScrollViewer>
-
             <!-- Table View (DataGrid) -->
-            <Border Visibility="{Binding IsTableViewActive, Converter={StaticResource BooleanToVisibilityConverter}}"
+            <Border
                     Style="{StaticResource CardStyle}" Margin="32" Padding="0">
                 <DataGrid ItemsSource="{Binding Employees}" AutoGenerateColumns="False" 
                           CanUserAddRows="False" GridLinesVisibility="None"

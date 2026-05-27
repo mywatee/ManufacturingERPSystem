@@ -22,7 +22,8 @@
                 Content="+ Tạo hóa đơn" 
                 Style="{StaticResource PrimaryButtonStyle}" 
                 Padding="20,10"
-                Command="{Binding CreateInvoiceCommand}"/>
+                Command="{Binding CreateInvoiceCommand}"
+                Visibility="{Binding CanAddFinance, Converter={StaticResource BooleanToVisibilityConverter}}"/>
 
         <!-- Debt KPIs -->
         <Grid Grid.Row="1" Margin="0,0,0,32">
@@ -224,18 +225,20 @@
                                         <Button Style="{StaticResource GhostButtonStyle}" ToolTip="Thanh toán" Foreground="#3B82F6"
                                                 Command="{Binding DataContext.PayInvoiceCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
                                                 CommandParameter="{Binding}"
+                                                IsEnabled="{Binding DataContext.CanEditFinance, RelativeSource={RelativeSource AncestorType=DataGrid}}"
                                                 Visibility="{Binding RemainingAmount, Converter={StaticResource GreaterThanZeroToVisibilityConverter}}">
                                             <Path Data="{StaticResource IconDollar}" Fill="#3B82F6" Width="14" Height="14" Stretch="Uniform"/>
                                         </Button>
                                         <Button Style="{StaticResource GhostButtonStyle}" ToolTip="Sửa" Foreground="#F59E0B"
                                                 Command="{Binding DataContext.EditInvoiceCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
-                                                CommandParameter="{Binding}" Margin="4,0">
+                                                CommandParameter="{Binding}" Margin="4,0"
+                                                Visibility="{Binding DataContext.CanEditFinance, RelativeSource={RelativeSource AncestorType=DataGrid}, Converter={StaticResource BooleanToVisibilityConverter}}">
                                             <Path Data="{StaticResource IconEdit}" Fill="#F59E0B" Width="14" Height="14" Stretch="Uniform"/>
                                         </Button>
                                         <Button Style="{StaticResource GhostButtonStyle}" ToolTip="Xóa" Foreground="#EF4444"
                                                 Command="{Binding DataContext.DeleteInvoiceCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
                                                 CommandParameter="{Binding}"
-                                                Visibility="{Binding Status, Converter={StaticResource StringToBooleanConverter}, ConverterParameter='Chưa thanh toán|Quá hạn'}">
+                                                Visibility="{Binding DataContext.CanDeleteFinance, RelativeSource={RelativeSource AncestorType=DataGrid}, Converter={StaticResource BooleanToVisibilityConverter}}">
                                             <Path Data="{StaticResource IconDelete}" Fill="#EF4444" Width="14" Height="14" Stretch="Uniform"/>
                                         </Button>
                                     </StackPanel>
@@ -385,18 +388,20 @@
                                         <Button Style="{StaticResource GhostButtonStyle}" ToolTip="Thu tiền" Foreground="#059669"
                                                 Command="{Binding DataContext.PayInvoiceCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
                                                 CommandParameter="{Binding}"
+                                                IsEnabled="{Binding DataContext.CanEditFinance, RelativeSource={RelativeSource AncestorType=DataGrid}}"
                                                 Visibility="{Binding RemainingAmount, Converter={StaticResource GreaterThanZeroToVisibilityConverter}}">
                                             <Path Data="{StaticResource IconTrendingUp}" Fill="#059669" Width="14" Height="14" Stretch="Uniform"/>
                                         </Button>
                                         <Button Style="{StaticResource GhostButtonStyle}" ToolTip="Sửa" Foreground="#F59E0B"
                                                 Command="{Binding DataContext.EditInvoiceCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
-                                                CommandParameter="{Binding}" Margin="4,0">
+                                                CommandParameter="{Binding}" Margin="4,0"
+                                                Visibility="{Binding DataContext.CanEditFinance, RelativeSource={RelativeSource AncestorType=DataGrid}, Converter={StaticResource BooleanToVisibilityConverter}}">
                                             <Path Data="{StaticResource IconEdit}" Fill="#F59E0B" Width="14" Height="14" Stretch="Uniform"/>
                                         </Button>
                                         <Button Style="{StaticResource GhostButtonStyle}" ToolTip="Xóa" Foreground="#EF4444"
                                                 Command="{Binding DataContext.DeleteInvoiceCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
                                                 CommandParameter="{Binding}"
-                                                Visibility="{Binding Status, Converter={StaticResource StringToBooleanConverter}, ConverterParameter='Chưa thanh toán|Quá hạn'}">
+                                                Visibility="{Binding DataContext.CanDeleteFinance, RelativeSource={RelativeSource AncestorType=DataGrid}, Converter={StaticResource BooleanToVisibilityConverter}}">
                                             <Path Data="{StaticResource IconDelete}" Fill="#EF4444" Width="14" Height="14" Stretch="Uniform"/>
                                         </Button>
                                     </StackPanel>

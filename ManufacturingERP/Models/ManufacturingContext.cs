@@ -61,11 +61,17 @@ public partial class ManufacturingContext : DbContext
     public virtual DbSet<Invoice> Invoices { get; set; }
     public virtual DbSet<InvoiceItem> InvoiceItems { get; set; }
     public virtual DbSet<Payroll> Payrolls { get; set; }
+    public virtual DbSet<Document> Documents { get; set; }
+    public virtual DbSet<DocumentChunk> DocumentChunks { get; set; }
 
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
-        => optionsBuilder.UseSqlServer("Server=.\\SQLEXPRESS;Database=ManufacturingERP_New;Trusted_Connection=True;TrustServerCertificate=True;");
+    {
+        if (!optionsBuilder.IsConfigured)
+        {
+            optionsBuilder.UseSqlServer(ManufacturingERP.Core.ConnectionStrings.Default);
+        }
+    }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -154,12 +160,11 @@ public partial class ManufacturingContext : DbContext
             entity.Property(e => e.LastUpdated)
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime");
-            entity.Property(e => e.WarehouseId).HasColumnName("WarehouseID");
             entity.Property(e => e.WarehouseLocation).HasMaxLength(50);
 
             entity.HasOne(d => d.Material).WithMany(p => p.Inventories)
                 .HasForeignKey(d => d.MaterialId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
+                .OnDelete(DeleteBehavior.Cascade)
                 .HasConstraintName("FK_Inventory_Material");
 
             entity.HasOne(d => d.Warehouse).WithMany(p => p.Inventories)
@@ -271,27 +276,7 @@ public partial class ManufacturingContext : DbContext
         });
 
 
-        modelBuilder.Entity<StockTransaction>(entity =>
-        {
-            entity.HasKey(e => e.TransactionId).HasName("PK__StockTra__55433A4B1AE83A43");
-
-            entity.Property(e => e.TransactionId).HasColumnName("TransactionID");
-            entity.Property(e => e.MaterialId).HasColumnName("MaterialID");
-            entity.Property(e => e.Quantity).HasColumnType("decimal(18, 2)");
-            entity.Property(e => e.ReferenceCode).HasMaxLength(50);
-            entity.Property(e => e.TransDate)
-                .HasDefaultValueSql("(getdate())")
-                .HasColumnType("datetime");
-            entity.Property(e => e.Type).HasMaxLength(10);
-
-            entity.HasOne(d => d.Material).WithMany(p => p.StockTransactions)
-                .HasForeignKey(d => d.MaterialId)
-                .HasConstraintName("FK__StockTran__Mater__7C4F7684");
-
-            entity.HasOne(d => d.TransByNavigation).WithMany(p => p.StockTransactions)
-                .HasForeignKey(d => d.TransBy)
-                .HasConstraintName("FK__StockTran__Trans__7D439ABD");
-        });
+        // StockTransaction config moved to second block (line 462)
 
         modelBuilder.Entity<User>(entity =>
         {
@@ -553,6 +538,39 @@ public partial class ManufacturingContext : DbContext
                 .WithMany()
                 .HasForeignKey(d => d.EmployeeId)
                 .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        modelBuilder.Entity<Document>(entity =>
+        {
+            entity.ToTable("Documents");
+            entity.HasKey(e => e.DocumentId);
+            entity.Property(e => e.FileName).HasMaxLength(255).IsRequired();
+            entity.Property(e => e.OriginalFileName).HasMaxLength(255).IsRequired();
+            entity.Property(e => e.ContentType).HasMaxLength(20).IsRequired();
+            entity.Property(e => e.FilePath).HasMaxLength(1000).IsRequired();
+            entity.Property(e => e.Description).HasMaxLength(500);
+            entity.Property(e => e.Category).HasMaxLength(100);
+            entity.Property(e => e.UploadedAt).HasDefaultValueSql("(getdate())");
+
+            entity.HasOne(d => d.UploadedBy)
+                .WithMany()
+                .HasForeignKey(d => d.UploadedByUserId)
+                .OnDelete(DeleteBehavior.Restrict)
+                .HasConstraintName("FK_Documents_Users");
+        });
+
+        modelBuilder.Entity<DocumentChunk>(entity =>
+        {
+            entity.ToTable("DocumentChunks");
+            entity.HasKey(e => e.ChunkId);
+            entity.Property(e => e.Content).IsRequired();
+            entity.Property(e => e.EmbeddingJson).HasColumnType("nvarchar(max)");
+
+            entity.HasOne(d => d.Document)
+                .WithMany(p => p.Chunks)
+                .HasForeignKey(d => d.DocumentId)
+                .OnDelete(DeleteBehavior.Cascade)
+                .HasConstraintName("FK_DocumentChunks_Documents");
         });
     }
 

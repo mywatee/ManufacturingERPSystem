@@ -1,7 +1,11 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using ManufacturingERP.Core;
+using ManufacturingERP.Models;
 using ManufacturingERP.Services;
+using Microsoft.EntityFrameworkCore;
+using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace ManufacturingERP.ViewModels
@@ -34,6 +38,22 @@ namespace ManufacturingERP.ViewModels
         [ObservableProperty]
         private bool _isRememberMe;
 
+        // === WorkOrder Stats (real data from DB) ===
+        [ObservableProperty]
+        private string _inProgressCount = "–";
+
+        [ObservableProperty]
+        private string _plannedCount = "–";
+
+        [ObservableProperty]
+        private string _completedTodayCount = "–";
+
+        [ObservableProperty]
+        private string _systemStatusText = "Đang kết nối...";
+
+        [ObservableProperty]
+        private string _systemStatusColor = "#60A5FA";
+
         public LoginViewModel(
             IAuthService authService, 
             INavigationService navigationService,
@@ -46,6 +66,43 @@ namespace ManufacturingERP.ViewModels
             // Load saved preferences
             Username = _preferencesService.SavedUsername;
             IsRememberMe = _preferencesService.IsRememberMe;
+
+            // Load real WorkOrder stats in background
+            _ = LoadWorkOrderStatsAsync();
+        }
+
+        private async Task LoadWorkOrderStatsAsync()
+        {
+            try
+            {
+                await using var context = new ManufacturingContext();
+                var today = DateTime.Today;
+
+                var inProgress = await context.WorkOrders
+                    .CountAsync(w => w.Status == "InProgress");
+
+                var planned = await context.WorkOrders
+                    .CountAsync(w => w.Status == "Planned");
+
+                var completedToday = await context.WorkOrders
+                    .CountAsync(w => w.Status == "Completed"
+                                  && w.EndDate.HasValue
+                                  && w.EndDate.Value.Date == today);
+
+                InProgressCount = inProgress.ToString();
+                PlannedCount = planned.ToString();
+                CompletedTodayCount = completedToday.ToString();
+                SystemStatusText = "Hệ thống hoạt động bình thường";
+                SystemStatusColor = "#34D399";
+            }
+            catch
+            {
+                InProgressCount = "N/A";
+                PlannedCount = "N/A";
+                CompletedTodayCount = "N/A";
+                SystemStatusText = "Không thể kết nối cơ sở dữ liệu";
+                SystemStatusColor = "#F87171";
+            }
         }
 
         [RelayCommand]

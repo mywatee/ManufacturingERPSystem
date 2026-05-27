@@ -19,6 +19,12 @@ namespace ManufacturingERP.ViewModels
         private readonly IUserManagementService _userManagementService;
         private readonly IPermissionService _permissionService;
         private readonly IAuditLogService _auditLogService;
+        private readonly IBackupService _backupService;
+        private readonly IAccessControlService _accessControlService;
+
+        [ObservableProperty] private bool _canAddAdmin;
+        [ObservableProperty] private bool _canEditAdmin;
+        [ObservableProperty] private bool _canDeleteAdmin;
 
         [ObservableProperty]
         private string _activeTab = "users";
@@ -114,7 +120,9 @@ namespace ManufacturingERP.ViewModels
             INotificationService notificationService,
             IUserManagementService userManagementService,
             IPermissionService permissionService,
-            IAuditLogService auditLogService)
+            IAuditLogService auditLogService,
+            IAccessControlService accessControlService,
+            IBackupService backupService)
         {
             _settingsService = settingsService;
             _authService = authService;
@@ -122,28 +130,53 @@ namespace ManufacturingERP.ViewModels
             _userManagementService = userManagementService;
             _permissionService = permissionService;
             _auditLogService = auditLogService;
+            _accessControlService = accessControlService;
+            _backupService = backupService;
              
-            LoadUsersAsync();
+            _ = LoadPermissionsAsync();
+            _ = LoadUsersAsync();
             _ = LoadRolesAndPermissionsAsync();
             _ = LoadAuditLogsAsync();
-            LoadSecuritySettings();
+            _ = LoadSecuritySettingsAsync();
             _ = LoadResetRequestsAsync();
         }
 
-        private async void LoadSecuritySettings()
+        private async Task LoadPermissionsAsync()
         {
-            MinPasswordLength = await _settingsService.GetSettingIntAsync("MinPasswordLength", 8);
-            SelectedHashAlgorithm = await _settingsService.GetSettingAsync("HashAlgorithm", "bcrypt (Khuyến nghị)");
-            SessionTimeout = await _settingsService.GetSettingIntAsync("SessionTimeout", 30);
-            MaxLoginAttempts = await _settingsService.GetSettingIntAsync("MaxLoginAttempts", 5);
-            IsComplexityRequired = await _settingsService.GetSettingBoolAsync("IsComplexityRequired", true);
-            IsRotationRequired = await _settingsService.GetSettingBoolAsync("IsRotationRequired", true);
-            Is2FARequired = await _settingsService.GetSettingBoolAsync("Is2FARequired", false);
+            await _accessControlService.RefreshAsync();
+            var perms = ModulePermissionStateFactory.FromAccessControl(_accessControlService, SystemModules.SystemAdmin);
+            CanAddAdmin = perms.CanAdd;
+            CanEditAdmin = perms.CanEdit;
+            CanDeleteAdmin = perms.CanDelete;
+        }
+
+        private async Task LoadSecuritySettingsAsync()
+        {
+            try
+            {
+                MinPasswordLength = await _settingsService.GetSettingIntAsync("MinPasswordLength", 8);
+                SelectedHashAlgorithm = await _settingsService.GetSettingAsync("HashAlgorithm", "bcrypt (Khuyến nghị)");
+                SessionTimeout = await _settingsService.GetSettingIntAsync("SessionTimeout", 30);
+                MaxLoginAttempts = await _settingsService.GetSettingIntAsync("MaxLoginAttempts", 5);
+                IsComplexityRequired = await _settingsService.GetSettingBoolAsync("IsComplexityRequired", true);
+                IsRotationRequired = await _settingsService.GetSettingBoolAsync("IsRotationRequired", true);
+                Is2FARequired = await _settingsService.GetSettingBoolAsync("Is2FARequired", false);
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"LoadSecuritySettings error: {ex.Message}");
+            }
         }
 
         [RelayCommand]
         private async Task SaveSecuritySettings()
         {
+            if (!_accessControlService.HasCached(SystemModules.SystemAdmin, PermissionAction.Edit))
+            {
+                _notificationService.ShowError("Bạn không có quyền Sửa trong phân hệ Quản trị hệ thống.");
+                return;
+            }
+
             await _settingsService.SetSettingAsync("MinPasswordLength", MinPasswordLength);
             await _settingsService.SetSettingAsync("HashAlgorithm", SelectedHashAlgorithm);
             await _settingsService.SetSettingAsync("SessionTimeout", SessionTimeout);
@@ -152,19 +185,291 @@ namespace ManufacturingERP.ViewModels
             await _settingsService.SetSettingAsync("IsRotationRequired", IsRotationRequired);
             await _settingsService.SetSettingAsync("Is2FARequired", Is2FARequired);
             
-            // Add a log entry
             var actor = _authService.CurrentUser;
-            AuditLogs.Insert(0, new AuditLogViewModel 
-            { 
-                Timestamp = DateTime.Now, 
-                UserFullName = actor?.Employee?.FullName ?? actor?.Username ?? "Quản trị viên", 
-                Action = "Sửa", 
-                TableName = "SystemSettings", 
-                OldValue = "Cấu hình cũ", 
-                NewValue = "Cập nhật chính sách bảo mật" 
-            });
-
             await _auditLogService.LogAsync(actor?.UserId, "Sửa", "SystemSettings", "Cấu hình cũ", "Cập nhật chính sách bảo mật");
+            _notificationService.ShowSuccess("Đã lưu cấu hình bảo mật.");
+        }
+
+        [RelayCommand]
+        private async Task ResetSecuritySettings()
+        {
+            if (!_accessControlService.HasCached(SystemModules.SystemAdmin, PermissionAction.Edit))
+            {
+                _notificationService.ShowError("Bạn không có quyền Sửa trong phân hệ Quản trị hệ thống.");
+                return;
+            }
+
+            bool confirm = _notificationService.Confirm(
+                "Bạn có chắc chắn muốn đặt lại tất cả cấu hình bảo mật về mặc định?",
+                "Xác nhận đặt lại");
+
+            if (!confirm) return;
+
+            MinPasswordLength = 8;
+            SelectedHashAlgorithm = "bcrypt (Khuyến nghị)";
+            SessionTimeout = 30;
+            MaxLoginAttempts = 5;
+            IsComplexityRequired = true;
+            IsRotationRequired = true;
+            Is2FARequired = false;
+
+            await _settingsService.SetSettingAsync("MinPasswordLength", 8);
+            await _settingsService.SetSettingAsync("HashAlgorithm", "bcrypt (Khuyến nghị)");
+            await _settingsService.SetSettingAsync("SessionTimeout", 30);
+            await _settingsService.SetSettingAsync("MaxLoginAttempts", 5);
+            await _settingsService.SetSettingAsync("IsComplexityRequired", true);
+            await _settingsService.SetSettingAsync("IsRotationRequired", true);
+            await _settingsService.SetSettingAsync("Is2FARequired", false);
+
+            var actor = _authService.CurrentUser;
+            await _auditLogService.LogAsync(actor?.UserId, "Sửa", "SystemSettings", "Security settings", "Reset to defaults");
+            _notificationService.ShowSuccess("Đã đặt lại cấu hình bảo mật về mặc định.");
+        }
+
+        [RelayCommand]
+        private async Task SaveBusinessProfile()
+        {
+            if (!_accessControlService.HasCached(SystemModules.SystemAdmin, PermissionAction.Edit))
+            {
+                _notificationService.ShowError("Bạn không có quyền Sửa trong phân hệ Quản trị hệ thống.");
+                return;
+            }
+
+            await _settingsService.SetSettingAsync("CompanyName", CompanyName);
+            await _settingsService.SetSettingAsync("TaxCode", TaxCode);
+            await _settingsService.SetSettingAsync("CompanyAddress", Address);
+            await _settingsService.SetSettingAsync("CompanyPhone", Phone);
+            await _settingsService.SetSettingAsync("CompanyEmail", Email);
+
+            var actor = _authService.CurrentUser;
+            await _auditLogService.LogAsync(actor?.UserId, "Sửa", "SystemSettings", "Business Profile", "Cập nhật thông tin doanh nghiệp");
+            _notificationService.ShowSuccess("Đã lưu thông tin doanh nghiệp.");
+        }
+
+        [RelayCommand]
+        private async Task SaveFormatConfig()
+        {
+            if (!_accessControlService.HasCached(SystemModules.SystemAdmin, PermissionAction.Edit))
+            {
+                _notificationService.ShowError("Bạn không có quyền Sửa trong phân hệ Quản trị hệ thống.");
+                return;
+            }
+
+            await _settingsService.SetSettingAsync("DateFormat", SelectedDateFormat);
+            await _settingsService.SetSettingAsync("TimeFormat", SelectedTimeFormat);
+            await _settingsService.SetSettingAsync("Currency", SelectedCurrency);
+            await _settingsService.SetSettingAsync("TimeZone", SelectedTimeZone);
+
+            var actor = _authService.CurrentUser;
+            await _auditLogService.LogAsync(actor?.UserId, "Sửa", "SystemSettings", "Format Config", "Cập nhật cấu hình định dạng");
+            _notificationService.ShowSuccess("Đã lưu cấu hình định dạng.");
+        }
+
+        // Backup & Restore
+        [ObservableProperty] private string _backupStatus = "";
+        [ObservableProperty] private bool _isRestoring;
+
+        [RelayCommand]
+        private async Task BackupDatabase()
+        {
+            if (!_accessControlService.HasCached(SystemModules.SystemAdmin, PermissionAction.Edit))
+            {
+                _notificationService.ShowError("Bạn không có quyền thực hiện thao tác này.");
+                return;
+            }
+
+            var dialog = new Microsoft.Win32.SaveFileDialog
+            {
+                Title = "Chọn nơi lưu file sao lưu",
+                Filter = "SQL Server Backup (*.bak)|*.bak",
+                FileName = $"ManufacturingERP_{DateTime.Now:yyyyMMdd_HHmmss}.bak"
+            };
+
+            if (dialog.ShowDialog() != true) return;
+
+            BackupStatus = "Đang sao lưu...";
+            try
+            {
+                await _backupService.BackupDatabaseAsync(dialog.FileName);
+                BackupStatus = "";
+
+                var actor = _authService.CurrentUser;
+                await _auditLogService.LogAsync(actor?.UserId, "Sao lưu", "Database", "-", $"File: {dialog.FileName}");
+                _notificationService.ShowSuccess($"Sao lưu thành công: {dialog.FileName}");
+            }
+            catch (Exception ex)
+            {
+                BackupStatus = "";
+                _notificationService.ShowError($"Lỗi sao lưu: {ex.Message}");
+            }
+        }
+
+        [RelayCommand]
+        private async Task RestoreDatabase()
+        {
+            if (!_accessControlService.HasCached(SystemModules.SystemAdmin, PermissionAction.Edit))
+            {
+                _notificationService.ShowError("Bạn không có quyền thực hiện thao tác này.");
+                return;
+            }
+
+            bool confirm = _notificationService.Confirm(
+                "CẢNH BÁO: Phục hồi dữ liệu sẽ xóa toàn bộ dữ liệu hiện tại và thay thế bằng dữ liệu từ file sao lưu. Ứng dụng sẽ tự động đóng sau khi phục hồi.\n\nBạn có chắc chắn muốn tiếp tục?",
+                "Xác nhận phục hồi dữ liệu");
+
+            if (!confirm) return;
+
+            var dialog = new Microsoft.Win32.OpenFileDialog
+            {
+                Title = "Chọn file sao lưu cần phục hồi",
+                Filter = "SQL Server Backup (*.bak)|*.bak"
+            };
+
+            if (dialog.ShowDialog() != true) return;
+
+            if (!_backupService.IsValidBackupFile(dialog.FileName))
+            {
+                _notificationService.ShowError("File không hợp lệ.");
+                return;
+            }
+
+            IsRestoring = true;
+            try
+            {
+                await _backupService.RestoreDatabaseAsync(dialog.FileName);
+
+                var actor = _authService.CurrentUser;
+                await _auditLogService.LogAsync(actor?.UserId, "Phục hồi", "Database", "-", $"File: {dialog.FileName}");
+
+                _notificationService.ShowSuccess("Phục hồi dữ liệu thành công. Ứng dụng sẽ đóng để áp dụng thay đổi.");
+                System.Windows.Application.Current.Shutdown();
+            }
+            catch (Exception ex)
+            {
+                IsRestoring = false;
+                _notificationService.ShowError($"Lỗi phục hồi: {ex.Message}");
+            }
+        }
+
+        // Role CRUD
+        [RelayCommand]
+        private async Task AddRole()
+        {
+            if (!_accessControlService.HasCached(SystemModules.SystemAdmin, PermissionAction.Add))
+            {
+                _notificationService.ShowError("Bạn không có quyền Thêm trong phân hệ Quản trị hệ thống.");
+                return;
+            }
+
+            var inputDialog = new Views.Dialogs.InputDialog("Thêm vai trò mới", "Nhập tên vai trò:");
+            inputDialog.Owner = System.Windows.Application.Current.MainWindow;
+            if (inputDialog.ShowDialog() != true) return;
+
+            var roleName = inputDialog.InputText?.Trim();
+            if (string.IsNullOrEmpty(roleName))
+            {
+                _notificationService.ShowError("Tên vai trò không được trống.");
+                return;
+            }
+
+            try
+            {
+                await _userManagementService.CreateRoleAsync(roleName);
+                await LoadRolesAndPermissionsAsync();
+                SelectedRole = roleName;
+
+                var actor = _authService.CurrentUser;
+                await _auditLogService.LogAsync(actor?.UserId, "Thêm", "Roles", "-", $"Role: {roleName}");
+                _notificationService.ShowSuccess($"Đã thêm vai trò: {roleName}");
+            }
+            catch (Exception ex)
+            {
+                _notificationService.ShowError($"Lỗi khi thêm vai trò: {ex.Message}");
+            }
+        }
+
+        [RelayCommand]
+        private async Task RenameRole()
+        {
+            if (!_accessControlService.HasCached(SystemModules.SystemAdmin, PermissionAction.Edit))
+            {
+                _notificationService.ShowError("Bạn không có quyền Sửa trong phân hệ Quản trị hệ thống.");
+                return;
+            }
+
+            var roles = await _userManagementService.GetAllRolesAsync();
+            var role = roles.FirstOrDefault(r => r.RoleName == SelectedRole);
+            if (role == null)
+            {
+                _notificationService.ShowError("Vai trò không hợp lệ.");
+                return;
+            }
+
+            var inputDialog = new Views.Dialogs.InputDialog("Đổi tên vai trò", $"Tên mới cho '{SelectedRole}':", SelectedRole);
+            inputDialog.Owner = System.Windows.Application.Current.MainWindow;
+            if (inputDialog.ShowDialog() != true) return;
+
+            var newName = inputDialog.InputText?.Trim();
+            if (string.IsNullOrEmpty(newName))
+            {
+                _notificationService.ShowError("Tên vai trò không được trống.");
+                return;
+            }
+
+            try
+            {
+                await _userManagementService.RenameRoleAsync(role.RoleId, newName);
+                await LoadRolesAndPermissionsAsync();
+                SelectedRole = newName;
+
+                var actor = _authService.CurrentUser;
+                await _auditLogService.LogAsync(actor?.UserId, "Sửa", "Roles", $"Role: {SelectedRole}", $"Role: {newName}");
+                _notificationService.ShowSuccess($"Đã đổi tên vai trò thành: {newName}");
+            }
+            catch (Exception ex)
+            {
+                _notificationService.ShowError($"Lỗi khi đổi tên vai trò: {ex.Message}");
+            }
+        }
+
+        [RelayCommand]
+        private async Task DeleteRole()
+        {
+            if (!_accessControlService.HasCached(SystemModules.SystemAdmin, PermissionAction.Delete))
+            {
+                _notificationService.ShowError("Bạn không có quyền Xóa trong phân hệ Quản trị hệ thống.");
+                return;
+            }
+
+            bool confirm = _notificationService.Confirm(
+                $"Bạn có chắc chắn muốn XÓA vai trò '{SelectedRole}' không?",
+                "Xác nhận xóa vai trò");
+
+            if (!confirm) return;
+
+            var roles = await _userManagementService.GetAllRolesAsync();
+            var role = roles.FirstOrDefault(r => r.RoleName == SelectedRole);
+            if (role == null)
+            {
+                _notificationService.ShowError("Vai trò không hợp lệ.");
+                return;
+            }
+
+            try
+            {
+                var success = await _userManagementService.DeleteRoleAsync(role.RoleId);
+                if (success)
+                {
+                    await LoadRolesAndPermissionsAsync();
+                    var actor = _authService.CurrentUser;
+                    await _auditLogService.LogAsync(actor?.UserId, "Xóa", "Roles", $"Role: {SelectedRole}", "-");
+                    _notificationService.ShowSuccess($"Đã xóa vai trò: {SelectedRole}");
+                }
+            }
+            catch (Exception ex)
+            {
+                _notificationService.ShowError($"Lỗi khi xóa vai trò: {ex.Message}");
+            }
         }
 
         [RelayCommand]
@@ -174,6 +479,11 @@ namespace ManufacturingERP.ViewModels
         private async Task ToggleUserStatus(User user)
         {
             if (user == null) return;
+            if (!_accessControlService.HasCached(SystemModules.SystemAdmin, PermissionAction.Edit))
+            {
+                _notificationService.ShowError("Bạn không có quyền Sửa trong phân hệ Quản trị hệ thống.");
+                return;
+            }
 
             string action = (user.IsActive ?? false) ? "KHÓA" : "MỞ KHÓA";
             bool confirm = _notificationService.Confirm(
@@ -221,6 +531,12 @@ namespace ManufacturingERP.ViewModels
         [RelayCommand]
         private async Task AddUser()
         {
+            if (!_accessControlService.HasCached(SystemModules.SystemAdmin, PermissionAction.Add))
+            {
+                _notificationService.ShowError("Bạn không có quyền Thêm trong phân hệ Quản trị hệ thống.");
+                return;
+            }
+
             var dialog = new Views.Dialogs.UserDialog(new User(), AvailableRoles, _notificationService, true);
             dialog.Owner = System.Windows.Application.Current.MainWindow;
             
@@ -248,6 +564,11 @@ namespace ManufacturingERP.ViewModels
         private async Task EditUser(User user)
         {
             if (user == null) return;
+            if (!_accessControlService.HasCached(SystemModules.SystemAdmin, PermissionAction.Edit))
+            {
+                _notificationService.ShowError("Bạn không có quyền Sửa trong phân hệ Quản trị hệ thống.");
+                return;
+            }
             
             var dialog = new Views.Dialogs.UserDialog(user, AvailableRoles, _notificationService);
             dialog.Owner = System.Windows.Application.Current.MainWindow;
@@ -285,6 +606,11 @@ namespace ManufacturingERP.ViewModels
         private async Task DeleteUser(User user)
         {
             if (user == null) return;
+            if (!_accessControlService.HasCached(SystemModules.SystemAdmin, PermissionAction.Delete))
+            {
+                _notificationService.ShowError("Bạn không có quyền Xóa trong phân hệ Quản trị hệ thống.");
+                return;
+            }
 
             bool confirm = _notificationService.Confirm(
                 $"Bạn có chắc chắn muốn XÓA vĩnh viễn người dùng {user.Employee?.FullName ?? user.Username} ({user.Username}) khỏi hệ thống không?", 
@@ -321,8 +647,15 @@ namespace ManufacturingERP.ViewModels
         private async Task ResetPassword(User user)
         {
             if (user == null) return;
+            if (!_accessControlService.HasCached(SystemModules.SystemAdmin, PermissionAction.Edit))
+            {
+                _notificationService.ShowError("Bạn không có quyền Sửa trong phân hệ Quản trị hệ thống.");
+                return;
+            }
 
-            var dialog = new Views.Dialogs.ResetPasswordDialog(_notificationService);
+            var minLength = await _settingsService.GetSettingIntAsync("MinPasswordLength", 8);
+            var complexityRequired = await _settingsService.GetSettingBoolAsync("IsComplexityRequired", true);
+            var dialog = new Views.Dialogs.ResetPasswordDialog(_notificationService, minLength, complexityRequired);
             dialog.Owner = System.Windows.Application.Current.MainWindow;
             
             if (dialog.ShowDialog() == true)
@@ -353,6 +686,12 @@ namespace ManufacturingERP.ViewModels
         [RelayCommand]
         private async Task SavePermissions()
         {
+            if (!_accessControlService.HasCached(SystemModules.SystemAdmin, PermissionAction.Edit))
+            {
+                _notificationService.ShowError("Bạn không có quyền Sửa trong phân hệ Quản trị hệ thống.");
+                return;
+            }
+
             try
             {
                 var dtos = Permissions.Select(p =>
@@ -374,6 +713,12 @@ namespace ManufacturingERP.ViewModels
         [RelayCommand]
         private async Task ResetPermissions()
         {
+            if (!_accessControlService.HasCached(SystemModules.SystemAdmin, PermissionAction.Edit))
+            {
+                _notificationService.ShowError("Bạn không có quyền Sửa trong phân hệ Quản trị hệ thống.");
+                return;
+            }
+
             try
             {
                 await _permissionService.ResetRolePermissionsAsync(SelectedRole);
@@ -394,6 +739,11 @@ namespace ManufacturingERP.ViewModels
         private async Task ApproveReset(PasswordResetRequest request)
         {
             if (request == null) return;
+            if (!_accessControlService.HasCached(SystemModules.SystemAdmin, PermissionAction.Edit))
+            {
+                _notificationService.ShowError("Bạn không có quyền Sửa trong phân hệ Quản trị hệ thống.");
+                return;
+            }
 
             var admin = _authService.CurrentUser;
             if (admin == null) return;

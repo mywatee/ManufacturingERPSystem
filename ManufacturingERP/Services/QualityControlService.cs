@@ -40,7 +40,7 @@ public class QualityControlService : IQualityControlService
     {
         try
         {
-            var context = await _contextFactory.CreateDbContextAsync();
+            using var context = await _contextFactory.CreateDbContextAsync();
             
             // VALIDATION: Kiểm tra nghiêm ngặt - Số lượng QC không được vượt quá số lượng đã báo cáo sản xuất
             if (record.Woid.HasValue)
@@ -74,7 +74,6 @@ public class QualityControlService : IQualityControlService
 
             record.InspectionDate = DateTime.Now;
             context.QualityControls.Add(record);
-            await context.SaveChangesAsync();
 
             // XỬ LÝ ĐỒNG BỘ VỀ LỆNH SẢN XUẤT (WorkOrder)
             if (record.Woid.HasValue)
@@ -86,7 +85,8 @@ public class QualityControlService : IQualityControlService
                 if (order != null)
                 {
                     // 1. Cập nhật số lượng đạt chuẩn (ActualQty) vào header của lệnh
-                    order.ActualQty = (order.ActualQty ?? 0) + (record.PassedQty ?? 0);
+                    var itemsActual = order.WorkOrderItems?.Sum(i => i.ActualQty) ?? 0;
+                    order.ActualQty = itemsActual + (record.PassedQty ?? 0);
                     
                     // 2. Cập nhật chi tiết từng sản phẩm trong lệnh và ghi nhận tiến độ
                     var targetItem = order.WorkOrderItems.FirstOrDefault(i => i.ItemId == record.WorkOrderItemId) 
@@ -94,7 +94,7 @@ public class QualityControlService : IQualityControlService
 
                     if (targetItem != null)
                     {
-                        targetItem.ActualQty += (record.PassedQty ?? 0);
+                        targetItem.ActualQty = targetItem.ActualQty + (record.PassedQty ?? 0);
 
                         // Thêm bản ghi tiến độ để hệ thống tự động tính toán FailedQty
                         context.WorkOrderProgresses.Add(new WorkOrderProgress
@@ -128,12 +128,12 @@ public class QualityControlService : IQualityControlService
                     var targetWh = warehouses.FirstOrDefault(w => w.Name.Contains("Thành phẩm") || w.Name.Contains("Thành Phẩm")) 
                                 ?? warehouses.FirstOrDefault();
 
-                    if (targetWh != null)
+                    if (targetWh != null && int.TryParse(targetWh.Id, out int whId))
                     {
                         await _warehouseService.AddStockTransactionAsync(new StockTransaction
                         {
                             MaterialId = targetItem.ProductId,
-                            WarehouseId = int.Parse(targetWh.Id),
+                            WarehouseId = whId,
                             Quantity = (decimal)record.PassedQty.Value,
 
                             Type = "Nhập kho",
@@ -176,6 +176,10 @@ public class QualityControlService : IQualityControlService
 
             return true;
 
+        }
+        catch (InvalidOperationException)
+        {
+            throw;
         }
         catch (Exception)
         {
@@ -240,20 +244,9 @@ public class QualityControlService : IQualityControlService
     }
 
 
-    public async Task<List<TrendPoint>> GetDefectTrendAsync(string period, int count)
+    public async Task<List<TrendPoint>> GetDefectTrendAsync(string period, int count, DateTime startDate)
     {
         using var context = await _contextFactory.CreateDbContextAsync();
-        DateTime startDate;
-        
-        // Căn chỉnh ngày bắt đầu dựa trên chu kỳ
-        if (period == "Ngày") startDate = DateTime.Now.Date.AddDays(-count + 1);
-        else if (period == "Tháng") startDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1).AddMonths(-count + 1);
-        else // Tuần
-        {
-            // Tìm Thứ 2 gần nhất
-            int diff = (7 + (DateTime.Now.DayOfWeek - DayOfWeek.Monday)) % 7;
-            startDate = DateTime.Now.Date.AddDays(-diff).AddDays(-(count - 1) * 7);
-        }
 
         var records = await context.QualityControls
             .Where(q => q.InspectionDate >= startDate)
@@ -271,23 +264,37 @@ public class QualityControlService : IQualityControlService
                 pStart = startDate.AddDays(i);
                 pEnd = pStart.AddDays(1);
                 
-                string dayName = pStart.DayOfWeek switch {
-                    DayOfWeek.Monday => "T2",
-                    DayOfWeek.Tuesday => "T3",
-                    DayOfWeek.Wednesday => "T4",
-                    DayOfWeek.Thursday => "T5",
-                    DayOfWeek.Friday => "T6",
-                    DayOfWeek.Saturday => "T7",
-                    DayOfWeek.Sunday => "CN",
-                    _ => ""
-                };
-                label = $"{dayName} {pStart:dd/MM}";
+                if (count > 14 && i % 7 != 0 && i != count - 1)
+                {
+                    label = "";
+                }
+                else
+                {
+                    string dayName = pStart.DayOfWeek switch {
+                        DayOfWeek.Monday => "T2",
+                        DayOfWeek.Tuesday => "T3",
+                        DayOfWeek.Wednesday => "T4",
+                        DayOfWeek.Thursday => "T5",
+                        DayOfWeek.Friday => "T6",
+                        DayOfWeek.Saturday => "T7",
+                        DayOfWeek.Sunday => "CN",
+                        _ => ""
+                    };
+                    label = $"{dayName} {pStart:dd/MM}";
+                }
             }
             else if (period == "Tháng")
             {
                 pStart = startDate.AddMonths(i);
                 pEnd = pStart.AddMonths(1);
                 label = $"Th.{pStart:MM/yy}";
+            }
+            else if (period == "Quý")
+            {
+                pStart = startDate.AddMonths(i * 3);
+                pEnd = pStart.AddMonths(3);
+                int q = (pStart.Month - 1) / 3 + 1;
+                label = $"Q{q}/{pStart:yy}";
             }
             else // Tuần
             {
@@ -322,22 +329,6 @@ public class QualityControlService : IQualityControlService
 
     {
         using var context = await _contextFactory.CreateDbContextAsync();
-        
-        // VÁ DỮ LIỆU TỰ ĐỘNG: Gắn các bản ghi QC chưa có WorkOrderItemId vào sản phẩm đầu tiên của lệnh
-        var orphanedRecords = await context.QualityControls
-            .Where(q => q.WorkOrderItemId == null && q.Woid != null)
-            .ToListAsync();
-        
-        if (orphanedRecords.Any())
-        {
-            foreach (var rec in orphanedRecords)
-            {
-                var firstItem = await context.WorkOrderItems.FirstOrDefaultAsync(i => i.WorkOrderId == rec.Woid);
-                if (firstItem != null) rec.WorkOrderItemId = firstItem.ItemId;
-            }
-            await context.SaveChangesAsync();
-        }
-
         var records = await context.QualityControls
             .Where(q => q.InspectionDate >= startDate && q.InspectionDate <= endDate)
             .ToListAsync();
@@ -349,8 +340,8 @@ public class QualityControlService : IQualityControlService
         // Giả lập phân loại lỗi từ DefectReason (Trong thực tế nên có bảng DefectCategories)
         var defectStats = records
             .Where(q => !string.IsNullOrEmpty(q.DefectReason))
-            .GroupBy(q => q.DefectReason!)
-            .Select(g => (Category: g.Key, Count: g.Count()))
+            .GroupBy(q => q.DefectReason ?? "Khác")
+            .Select(g => (Category: g.Key, Count: g.Sum(q => q.FailedQty ?? 0)))
             .OrderByDescending(x => x.Count)
             .ToList();
 

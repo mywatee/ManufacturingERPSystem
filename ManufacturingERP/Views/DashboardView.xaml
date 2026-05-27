@@ -20,15 +20,28 @@
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
 
                 <!-- Page Title & Header -->
                 <Grid Grid.Row="0" Margin="0,0,0,30">
-                    <StackPanel>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0">
                         <TextBlock Text="Bảng điều khiển" FontSize="26" FontWeight="Bold" Foreground="{StaticResource PrimaryTextBrush}"/>
                         <TextBlock Text="Tổng quan hệ thống sản xuất - Cập nhật thời gian thực" 
                                    FontSize="14" Foreground="{StaticResource SecondaryTextBrush}" Margin="0,5,0,0"/>
                     </StackPanel>
+                    <Button Grid.Column="1" Command="{Binding RefreshDashboardCommand}"
+                            VerticalAlignment="Top" Padding="15,8" Style="{StaticResource SecondaryButtonStyle}">
+                        <StackPanel Orientation="Horizontal">
+                            <Path Data="M1 4v6h6 M23 20v-6h-6" Stroke="#4B5563" StrokeThickness="2"
+                                  StrokeStartLineCap="Round" StrokeEndLineCap="Round" Width="16" Height="16" Margin="0,0,8,0"/>
+                            <TextBlock Text="Làm mới" VerticalAlignment="Center" FontWeight="SemiBold"/>
+                        </StackPanel>
+                    </Button>
                 </Grid>
                 
                 <!-- Rest of the content stays the same -->
@@ -54,7 +67,10 @@
                     </StackPanel>
                 </Border>
 
-                <Border Grid.Column="1" Style="{StaticResource CardStyle}" Margin="10,0,10,0">
+                <Border Grid.Column="1" Style="{StaticResource CardStyle}" Margin="10,0,10,0" Cursor="Hand">
+                    <Border.InputBindings>
+                        <MouseBinding Gesture="LeftClick" Command="{Binding ViewMaterialAlertsCommand}"/>
+                    </Border.InputBindings>
                     <StackPanel>
                         <Grid Margin="0,0,0,15">
                             <Border Width="45" Height="45" CornerRadius="8" Background="{StaticResource OrangeIconBg}" HorizontalAlignment="Left">
@@ -108,16 +124,16 @@
                         </Grid.RowDefinitions>
                         <TextBlock Grid.Row="0" Text="Tiến độ sản xuất so với Kế hoạch" FontSize="18" FontWeight="Bold" Margin="0,0,0,20"/>
                         
-                        <lvc:CartesianChart Grid.Row="1" Series="{Binding ProductionSeries}" LegendLocation="None">
-                            <lvc:CartesianChart.AxisX>
-                                <lvc:Axis Labels="{Binding ProductionLabels}">
-                                    <lvc:Axis.Separator>
-                                        <lvc:Separator Step="1" IsEnabled="False"/>
-                                    </lvc:Axis.Separator>
-                                </lvc:Axis>
-                            </lvc:CartesianChart.AxisX>
+                            <lvc:CartesianChart Grid.Row="1" Series="{Binding ProductionSeries}" LegendLocation="None">
+                                <lvc:CartesianChart.AxisX>
+                                    <lvc:Axis Labels="{Binding ProductionLabels}">
+                                        <lvc:Axis.Separator>
+                                            <lvc:Separator Step="1" IsEnabled="False"/>
+                                        </lvc:Axis.Separator>
+                                    </lvc:Axis>
+                                </lvc:CartesianChart.AxisX>
                             <lvc:CartesianChart.AxisY>
-                                <lvc:Axis MinValue="180" MaxValue="280">
+                                <lvc:Axis>
                                     <lvc:Axis.Separator>
                                         <lvc:Separator StrokeThickness="1" Stroke="#F1F5F9" />
                                     </lvc:Axis.Separator>
@@ -147,7 +163,7 @@
                             <RowDefinition Height="*"/>
                             <RowDefinition Height="Auto"/>
                         </Grid.RowDefinitions>
-                        <TextBlock Grid.Row="0" Text="Phân tích lý do hàng lỗi" FontSize="18" FontWeight="Bold" Margin="0,0,0,10"/>
+                        <TextBlock Grid.Row="0" Text="Kết quả kiểm tra chất lượng" FontSize="18" FontWeight="Bold" Margin="0,0,0,10"/>
                         
                         <!-- Modern Donut Chart -->
                         <Grid Grid.Row="1">
@@ -172,16 +188,47 @@
                             </StackPanel>
                         </Grid>
 
-                        <!-- Pie Chart Legend (Empty) -->
+                        <!-- Pie Chart Legend (Dynamic) -->
                         <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,15,0,0">
-                            <TextBlock Text="Không có dữ liệu lỗi" FontSize="12" Foreground="{StaticResource SecondaryTextBrush}" FontStyle="Italic"/>
+                            <Ellipse Width="10" Height="10" Fill="#22C35E" Margin="0,0,6,0"/>
+                            <TextBlock Text="Đạt" FontSize="12" Foreground="{StaticResource SecondaryTextBrush}" Margin="0,0,20,0"/>
+                            <Ellipse Width="10" Height="10" Fill="#EF4444" Margin="0,0,6,0"/>
+                            <TextBlock Text="Lỗi" FontSize="12" Foreground="{StaticResource SecondaryTextBrush}" Margin="0,0,20,0"/>
+                            <TextBlock Text="{Binding QcSummaryText}" FontSize="12" Foreground="{StaticResource SecondaryTextBrush}" FontStyle="Italic"/>
                         </StackPanel>
                     </Grid>
                 </Border>
             </Grid>
 
-            <!-- Urgent Orders (Row 3) -->
+            <!-- Defect Reason Statistics (Row 3) -->
             <Border Grid.Row="3" Style="{StaticResource CardStyle}" Margin="0,0,0,30">
+                <StackPanel>
+                    <TextBlock Text="Thống kê lý do hàng lỗi" FontSize="18" FontWeight="Bold" Margin="0,0,0,20"/>
+
+                    <DataGrid Style="{StaticResource ModernDataGridStyle}" ItemsSource="{Binding DefectReasonStats}" IsReadOnly="True"
+                              AutoGenerateColumns="False" MaxHeight="300">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Lý do lỗi" Binding="{Binding Reason}" Width="*"/>
+                            <DataGridTextColumn Header="Số lần ghi nhận" Binding="{Binding Count}" Width="150"/>
+                            <DataGridTemplateColumn Header="Tỷ lệ" Width="200">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Stretch">
+                                            <ProgressBar Value="{Binding Percentage}" Width="100" Height="8"
+                                                         Style="{StaticResource ModernProgressBarStyle}" Foreground="#EF4444"
+                                                         Margin="0,0,8,0"/>
+                                            <TextBlock Text="{Binding PercentageDisplay}" FontSize="12" Foreground="{StaticResource SecondaryTextBrush}"/>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </StackPanel>
+            </Border>
+
+            <!-- Urgent Orders (Row 4) -->
+            <Border Grid.Row="4" Style="{StaticResource CardStyle}" Margin="0,0,0,30">
                 <StackPanel>
                     <Grid Margin="0,0,0,20">
                         <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
@@ -323,8 +370,8 @@
                 </StackPanel>
             </Border>
 
-            <!-- Recent Activity (Row 4) -->
-            <Border Grid.Row="4" Style="{StaticResource CardStyle}">
+            <!-- Recent Activity (Row 5) -->
+            <Border Grid.Row="5" Style="{StaticResource CardStyle}">
                 <StackPanel>
                     <Grid Margin="0,0,0,20">
                         <TextBlock Text="Hoạt động gần đây" FontSize="18" FontWeight="Bold" VerticalAlignment="Center"/>

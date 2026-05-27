@@ -280,15 +280,8 @@
                                                 HorizontalAlignment="Right" Background="Transparent" BorderThickness="0" Cursor="Hand">
                                             <Button.Style>
                                                 <Style TargetType="Button">
-                                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                                    <Setter Property="Visibility" Value="{Binding OrderItems.Count, Converter={StaticResource GreaterThanZeroToVisibilityConverter}}"/>
                                                     <Style.Triggers>
-                                                        <DataTrigger Binding="{Binding OrderItems.Count, Converter={StaticResource StringHasValueToBooleanConverter}}" Value="True">
-                                                            <Setter Property="Visibility" Value="Visible"/>
-                                                        </DataTrigger>
-                                                        <!-- If Converter above doesn't work for int, I'll use a simpler trigger or just visible -->
-                                                        <DataTrigger Binding="{Binding OrderItems.Count}" Value="0">
-                                                            <Setter Property="Visibility" Value="Collapsed"/>
-                                                        </DataTrigger>
                                                         <Trigger Property="IsMouseOver" Value="True">
                                                             <Setter Property="Opacity" Value="0.7"/>
                                                         </Trigger>
@@ -388,14 +381,9 @@
                                                     <Button Command="{Binding DataContext.RemoveItemCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}" 
                                                             CommandParameter="{Binding}" Visibility="Collapsed"/> <!-- Placeholder for alignment -->
                                                             
-                                                    <Button Command="{Binding DataContext.SelectedOrderItem, RelativeSource={RelativeSource AncestorType=DataGrid}}"
-                                                            CommandParameter="{Binding}"
-                                                            Width="32" Height="32" Background="Transparent" BorderThickness="0" Margin="0,0,8,0">
-                                                        <Button.Style>
-                                                            <Style TargetType="Button">
-                                                                <Setter Property="Command" Value="{Binding DataContext.SetSelectedItemCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"/>
-                                                            </Style>
-                                                        </Button.Style>
+                                                    <Button CommandParameter="{Binding}"
+                                                            Width="32" Height="32" Background="Transparent" BorderThickness="0" Margin="0,0,8,0"
+                                                            Command="{Binding DataContext.SetSelectedItemCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}">
                                                         <Button.Template>
                                                             <ControlTemplate TargetType="Button">
                                                                 <Border x:Name="btnBorder" Background="Transparent" CornerRadius="16">

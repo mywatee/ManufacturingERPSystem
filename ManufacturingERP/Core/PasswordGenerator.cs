@@ -4,9 +4,9 @@ namespace ManufacturingERP.Core;
 
 public static class PasswordGenerator
 {
-    private const string Lower = "abcdefghijkmnopqrstuvwxyz";
-    private const string Upper = "ABCDEFGHJKLMNPQRSTUVWXYZ";
-    private const string Digits = "23456789";
+    private const string Lower = "abcdefghijklmnopqrstuvwxyz";
+    private const string Upper = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    private const string Digits = "0123456789";
     private const string Specials = "!@#$%^&*_-+=";
 
     public static string GenerateTemporaryPassword(int length = 12)

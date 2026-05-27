@@ -13,4 +13,10 @@ public interface IUserManagementService
     Task<bool> ToggleActiveAsync(int userId, bool isActive);
     Task ResetPasswordAsync(int userId, string newPassword);
     Task DeleteUserAsync(int userId);
+
+    // Role management
+    Task<Role> CreateRoleAsync(string roleName);
+    Task<bool> RenameRoleAsync(int roleId, string newName);
+    Task<bool> DeleteRoleAsync(int roleId);
+    Task<List<Role>> GetAllRolesAsync();
 }

@@ -193,7 +193,7 @@
                       VerticalScrollBarVisibility="Disabled"
                       IsReadOnly="True">
                 <DataGrid.Columns>
-                    <DataGridTextColumn Header="Mã NV" Binding="{Binding EmployeeId}" Width="80"/>
+                    <DataGridTextColumn Header="Mã NV" Binding="{Binding EmployeeCode}" Width="100"/>
                     <DataGridTextColumn Header="Tên nhân viên" Binding="{Binding Name}" Width="1.5*"/>
                     <DataGridTextColumn Header="Bộ phận" Binding="{Binding Department}" Width="*"/>
                     <DataGridTextColumn Header="Sản lượng đạt" Binding="{Binding ProductionQty}" Width="100"/>

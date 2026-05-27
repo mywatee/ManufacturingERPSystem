@@ -37,7 +37,7 @@ public partial class Employee : ObservableObject
     public decimal? BasicSalary { get; set; }
 
     [MaxLength(20)]
-    public string Status { get; set; } = "Active"; // Active, OnLeave, Resigned
+    public string Status { get; set; } = "Đang làm việc"; // Đang làm việc, Nghỉ phép, Đã nghỉ việc
 
     [Column(TypeName = "decimal(18,2)")]
     public decimal? PiecesRate { get; set; } = 15000;

@@ -363,10 +363,10 @@ public partial class WarehouseReportViewModel : ViewModelBase
                     var mat = materials.FirstOrDefault(m => m.MaterialCode == item.MaterialCode);
                     var wh = warehouses.FirstOrDefault(w => w.Name == item.Warehouse || w.Code == item.Warehouse);
 
-                    if (mat != null && wh != null)
+                    if (mat != null && wh != null && int.TryParse(wh.Id, out int whId))
                     {
-                        int whId = int.Parse(wh.Id);
-                        bool ok = await _warehouseService.AdjustStockAsync(whId, mat.MaterialId, (decimal)item.CurrentQty, 1, "Nhập dữ liệu từ Excel");
+                        int userId = _authService.CurrentUser?.UserId ?? 1;
+                        bool ok = await _warehouseService.AdjustStockAsync(whId, mat.MaterialId, (decimal)item.CurrentQty, userId, "Nhập dữ liệu từ Excel", IsUpdateMode);
                         if (ok) count++;
                     }
                 }
@@ -376,7 +376,8 @@ public partial class WarehouseReportViewModel : ViewModelBase
                 // Log activity
                 await _activityService.LogActivityAsync("Nhập file", $"[Warehouse] Nhập dữ liệu tồn kho từ file Excel. Số dòng: {count}");
 
-                _navigationService.NavigateTo<WarehouseViewModel>();
+                var whVm = _navigationService.NavigateTo<WarehouseViewModel>();
+                await whVm.InitializeAsync();
             }
             catch (Exception ex) { _notificationService.ShowError("Lỗi: " + ex.Message); }
             finally { IsBusy = false; }

@@ -3,8 +3,36 @@
   "WorkspaceRootPath": "D:\\DoAn\\DoAnCoSo\\ManufacturingERP\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{0AE4CB9B-4E4B-335D-C266-215AF3F7A525}|ManufacturingERP\\ManufacturingERP.csproj|d:\\doan\\doancoso\\manufacturingerp\\manufacturingerp\\viewmodels\\masterdataimportviewmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{0AE4CB9B-4E4B-335D-C266-215AF3F7A525}|ManufacturingERP\\ManufacturingERP.csproj|solutionrelative:manufacturingerp\\viewmodels\\masterdataimportviewmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{0AE4CB9B-4E4B-335D-C266-215AF3F7A525}|ManufacturingERP\\ManufacturingERP.csproj|d:\\doan\\doancoso\\manufacturingerp\\manufacturingerp\\services\\databaseseederservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0AE4CB9B-4E4B-335D-C266-215AF3F7A525}|ManufacturingERP\\ManufacturingERP.csproj|solutionrelative:manufacturingerp\\services\\databaseseederservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0AE4CB9B-4E4B-335D-C266-215AF3F7A525}|ManufacturingERP\\ManufacturingERP.csproj|d:\\doan\\doancoso\\manufacturingerp\\manufacturingerp\\views\\attendanceconsoleview.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0AE4CB9B-4E4B-335D-C266-215AF3F7A525}|ManufacturingERP\\ManufacturingERP.csproj|solutionrelative:manufacturingerp\\views\\attendanceconsoleview.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0AE4CB9B-4E4B-335D-C266-215AF3F7A525}|ManufacturingERP\\ManufacturingERP.csproj|d:\\doan\\doancoso\\manufacturingerp\\manufacturingerp\\views\\components\\toastnotificationview.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0AE4CB9B-4E4B-335D-C266-215AF3F7A525}|ManufacturingERP\\ManufacturingERP.csproj|solutionrelative:manufacturingerp\\views\\components\\toastnotificationview.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0AE4CB9B-4E4B-335D-C266-215AF3F7A525}|ManufacturingERP\\ManufacturingERP.csproj|d:\\doan\\doancoso\\manufacturingerp\\manufacturingerp\\services\\aichatservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0AE4CB9B-4E4B-335D-C266-215AF3F7A525}|ManufacturingERP\\ManufacturingERP.csproj|solutionrelative:manufacturingerp\\services\\aichatservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0AE4CB9B-4E4B-335D-C266-215AF3F7A525}|ManufacturingERP\\ManufacturingERP.csproj|d:\\doan\\doancoso\\manufacturingerp\\manufacturingerp\\mainwindow.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
+      "RelativeMoniker": "D:0:0:{0AE4CB9B-4E4B-335D-C266-215AF3F7A525}|ManufacturingERP\\ManufacturingERP.csproj|solutionrelative:manufacturingerp\\mainwindow.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0AE4CB9B-4E4B-335D-C266-215AF3F7A525}|ManufacturingERP\\ManufacturingERP.csproj|d:\\doan\\doancoso\\manufacturingerp\\manufacturingerp\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{0AE4CB9B-4E4B-335D-C266-215AF3F7A525}|ManufacturingERP\\ManufacturingERP.csproj|solutionrelative:manufacturingerp\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0AE4CB9B-4E4B-335D-C266-215AF3F7A525}|ManufacturingERP\\ManufacturingERP.csproj|d:\\doan\\doancoso\\manufacturingerp\\manufacturingerp\\views\\importexportview.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
+      "RelativeMoniker": "D:0:0:{0AE4CB9B-4E4B-335D-C266-215AF3F7A525}|ManufacturingERP\\ManufacturingERP.csproj|solutionrelative:manufacturingerp\\views\\importexportview.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0AE4CB9B-4E4B-335D-C266-215AF3F7A525}|ManufacturingERP\\ManufacturingERP.csproj|d:\\doan\\doancoso\\manufacturingerp\\manufacturingerp\\views\\createworkorderview.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
+      "RelativeMoniker": "D:0:0:{0AE4CB9B-4E4B-335D-C266-215AF3F7A525}|ManufacturingERP\\ManufacturingERP.csproj|solutionrelative:manufacturingerp\\views\\createworkorderview.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{0AE4CB9B-4E4B-335D-C266-215AF3F7A525}|ManufacturingERP\\ManufacturingERP.csproj|d:\\doan\\doancoso\\manufacturingerp\\manufacturingerp\\viewmodels\\dashboardviewmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -72,10 +100,6 @@
     {
       "AbsoluteMoniker": "D:0:0:{0AE4CB9B-4E4B-335D-C266-215AF3F7A525}|ManufacturingERP\\ManufacturingERP.csproj|d:\\doan\\doancoso\\manufacturingerp\\manufacturingerp\\viewmodels\\createinvoiceviewmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{0AE4CB9B-4E4B-335D-C266-215AF3F7A525}|ManufacturingERP\\ManufacturingERP.csproj|solutionrelative:manufacturingerp\\viewmodels\\createinvoiceviewmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{0AE4CB9B-4E4B-335D-C266-215AF3F7A525}|ManufacturingERP\\ManufacturingERP.csproj|d:\\doan\\doancoso\\manufacturingerp\\manufacturingerp\\services\\databaseseederservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{0AE4CB9B-4E4B-335D-C266-215AF3F7A525}|ManufacturingERP\\ManufacturingERP.csproj|solutionrelative:manufacturingerp\\services\\databaseseederservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{0AE4CB9B-4E4B-335D-C266-215AF3F7A525}|ManufacturingERP\\ManufacturingERP.csproj|d:\\doan\\doancoso\\manufacturingerp\\manufacturingerp\\views\\hrview.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
@@ -248,18 +272,6 @@
       "RelativeMoniker": "D:0:0:{0AE4CB9B-4E4B-335D-C266-215AF3F7A525}|ManufacturingERP\\ManufacturingERP.csproj|solutionrelative:manufacturingerp\\views\\createworkorderview.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{0AE4CB9B-4E4B-335D-C266-215AF3F7A525}|ManufacturingERP\\ManufacturingERP.csproj|d:\\doan\\doancoso\\manufacturingerp\\manufacturingerp\\views\\createworkorderview.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
-      "RelativeMoniker": "D:0:0:{0AE4CB9B-4E4B-335D-C266-215AF3F7A525}|ManufacturingERP\\ManufacturingERP.csproj|solutionrelative:manufacturingerp\\views\\createworkorderview.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{0AE4CB9B-4E4B-335D-C266-215AF3F7A525}|ManufacturingERP\\ManufacturingERP.csproj|d:\\doan\\doancoso\\manufacturingerp\\manufacturingerp\\mainwindow.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
-      "RelativeMoniker": "D:0:0:{0AE4CB9B-4E4B-335D-C266-215AF3F7A525}|ManufacturingERP\\ManufacturingERP.csproj|solutionrelative:manufacturingerp\\mainwindow.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{0AE4CB9B-4E4B-335D-C266-215AF3F7A525}|ManufacturingERP\\ManufacturingERP.csproj|d:\\doan\\doancoso\\manufacturingerp\\manufacturingerp\\views\\components\\toastnotificationview.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{0AE4CB9B-4E4B-335D-C266-215AF3F7A525}|ManufacturingERP\\ManufacturingERP.csproj|solutionrelative:manufacturingerp\\views\\components\\toastnotificationview.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{0AE4CB9B-4E4B-335D-C266-215AF3F7A525}|ManufacturingERP\\ManufacturingERP.csproj|d:\\doan\\doancoso\\manufacturingerp\\manufacturingerp\\views\\dialogs\\workorderdialog.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
       "RelativeMoniker": "D:0:0:{0AE4CB9B-4E4B-335D-C266-215AF3F7A525}|ManufacturingERP\\ManufacturingERP.csproj|solutionrelative:manufacturingerp\\views\\dialogs\\workorderdialog.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
     },
@@ -297,35 +309,94 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 4,
+          "SelectedChildIndex": 2,
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "FileService.cs",
-              "DocumentMoniker": "D:\\DoAn\\DoAnCoSo\\ManufacturingERP\\ManufacturingERP\\Services\\FileService.cs",
-              "RelativeDocumentMoniker": "ManufacturingERP\\Services\\FileService.cs",
-              "ToolTip": "D:\\DoAn\\DoAnCoSo\\ManufacturingERP\\ManufacturingERP\\Services\\FileService.cs",
-              "RelativeToolTip": "ManufacturingERP\\Services\\FileService.cs",
-              "ViewState": "AgIAAMQAAAAAAAAAAADgv88AAAAAAAAAAAAAAA==",
+              "DocumentIndex": 3,
+              "Title": "AIChatService.cs",
+              "DocumentMoniker": "D:\\DoAn\\DoAnCoSo\\ManufacturingERP\\ManufacturingERP\\Services\\AIChatService.cs",
+              "RelativeDocumentMoniker": "ManufacturingERP\\Services\\AIChatService.cs",
+              "ToolTip": "D:\\DoAn\\DoAnCoSo\\ManufacturingERP\\ManufacturingERP\\Services\\AIChatService.cs",
+              "RelativeToolTip": "ManufacturingERP\\Services\\AIChatService.cs",
+              "ViewState": "AgIAAAUAAAAAAAAAAAAiwCgAAAArAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-04-26T14:27:58.984Z"
+              "WhenOpened": "2026-05-25T14:36:28.222Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 16,
-              "Title": "FinanceModels.cs",
-              "DocumentMoniker": "D:\\DoAn\\DoAnCoSo\\ManufacturingERP\\ManufacturingERP\\Models\\FinanceModels.cs",
-              "RelativeDocumentMoniker": "ManufacturingERP\\Models\\FinanceModels.cs",
-              "ToolTip": "D:\\DoAn\\DoAnCoSo\\ManufacturingERP\\ManufacturingERP\\Models\\FinanceModels.cs",
-              "RelativeToolTip": "ManufacturingERP\\Models\\FinanceModels.cs",
-              "ViewState": "AgIAAFUAAAAAAAAAAAA4wGEAAAATAAAAAAAAAA==",
+              "DocumentIndex": 4,
+              "Title": "MainWindow.xaml",
+              "DocumentMoniker": "D:\\DoAn\\DoAnCoSo\\ManufacturingERP\\ManufacturingERP\\MainWindow.xaml",
+              "RelativeDocumentMoniker": "ManufacturingERP\\MainWindow.xaml",
+              "ToolTip": "D:\\DoAn\\DoAnCoSo\\ManufacturingERP\\ManufacturingERP\\MainWindow.xaml",
+              "RelativeToolTip": "ManufacturingERP\\MainWindow.xaml",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
+              "WhenOpened": "2026-04-13T06:40:04.566Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "DatabaseSeederService.cs",
+              "DocumentMoniker": "D:\\DoAn\\DoAnCoSo\\ManufacturingERP\\ManufacturingERP\\Services\\DatabaseSeederService.cs",
+              "RelativeDocumentMoniker": "ManufacturingERP\\Services\\DatabaseSeederService.cs",
+              "ToolTip": "D:\\DoAn\\DoAnCoSo\\ManufacturingERP\\ManufacturingERP\\Services\\DatabaseSeederService.cs",
+              "RelativeToolTip": "ManufacturingERP\\Services\\DatabaseSeederService.cs",
+              "ViewState": "AgIAANkBAAAAAAAAAADgv7gBAAAMAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-05-12T15:13:41.596Z"
+              "WhenOpened": "2026-05-07T04:17:43.929Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 1,
+              "Title": "AttendanceConsoleView.xaml.cs",
+              "DocumentMoniker": "D:\\DoAn\\DoAnCoSo\\ManufacturingERP\\ManufacturingERP\\Views\\AttendanceConsoleView.xaml.cs",
+              "RelativeDocumentMoniker": "ManufacturingERP\\Views\\AttendanceConsoleView.xaml.cs",
+              "ToolTip": "D:\\DoAn\\DoAnCoSo\\ManufacturingERP\\ManufacturingERP\\Views\\AttendanceConsoleView.xaml.cs",
+              "RelativeToolTip": "ManufacturingERP\\Views\\AttendanceConsoleView.xaml.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAgAAAAIAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-05-26T09:55:06.964Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "ToastNotificationView.xaml.cs",
+              "DocumentMoniker": "D:\\DoAn\\DoAnCoSo\\ManufacturingERP\\ManufacturingERP\\Views\\Components\\ToastNotificationView.xaml.cs",
+              "RelativeDocumentMoniker": "ManufacturingERP\\Views\\Components\\ToastNotificationView.xaml.cs",
+              "ToolTip": "D:\\DoAn\\DoAnCoSo\\ManufacturingERP\\ManufacturingERP\\Views\\Components\\ToastNotificationView.xaml.cs",
+              "RelativeToolTip": "ManufacturingERP\\Views\\Components\\ToastNotificationView.xaml.cs",
+              "ViewState": "AgIAAAgAAAAAAAAAAAAiwBQAAAAIAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-22T07:08:46.396Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "appsettings.json",
+              "DocumentMoniker": "D:\\DoAn\\DoAnCoSo\\ManufacturingERP\\ManufacturingERP\\appsettings.json",
+              "RelativeDocumentMoniker": "ManufacturingERP\\appsettings.json",
+              "ToolTip": "D:\\DoAn\\DoAnCoSo\\ManufacturingERP\\ManufacturingERP\\appsettings.json",
+              "RelativeToolTip": "ManufacturingERP\\appsettings.json",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAEAAAA8AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2026-05-25T13:58:58.155Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "ImportExportView.xaml",
+              "DocumentMoniker": "D:\\DoAn\\DoAnCoSo\\ManufacturingERP\\ManufacturingERP\\Views\\ImportExportView.xaml",
+              "RelativeDocumentMoniker": "ManufacturingERP\\Views\\ImportExportView.xaml",
+              "ToolTip": "D:\\DoAn\\DoAnCoSo\\ManufacturingERP\\ManufacturingERP\\Views\\ImportExportView.xaml",
+              "RelativeToolTip": "ManufacturingERP\\Views\\ImportExportView.xaml",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
+              "WhenOpened": "2026-05-25T13:58:59.292Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
               "Title": "DashboardViewModel.cs",
               "DocumentMoniker": "D:\\DoAn\\DoAnCoSo\\ManufacturingERP\\ManufacturingERP\\ViewModels\\DashboardViewModel.cs",
               "RelativeDocumentMoniker": "ManufacturingERP\\ViewModels\\DashboardViewModel.cs",
@@ -337,7 +408,30 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 10,
+              "DocumentIndex": 7,
+              "Title": "CreateWorkOrderView.xaml",
+              "DocumentMoniker": "D:\\DoAn\\DoAnCoSo\\ManufacturingERP\\ManufacturingERP\\Views\\CreateWorkOrderView.xaml",
+              "RelativeDocumentMoniker": "ManufacturingERP\\Views\\CreateWorkOrderView.xaml",
+              "ToolTip": "D:\\DoAn\\DoAnCoSo\\ManufacturingERP\\ManufacturingERP\\Views\\CreateWorkOrderView.xaml",
+              "RelativeToolTip": "ManufacturingERP\\Views\\CreateWorkOrderView.xaml",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
+              "WhenOpened": "2026-04-22T06:43:49.328Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "FileService.cs",
+              "DocumentMoniker": "D:\\DoAn\\DoAnCoSo\\ManufacturingERP\\ManufacturingERP\\Services\\FileService.cs",
+              "RelativeDocumentMoniker": "ManufacturingERP\\Services\\FileService.cs",
+              "ToolTip": "D:\\DoAn\\DoAnCoSo\\ManufacturingERP\\ManufacturingERP\\Services\\FileService.cs",
+              "RelativeToolTip": "ManufacturingERP\\Services\\FileService.cs",
+              "ViewState": "AgIAAMQAAAAAAAAAAADgv88AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-26T14:27:58.984Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 17,
               "Title": "FinanceService.cs",
               "DocumentMoniker": "D:\\DoAn\\DoAnCoSo\\ManufacturingERP\\ManufacturingERP\\Services\\FinanceService.cs",
               "RelativeDocumentMoniker": "ManufacturingERP\\Services\\FinanceService.cs",
@@ -349,20 +443,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "MasterDataImportViewModel.cs",
-              "DocumentMoniker": "D:\\DoAn\\DoAnCoSo\\ManufacturingERP\\ManufacturingERP\\ViewModels\\MasterDataImportViewModel.cs",
-              "RelativeDocumentMoniker": "ManufacturingERP\\ViewModels\\MasterDataImportViewModel.cs",
-              "ToolTip": "D:\\DoAn\\DoAnCoSo\\ManufacturingERP\\ManufacturingERP\\ViewModels\\MasterDataImportViewModel.cs",
-              "RelativeToolTip": "ManufacturingERP\\ViewModels\\MasterDataImportViewModel.cs",
-              "ViewState": "AgIAANcAAAAAAAAAAAAiwNcAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-05-09T02:08:55.229Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 10,
               "Title": "WarehouseReportViewModel.cs",
               "DocumentMoniker": "D:\\DoAn\\DoAnCoSo\\ManufacturingERP\\ManufacturingERP\\ViewModels\\WarehouseReportViewModel.cs",
               "RelativeDocumentMoniker": "ManufacturingERP\\ViewModels\\WarehouseReportViewModel.cs",
@@ -374,7 +455,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 5,
+              "DocumentIndex": 12,
               "Title": "HRViewModel.cs",
               "DocumentMoniker": "D:\\DoAn\\DoAnCoSo\\ManufacturingERP\\ManufacturingERP\\ViewModels\\HRViewModel.cs",
               "RelativeDocumentMoniker": "ManufacturingERP\\ViewModels\\HRViewModel.cs",
@@ -386,7 +467,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 13,
+              "DocumentIndex": 20,
               "Title": "App.xaml",
               "DocumentMoniker": "D:\\DoAn\\DoAnCoSo\\ManufacturingERP\\ManufacturingERP\\App.xaml",
               "RelativeDocumentMoniker": "ManufacturingERP\\App.xaml",
@@ -397,7 +478,19 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 23,
+              "Title": "FinanceModels.cs",
+              "DocumentMoniker": "D:\\DoAn\\DoAnCoSo\\ManufacturingERP\\ManufacturingERP\\Models\\FinanceModels.cs",
+              "RelativeDocumentMoniker": "ManufacturingERP\\Models\\FinanceModels.cs",
+              "ToolTip": "D:\\DoAn\\DoAnCoSo\\ManufacturingERP\\ManufacturingERP\\Models\\FinanceModels.cs",
+              "RelativeToolTip": "ManufacturingERP\\Models\\FinanceModels.cs",
+              "ViewState": "AgIAAFUAAAAAAAAAAAA4wGEAAAATAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-05-12T15:13:41.596Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 11,
               "Title": "HRReportView.xaml",
               "DocumentMoniker": "D:\\DoAn\\DoAnCoSo\\ManufacturingERP\\ManufacturingERP\\Views\\HRReportView.xaml",
               "RelativeDocumentMoniker": "ManufacturingERP\\Views\\HRReportView.xaml",
@@ -408,7 +501,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 8,
+              "DocumentIndex": 15,
               "Title": "FinanceViewModel.cs",
               "DocumentMoniker": "D:\\DoAn\\DoAnCoSo\\ManufacturingERP\\ManufacturingERP\\ViewModels\\FinanceViewModel.cs",
               "RelativeDocumentMoniker": "ManufacturingERP\\ViewModels\\FinanceViewModel.cs",
@@ -420,7 +513,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 6,
+              "DocumentIndex": 13,
               "Title": "AttendanceManagementView.xaml",
               "DocumentMoniker": "D:\\DoAn\\DoAnCoSo\\ManufacturingERP\\ManufacturingERP\\Views\\AttendanceManagementView.xaml",
               "RelativeDocumentMoniker": "ManufacturingERP\\Views\\AttendanceManagementView.xaml",
@@ -431,7 +524,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 7,
+              "DocumentIndex": 14,
               "Title": "WorkOrderDetailViewModel.cs",
               "DocumentMoniker": "D:\\DoAn\\DoAnCoSo\\ManufacturingERP\\ManufacturingERP\\ViewModels\\WorkOrderDetailViewModel.cs",
               "RelativeDocumentMoniker": "ManufacturingERP\\ViewModels\\WorkOrderDetailViewModel.cs",
@@ -443,7 +536,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 11,
+              "DocumentIndex": 18,
               "Title": "FinanceView.xaml",
               "DocumentMoniker": "D:\\DoAn\\DoAnCoSo\\ManufacturingERP\\ManufacturingERP\\Views\\FinanceView.xaml",
               "RelativeDocumentMoniker": "ManufacturingERP\\Views\\FinanceView.xaml",
@@ -454,7 +547,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 9,
+              "DocumentIndex": 16,
               "Title": "CostAnalysisView.xaml",
               "DocumentMoniker": "D:\\DoAn\\DoAnCoSo\\ManufacturingERP\\ManufacturingERP\\Views\\Finance\\CostAnalysisView.xaml",
               "RelativeDocumentMoniker": "ManufacturingERP\\Views\\Finance\\CostAnalysisView.xaml",
@@ -465,7 +558,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 12,
+              "DocumentIndex": 19,
               "Title": "CashFlowView.xaml",
               "DocumentMoniker": "D:\\DoAn\\DoAnCoSo\\ManufacturingERP\\ManufacturingERP\\Views\\Finance\\CashFlowView.xaml",
               "RelativeDocumentMoniker": "ManufacturingERP\\Views\\Finance\\CashFlowView.xaml",
@@ -476,7 +569,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 14,
+              "DocumentIndex": 21,
               "Title": "XamlReader.cs",
               "DocumentMoniker": "C:\\Users\\ASUS\\AppData\\Local\\Temp\\.vsdbgsrc\\ba71154a7b44d057354e94bf9136ff00912660e0c8e1435d76b141387af3b90b\\XamlReader.cs",
               "ToolTip": "C:\\Users\\ASUS\\AppData\\Local\\Temp\\.vsdbgsrc\\ba71154a7b44d057354e94bf9136ff00912660e0c8e1435d76b141387af3b90b\\XamlReader.cs",
@@ -486,7 +579,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 15,
+              "DocumentIndex": 22,
               "Title": "NotificationService.cs",
               "DocumentMoniker": "D:\\DoAn\\DoAnCoSo\\ManufacturingERP\\ManufacturingERP\\Services\\NotificationService.cs",
               "RelativeDocumentMoniker": "ManufacturingERP\\Services\\NotificationService.cs",
@@ -498,7 +591,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 17,
+              "DocumentIndex": 24,
               "Title": "CreateInvoiceViewModel.cs",
               "DocumentMoniker": "D:\\DoAn\\DoAnCoSo\\ManufacturingERP\\ManufacturingERP\\ViewModels\\CreateInvoiceViewModel.cs",
               "RelativeDocumentMoniker": "ManufacturingERP\\ViewModels\\CreateInvoiceViewModel.cs",
@@ -510,19 +603,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 18,
-              "Title": "DatabaseSeederService.cs",
-              "DocumentMoniker": "D:\\DoAn\\DoAnCoSo\\ManufacturingERP\\ManufacturingERP\\Services\\DatabaseSeederService.cs",
-              "RelativeDocumentMoniker": "ManufacturingERP\\Services\\DatabaseSeederService.cs",
-              "ToolTip": "D:\\DoAn\\DoAnCoSo\\ManufacturingERP\\ManufacturingERP\\Services\\DatabaseSeederService.cs",
-              "RelativeToolTip": "ManufacturingERP\\Services\\DatabaseSeederService.cs",
-              "ViewState": "AgIAAKQBAAAAAAAAAAAiwNEBAAAcAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-05-07T04:17:43.929Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 20,
+              "DocumentIndex": 26,
               "Title": "HRService.cs",
               "DocumentMoniker": "D:\\DoAn\\DoAnCoSo\\ManufacturingERP\\ManufacturingERP\\Services\\HRService.cs",
               "RelativeDocumentMoniker": "ManufacturingERP\\Services\\HRService.cs",
@@ -534,7 +615,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 22,
+              "DocumentIndex": 28,
               "Title": "ShiftDialog.xaml.cs",
               "DocumentMoniker": "D:\\DoAn\\DoAnCoSo\\ManufacturingERP\\ManufacturingERP\\Views\\Dialogs\\ShiftDialog.xaml.cs",
               "RelativeDocumentMoniker": "ManufacturingERP\\Views\\Dialogs\\ShiftDialog.xaml.cs",
@@ -546,7 +627,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 21,
+              "DocumentIndex": 27,
               "Title": "AttendanceConsoleViewModel.cs",
               "DocumentMoniker": "D:\\DoAn\\DoAnCoSo\\ManufacturingERP\\ManufacturingERP\\ViewModels\\AttendanceConsoleViewModel.cs",
               "RelativeDocumentMoniker": "ManufacturingERP\\ViewModels\\AttendanceConsoleViewModel.cs",
@@ -558,7 +639,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 19,
+              "DocumentIndex": 25,
               "Title": "HRView.xaml",
               "DocumentMoniker": "D:\\DoAn\\DoAnCoSo\\ManufacturingERP\\ManufacturingERP\\Views\\HRView.xaml",
               "RelativeDocumentMoniker": "ManufacturingERP\\Views\\HRView.xaml",
@@ -569,7 +650,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 23,
+              "DocumentIndex": 29,
               "Title": "Microsoft.WinFX.targets",
               "DocumentMoniker": "C:\\Program Files\\dotnet\\sdk\\10.0.103\\Sdks\\Microsoft.NET.Sdk.WindowsDesktop\\targets\\Microsoft.WinFX.targets",
               "ToolTip": "C:\\Program Files\\dotnet\\sdk\\10.0.103\\Sdks\\Microsoft.NET.Sdk.WindowsDesktop\\targets\\Microsoft.WinFX.targets",
@@ -579,7 +660,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 24,
+              "DocumentIndex": 30,
               "Title": "ScheduleImportExportViewModel.cs",
               "DocumentMoniker": "D:\\DoAn\\DoAnCoSo\\ManufacturingERP\\ManufacturingERP\\ViewModels\\ScheduleImportExportViewModel.cs",
               "RelativeDocumentMoniker": "ManufacturingERP\\ViewModels\\ScheduleImportExportViewModel.cs",
@@ -591,7 +672,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 25,
+              "DocumentIndex": 31,
               "Title": "ScheduleDialog.xaml.cs",
               "DocumentMoniker": "D:\\DoAn\\DoAnCoSo\\ManufacturingERP\\ManufacturingERP\\Views\\Dialogs\\ScheduleDialog.xaml.cs",
               "RelativeDocumentMoniker": "ManufacturingERP\\Views\\Dialogs\\ScheduleDialog.xaml.cs",
@@ -603,7 +684,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 29,
+              "DocumentIndex": 35,
               "Title": "ManufacturingContext.cs",
               "DocumentMoniker": "D:\\DoAn\\DoAnCoSo\\ManufacturingERP\\ManufacturingERP\\Models\\ManufacturingContext.cs",
               "RelativeDocumentMoniker": "ManufacturingERP\\Models\\ManufacturingContext.cs",
@@ -615,7 +696,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 30,
+              "DocumentIndex": 36,
               "Title": "User.cs",
               "DocumentMoniker": "D:\\DoAn\\DoAnCoSo\\ManufacturingERP\\ManufacturingERP\\Models\\User.cs",
               "RelativeDocumentMoniker": "ManufacturingERP\\Models\\User.cs",
@@ -627,7 +708,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 27,
+              "DocumentIndex": 33,
               "Title": "AdminViewModel.cs",
               "DocumentMoniker": "D:\\DoAn\\DoAnCoSo\\ManufacturingERP\\ManufacturingERP\\ViewModels\\AdminViewModel.cs",
               "RelativeDocumentMoniker": "ManufacturingERP\\ViewModels\\AdminViewModel.cs",
@@ -639,7 +720,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 28,
+              "DocumentIndex": 34,
               "Title": "ImportExportViewModel.cs",
               "DocumentMoniker": "D:\\DoAn\\DoAnCoSo\\ManufacturingERP\\ManufacturingERP\\ViewModels\\ImportExportViewModel.cs",
               "RelativeDocumentMoniker": "ManufacturingERP\\ViewModels\\ImportExportViewModel.cs",
@@ -651,7 +732,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 26,
+              "DocumentIndex": 32,
               "Title": "EditEmployeeViewModel.cs",
               "DocumentMoniker": "D:\\DoAn\\DoAnCoSo\\ManufacturingERP\\ManufacturingERP\\ViewModels\\EditEmployeeViewModel.cs",
               "RelativeDocumentMoniker": "ManufacturingERP\\ViewModels\\EditEmployeeViewModel.cs",
@@ -663,7 +744,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 31,
+              "DocumentIndex": 37,
               "Title": "App.xaml.cs",
               "DocumentMoniker": "D:\\DoAn\\DoAnCoSo\\ManufacturingERP\\ManufacturingERP\\App.xaml.cs",
               "RelativeDocumentMoniker": "ManufacturingERP\\App.xaml.cs",
@@ -675,7 +756,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 33,
+              "DocumentIndex": 39,
               "Title": "WarehouseService.cs",
               "DocumentMoniker": "D:\\DoAn\\DoAnCoSo\\ManufacturingERP\\ManufacturingERP\\Services\\WarehouseService.cs",
               "RelativeDocumentMoniker": "ManufacturingERP\\Services\\WarehouseService.cs",
@@ -687,7 +768,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 34,
+              "DocumentIndex": 40,
               "Title": "CreateTransactionViewModel.cs",
               "DocumentMoniker": "D:\\DoAn\\DoAnCoSo\\ManufacturingERP\\ManufacturingERP\\ViewModels\\CreateTransactionViewModel.cs",
               "RelativeDocumentMoniker": "ManufacturingERP\\ViewModels\\CreateTransactionViewModel.cs",
@@ -699,7 +780,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 32,
+              "DocumentIndex": 38,
               "Title": "CreateTransactionView.xaml",
               "DocumentMoniker": "D:\\DoAn\\DoAnCoSo\\ManufacturingERP\\ManufacturingERP\\Views\\CreateTransactionView.xaml",
               "RelativeDocumentMoniker": "ManufacturingERP\\Views\\CreateTransactionView.xaml",
@@ -710,7 +791,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 41,
+              "DocumentIndex": 47,
               "Title": "PropertyPathWorker.cs",
               "DocumentMoniker": "C:\\Users\\ASUS\\AppData\\Local\\Temp\\.vsdbgsrc\\91b8eab688dba73dc7b179fffb2179670850a52b1cbbd82a2b0536ca94116ea9\\PropertyPathWorker.cs",
               "ToolTip": "C:\\Users\\ASUS\\AppData\\Local\\Temp\\.vsdbgsrc\\91b8eab688dba73dc7b179fffb2179670850a52b1cbbd82a2b0536ca94116ea9\\PropertyPathWorker.cs",
@@ -720,7 +801,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 35,
+              "DocumentIndex": 41,
               "Title": "WarehouseViewModel.cs",
               "DocumentMoniker": "D:\\DoAn\\DoAnCoSo\\ManufacturingERP\\ManufacturingERP\\ViewModels\\WarehouseViewModel.cs",
               "RelativeDocumentMoniker": "ManufacturingERP\\ViewModels\\WarehouseViewModel.cs",
@@ -732,7 +813,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 36,
+              "DocumentIndex": 42,
               "Title": "CreateMaterialView.xaml",
               "DocumentMoniker": "D:\\DoAn\\DoAnCoSo\\ManufacturingERP\\ManufacturingERP\\Views\\CreateMaterialView.xaml",
               "RelativeDocumentMoniker": "ManufacturingERP\\Views\\CreateMaterialView.xaml",
@@ -743,7 +824,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 38,
+              "DocumentIndex": 44,
               "Title": "QualityControlViewModel.cs",
               "DocumentMoniker": "D:\\DoAn\\DoAnCoSo\\ManufacturingERP\\ManufacturingERP\\ViewModels\\QualityControlViewModel.cs",
               "RelativeDocumentMoniker": "ManufacturingERP\\ViewModels\\QualityControlViewModel.cs",
@@ -755,7 +836,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 37,
+              "DocumentIndex": 43,
               "Title": "QualityControlService.cs",
               "DocumentMoniker": "D:\\DoAn\\DoAnCoSo\\ManufacturingERP\\ManufacturingERP\\Services\\QualityControlService.cs",
               "RelativeDocumentMoniker": "ManufacturingERP\\Services\\QualityControlService.cs",
@@ -767,7 +848,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 44,
+              "DocumentIndex": 50,
               "Title": "MasterDataView.xaml",
               "DocumentMoniker": "D:\\DoAn\\DoAnCoSo\\ManufacturingERP\\ManufacturingERP\\Views\\MasterDataView.xaml",
               "RelativeDocumentMoniker": "ManufacturingERP\\Views\\MasterDataView.xaml",
@@ -778,7 +859,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 40,
+              "DocumentIndex": 46,
               "Title": "CreateMaterialViewModel.cs",
               "DocumentMoniker": "D:\\DoAn\\DoAnCoSo\\ManufacturingERP\\ManufacturingERP\\ViewModels\\CreateMaterialViewModel.cs",
               "RelativeDocumentMoniker": "ManufacturingERP\\ViewModels\\CreateMaterialViewModel.cs",
@@ -790,7 +871,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 39,
+              "DocumentIndex": 45,
               "Title": "ProductionService.cs",
               "DocumentMoniker": "D:\\DoAn\\DoAnCoSo\\ManufacturingERP\\ManufacturingERP\\Services\\ProductionService.cs",
               "RelativeDocumentMoniker": "ManufacturingERP\\Services\\ProductionService.cs",
@@ -802,7 +883,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 43,
+              "DocumentIndex": 49,
               "Title": "EditBomDialog.xaml",
               "DocumentMoniker": "D:\\DoAn\\DoAnCoSo\\ManufacturingERP\\ManufacturingERP\\Views\\Dialogs\\EditBomDialog.xaml",
               "RelativeDocumentMoniker": "ManufacturingERP\\Views\\Dialogs\\EditBomDialog.xaml",
@@ -813,7 +894,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 42,
+              "DocumentIndex": 48,
               "Title": "MasterDataViewModel.cs",
               "DocumentMoniker": "D:\\DoAn\\DoAnCoSo\\ManufacturingERP\\ManufacturingERP\\ViewModels\\MasterDataViewModel.cs",
               "RelativeDocumentMoniker": "ManufacturingERP\\ViewModels\\MasterDataViewModel.cs",
@@ -825,7 +906,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 45,
+              "DocumentIndex": 51,
               "Title": "MasterDataImportExportViewModel.cs",
               "DocumentMoniker": "D:\\DoAn\\DoAnCoSo\\ManufacturingERP\\ManufacturingERP\\ViewModels\\MasterDataImportExportViewModel.cs",
               "RelativeDocumentMoniker": "ManufacturingERP\\ViewModels\\MasterDataImportExportViewModel.cs",
@@ -837,7 +918,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 47,
+              "DocumentIndex": 53,
               "Title": "MainViewModel.cs",
               "DocumentMoniker": "D:\\DoAn\\DoAnCoSo\\ManufacturingERP\\ManufacturingERP\\ViewModels\\MainViewModel.cs",
               "RelativeDocumentMoniker": "ManufacturingERP\\ViewModels\\MainViewModel.cs",
@@ -849,7 +930,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 46,
+              "DocumentIndex": 52,
               "Title": "MaterialDialog.xaml",
               "DocumentMoniker": "D:\\DoAn\\DoAnCoSo\\ManufacturingERP\\ManufacturingERP\\Views\\Dialogs\\MaterialDialog.xaml",
               "RelativeDocumentMoniker": "ManufacturingERP\\Views\\Dialogs\\MaterialDialog.xaml",
@@ -860,7 +941,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 48,
+              "DocumentIndex": 54,
               "Title": "CreateWarehouseView.xaml",
               "DocumentMoniker": "D:\\DoAn\\DoAnCoSo\\ManufacturingERP\\ManufacturingERP\\Views\\CreateWarehouseView.xaml",
               "RelativeDocumentMoniker": "ManufacturingERP\\Views\\CreateWarehouseView.xaml",
@@ -871,7 +952,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 53,
+              "DocumentIndex": 59,
               "Title": "ActivitiesView.xaml",
               "DocumentMoniker": "D:\\DoAn\\DoAnCoSo\\ManufacturingERP\\ManufacturingERP\\Views\\ActivitiesView.xaml",
               "RelativeDocumentMoniker": "ManufacturingERP\\Views\\ActivitiesView.xaml",
@@ -882,7 +963,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 49,
+              "DocumentIndex": 55,
               "Title": "WarehouseView.xaml",
               "DocumentMoniker": "D:\\DoAn\\DoAnCoSo\\ManufacturingERP\\ManufacturingERP\\Views\\WarehouseView.xaml",
               "RelativeDocumentMoniker": "ManufacturingERP\\Views\\WarehouseView.xaml",
@@ -893,7 +974,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 51,
+              "DocumentIndex": 57,
               "Title": "ResetPasswordDialog.xaml",
               "DocumentMoniker": "D:\\DoAn\\DoAnCoSo\\ManufacturingERP\\ManufacturingERP\\Views\\Dialogs\\ResetPasswordDialog.xaml",
               "RelativeDocumentMoniker": "ManufacturingERP\\Views\\Dialogs\\ResetPasswordDialog.xaml",
@@ -904,7 +985,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 50,
+              "DocumentIndex": 56,
               "Title": "UserDialog.xaml.cs",
               "DocumentMoniker": "D:\\DoAn\\DoAnCoSo\\ManufacturingERP\\ManufacturingERP\\Views\\Dialogs\\UserDialog.xaml.cs",
               "RelativeDocumentMoniker": "ManufacturingERP\\Views\\Dialogs\\UserDialog.xaml.cs",
@@ -916,7 +997,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 52,
+              "DocumentIndex": 58,
               "Title": "ActivityImportExportViewModel.cs",
               "DocumentMoniker": "D:\\DoAn\\DoAnCoSo\\ManufacturingERP\\ManufacturingERP\\ViewModels\\ActivityImportExportViewModel.cs",
               "RelativeDocumentMoniker": "ManufacturingERP\\ViewModels\\ActivityImportExportViewModel.cs",
@@ -928,7 +1009,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 55,
+              "DocumentIndex": 61,
               "Title": "ActivitiesViewModel.cs",
               "DocumentMoniker": "D:\\DoAn\\DoAnCoSo\\ManufacturingERP\\ManufacturingERP\\ViewModels\\ActivitiesViewModel.cs",
               "RelativeDocumentMoniker": "ManufacturingERP\\ViewModels\\ActivitiesViewModel.cs",
@@ -940,7 +1021,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 54,
+              "DocumentIndex": 60,
               "Title": "DesignSystem.xaml",
               "DocumentMoniker": "D:\\DoAn\\DoAnCoSo\\ManufacturingERP\\ManufacturingERP\\Styles\\DesignSystem.xaml",
               "RelativeDocumentMoniker": "ManufacturingERP\\Styles\\DesignSystem.xaml",
@@ -951,7 +1032,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 56,
+              "DocumentIndex": 62,
               "Title": "ActivityDetailView.xaml",
               "DocumentMoniker": "D:\\DoAn\\DoAnCoSo\\ManufacturingERP\\ManufacturingERP\\Views\\ActivityDetailView.xaml",
               "RelativeDocumentMoniker": "ManufacturingERP\\Views\\ActivityDetailView.xaml",
@@ -962,7 +1043,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 57,
+              "DocumentIndex": 63,
               "Title": "DashboardView.xaml",
               "DocumentMoniker": "D:\\DoAn\\DoAnCoSo\\ManufacturingERP\\ManufacturingERP\\Views\\DashboardView.xaml",
               "RelativeDocumentMoniker": "ManufacturingERP\\Views\\DashboardView.xaml",
@@ -973,7 +1054,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 58,
+              "DocumentIndex": 64,
               "Title": "ActivityDetailViewModel.cs",
               "DocumentMoniker": "D:\\DoAn\\DoAnCoSo\\ManufacturingERP\\ManufacturingERP\\ViewModels\\ActivityDetailViewModel.cs",
               "RelativeDocumentMoniker": "ManufacturingERP\\ViewModels\\ActivityDetailViewModel.cs",
@@ -985,7 +1066,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 59,
+              "DocumentIndex": 65,
               "Title": "ImportDialog.xaml",
               "DocumentMoniker": "D:\\DoAn\\DoAnCoSo\\ManufacturingERP\\ManufacturingERP\\Views\\Dialogs\\ImportDialog.xaml",
               "RelativeDocumentMoniker": "ManufacturingERP\\Views\\Dialogs\\ImportDialog.xaml",
@@ -996,18 +1077,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 63,
-              "Title": "MainWindow.xaml",
-              "DocumentMoniker": "D:\\DoAn\\DoAnCoSo\\ManufacturingERP\\ManufacturingERP\\MainWindow.xaml",
-              "RelativeDocumentMoniker": "ManufacturingERP\\MainWindow.xaml",
-              "ToolTip": "D:\\DoAn\\DoAnCoSo\\ManufacturingERP\\ManufacturingERP\\MainWindow.xaml",
-              "RelativeToolTip": "ManufacturingERP\\MainWindow.xaml",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
-              "WhenOpened": "2026-04-13T06:40:04.566Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 60,
+              "DocumentIndex": 66,
               "Title": "ProductionViewModel.cs",
               "DocumentMoniker": "D:\\DoAn\\DoAnCoSo\\ManufacturingERP\\ManufacturingERP\\ViewModels\\ProductionViewModel.cs",
               "RelativeDocumentMoniker": "ManufacturingERP\\ViewModels\\ProductionViewModel.cs",
@@ -1019,7 +1089,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 66,
+              "DocumentIndex": 69,
               "Title": "ManufacturingERP.ViewModels.LoginViewModel.g.cs",
               "DocumentMoniker": "C:\\Users\\ASUS\\AppData\\Local\\Temp\\.vsdbgsrc\\cedd3354f34a7da9c70c750aa8e472f1ac83a8b1\\ManufacturingERP.ViewModels.LoginViewModel.g.cs",
               "ToolTip": "C:\\Users\\ASUS\\AppData\\Local\\Temp\\.vsdbgsrc\\cedd3354f34a7da9c70c750aa8e472f1ac83a8b1\\ManufacturingERP.ViewModels.LoginViewModel.g.cs [Read Only]",
@@ -1030,18 +1100,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 62,
-              "Title": "CreateWorkOrderView.xaml",
-              "DocumentMoniker": "D:\\DoAn\\DoAnCoSo\\ManufacturingERP\\ManufacturingERP\\Views\\CreateWorkOrderView.xaml",
-              "RelativeDocumentMoniker": "ManufacturingERP\\Views\\CreateWorkOrderView.xaml",
-              "ToolTip": "D:\\DoAn\\DoAnCoSo\\ManufacturingERP\\ManufacturingERP\\Views\\CreateWorkOrderView.xaml",
-              "RelativeToolTip": "ManufacturingERP\\Views\\CreateWorkOrderView.xaml",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
-              "WhenOpened": "2026-04-22T06:43:49.328Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 61,
+              "DocumentIndex": 67,
               "Title": "CreateWorkOrderView.xaml.cs",
               "DocumentMoniker": "D:\\DoAn\\DoAnCoSo\\ManufacturingERP\\ManufacturingERP\\Views\\CreateWorkOrderView.xaml.cs",
               "RelativeDocumentMoniker": "ManufacturingERP\\Views\\CreateWorkOrderView.xaml.cs",
@@ -1053,19 +1112,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 64,
-              "Title": "ToastNotificationView.xaml.cs",
-              "DocumentMoniker": "D:\\DoAn\\DoAnCoSo\\ManufacturingERP\\ManufacturingERP\\Views\\Components\\ToastNotificationView.xaml.cs",
-              "RelativeDocumentMoniker": "ManufacturingERP\\Views\\Components\\ToastNotificationView.xaml.cs",
-              "ToolTip": "D:\\DoAn\\DoAnCoSo\\ManufacturingERP\\ManufacturingERP\\Views\\Components\\ToastNotificationView.xaml.cs",
-              "RelativeToolTip": "ManufacturingERP\\Views\\Components\\ToastNotificationView.xaml.cs",
-              "ViewState": "AgIAAA0AAAAAAAAAAAAiwBkAAABpAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-04-22T07:08:46.396Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 65,
+              "DocumentIndex": 68,
               "Title": "WorkOrderDialog.xaml",
               "DocumentMoniker": "D:\\DoAn\\DoAnCoSo\\ManufacturingERP\\ManufacturingERP\\Views\\Dialogs\\WorkOrderDialog.xaml",
               "RelativeDocumentMoniker": "ManufacturingERP\\Views\\Dialogs\\WorkOrderDialog.xaml",
@@ -1076,7 +1123,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 68,
+              "DocumentIndex": 71,
               "Title": "AdminView.xaml",
               "DocumentMoniker": "D:\\DoAn\\DoAnCoSo\\ManufacturingERP\\ManufacturingERP\\Views\\AdminView.xaml",
               "RelativeDocumentMoniker": "ManufacturingERP\\Views\\AdminView.xaml",
@@ -1087,7 +1134,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 67,
+              "DocumentIndex": 70,
               "Title": "LoginView.xaml",
               "DocumentMoniker": "D:\\DoAn\\DoAnCoSo\\ManufacturingERP\\ManufacturingERP\\Views\\LoginView.xaml",
               "RelativeDocumentMoniker": "ManufacturingERP\\Views\\LoginView.xaml",
@@ -1098,7 +1145,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 69,
+              "DocumentIndex": 72,
               "Title": "ManufacturingERP.csproj",
               "DocumentMoniker": "D:\\DoAn\\DoAnCoSo\\ManufacturingERP\\ManufacturingERP\\ManufacturingERP.csproj",
               "RelativeDocumentMoniker": "ManufacturingERP\\ManufacturingERP.csproj",
@@ -1110,7 +1157,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 70,
+              "DocumentIndex": 73,
               "Title": "Setter.cs",
               "DocumentMoniker": "C:\\Users\\ASUS\\AppData\\Local\\Temp\\.vsdbgsrc\\d312c2c8203cfd64f41ad194219a37166cf143f7a044325b58bf75ed3c63fa4e\\Setter.cs",
               "ToolTip": "C:\\Users\\ASUS\\AppData\\Local\\Temp\\.vsdbgsrc\\d312c2c8203cfd64f41ad194219a37166cf143f7a044325b58bf75ed3c63fa4e\\Setter.cs",
@@ -1120,7 +1167,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 71,
+              "DocumentIndex": 74,
               "Title": "DashboardView.xaml.cs",
               "DocumentMoniker": "D:\\DoAn\\DoAnCoSo\\ManufacturingERP\\ManufacturingERP\\Views\\DashboardView.xaml.cs",
               "RelativeDocumentMoniker": "ManufacturingERP\\Views\\DashboardView.xaml.cs",
@@ -1132,7 +1179,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 72,
+              "DocumentIndex": 75,
               "Title": "MainWindow.xaml.cs",
               "DocumentMoniker": "D:\\DoAn\\DoAnCoSo\\ManufacturingERP\\ManufacturingERP\\MainWindow.xaml.cs",
               "RelativeDocumentMoniker": "ManufacturingERP\\MainWindow.xaml.cs",

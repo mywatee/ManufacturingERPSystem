@@ -16,7 +16,7 @@
                 <ResourceDictionary Source="/ManufacturingERP;component/Styles/DesignSystem.xaml" />
             </ResourceDictionary.MergedDictionaries>
             
-            <local:FirstLetterConverter x:Key="LocalFirstLetterConverter"/>
+            <core:FirstLetterConverter x:Key="LocalFirstLetterConverter"/>
         </ResourceDictionary>
     </UserControl.Resources>
 

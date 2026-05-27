@@ -41,6 +41,12 @@ public class WarehouseService : IWarehouseService
         }).ToList();
     }
 
+    public async Task<Warehouse?> GetWarehouseByIdAsync(int id)
+    {
+        using var context = await _contextFactory.CreateDbContextAsync();
+        return await context.Warehouses.FindAsync(id);
+    }
+
     public async Task<List<InventoryItemDisplay>> GetInventoryAsync(string warehouseName = "Tất cả")
     {
         using var context = await _contextFactory.CreateDbContextAsync();
@@ -89,9 +95,10 @@ public class WarehouseService : IWarehouseService
             .AsNoTracking()
             .AsQueryable();
 
-        // Note: Warehouse relation isn't directly on StockTransaction in our DB, 
-        // but typically a transaction belongs to a warehouse. We'll filter if we can, else just return all.
-        // For now, return all recent.
+        if (warehouseName != "Tất cả")
+        {
+            query = query.Where(t => t.Warehouse != null && t.Warehouse.WarehouseName == warehouseName);
+        }
         var transactions = await query.Take(limit).ToListAsync();
 
         return transactions.Select(t => new StockTransactionDisplay
@@ -408,7 +415,7 @@ public class WarehouseService : IWarehouseService
         }
     }
 
-    public async Task<bool> AdjustStockAsync(int warehouseId, int materialId, decimal actualQuantity, int? userId, string notes)
+    public async Task<bool> AdjustStockAsync(int warehouseId, int materialId, decimal actualQuantity, int? userId, string notes, bool isAdditive = false)
     {
         using var context = await _contextFactory.CreateDbContextAsync();
         using var dbTransaction = await context.Database.BeginTransactionAsync();
@@ -419,6 +426,7 @@ public class WarehouseService : IWarehouseService
                 .FirstOrDefaultAsync(i => i.MaterialId == materialId && i.WarehouseId == warehouseId);
 
             decimal currentQty = inventory?.CurrentStock ?? 0;
+            if (isAdditive) actualQuantity = currentQty + actualQuantity;
             decimal diff = actualQuantity - currentQty;
 
             if (diff == 0) return true; // No change needed

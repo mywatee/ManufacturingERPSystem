@@ -53,17 +53,16 @@ namespace ManufacturingERP.Services
             query = query.Where(w => w.CreatedAt != null && w.CreatedAt >= startDate && w.CreatedAt < endDate);
 
             // Filter by status if specified
-            if (!string.IsNullOrEmpty(status) && status != "Tất cả trạng thái")
+            if (!string.IsNullOrWhiteSpace(status) && status != "Tất cả trạng thái")
             {
                 var possibleStatuses = new List<string> { status };
                 if (status == "Đang sản xuất") possibleStatuses.Add("Running");
                 else if (status == "Hoàn thành") possibleStatuses.Add("Completed");
                 else if (status == "Tạm dừng") possibleStatuses.Add("Paused");
-                else if (status == "Chờ duyệt" || status == "Chờ") possibleStatuses.Add("Planned");
+                else if (status == "Chờ duyệt" || status == "Chờ") { possibleStatuses.Add("Planned"); possibleStatuses.Add("Chờ"); }
+                else if (status == "Đã hủy") possibleStatuses.Add("Cancelled");
                 
-                // Chỉ lấy các lệnh có khả năng thực hiện QC (Đang làm, Đã xong, Tạm dừng)
-                var validStatuses = new[] { "Running", "Đang sản xuất", "Completed", "Hoàn thành", "Paused", "Tạm dừng" };
-                query = query.Where(w => validStatuses.Contains(w.Status));
+                query = query.Where(w => possibleStatuses.Contains(w.Status));
             }
 
             return await query.OrderByDescending(w => w.Woid).ToListAsync();
@@ -78,7 +77,7 @@ namespace ManufacturingERP.Services
                 // Optimization: Automatically fill metadata
                 order.CreatedAt = DateTime.Now;
                 order.CreatedBy = _authService.CurrentUser?.UserId;
-                order.Status = "Chờ";
+                order.Status = "Planned";
                 
                 // Optimization: Sync first item to main table for quick view
                 if (order.WorkOrderItems != null && order.WorkOrderItems.Any())
@@ -93,10 +92,8 @@ namespace ManufacturingERP.Services
                 await context.SaveChangesAsync();
                 return true;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                // Temporary debug log
-                try { System.IO.File.WriteAllText(@"D:\DoAn\DoAnCoSo\ManufacturingERP\debug_error.txt", ex.ToString()); } catch { }
                 return false;
             }
         }
@@ -122,6 +119,7 @@ namespace ManufacturingERP.Services
                 existingOrder.EndDate = order.EndDate;
                 
                 // 2. Cập nhật thông minh (Merge) thay vì Xóa sạch
+                if (order.WorkOrderItems == null) return false;
                 foreach (var incomingItem in order.WorkOrderItems)
                 {
                     var existingItem = existingOrder.WorkOrderItems.FirstOrDefault(i => i.ProductId == incomingItem.ProductId);
@@ -179,11 +177,23 @@ namespace ManufacturingERP.Services
             try
             {
                 using var context = await _contextFactory.CreateDbContextAsync();
-                
-                // CHỈ LƯU VẾT LỊCH SỬ TIẾN ĐỘ, KHÔNG CẬP NHẬT TRỰC TIẾP VÀO ACTUALQTY CỦA LỆNH
-                // (Vì ActualQty hiện tại sẽ dùng để lưu trữ sản lượng đã qua QC)
                 context.WorkOrderProgresses.Add(progress);
                 await context.SaveChangesAsync();
+
+                // Cập nhật ActualQty của WorkOrderItem từ tổng ProducedQty đã ghi nhận
+                if (progress.WorkOrderItemId.HasValue)
+                {
+                    var item = await context.WorkOrderItems.FindAsync(progress.WorkOrderItemId.Value);
+                    if (item != null)
+                    {
+                        var totalProduced = await context.WorkOrderProgresses
+                            .Where(p => p.WorkOrderItemId == progress.WorkOrderItemId.Value)
+                            .SumAsync(p => (int?)p.ProducedQty ?? 0);
+                        item.ActualQty = totalProduced;
+                        await context.SaveChangesAsync();
+                    }
+                }
+
                 return true;
             }
             catch (Exception)
@@ -196,22 +206,22 @@ namespace ManufacturingERP.Services
         {
             if (order.WorkOrderItems == null || !order.WorkOrderItems.Any()) return;
 
-            // Lấy kho mặc định (Lấy kho đầu tiên trong hệ thống để thực hiện giao dịch tự động)
+            // Tìm kho theo tên để giao dịch vào đúng kho
             var warehouses = await _warehouseService.GetWarehousesAsync();
-            var defaultWarehouse = warehouses.FirstOrDefault();
-            if (defaultWarehouse == null) return;
+            var tpWarehouse = warehouses.FirstOrDefault(w => w.Name.Contains("Thành Phẩm"));
+            var nvlWarehouse = warehouses.FirstOrDefault(w => w.Name.Contains("Nguyên Vật Liệu"));
 
-            if (!int.TryParse(defaultWarehouse.Id, out int warehouseId)) return;
+            if (!int.TryParse(tpWarehouse?.Id, out int tpWhId)) return;
 
             foreach (var item in order.WorkOrderItems)
             {
                 if (item.ActualQty <= 0) continue;
 
-                // 1. NHẬP KHO THÀNH PHẨM
+                // 1. NHẬP KHO THÀNH PHẨM vào Kho Thành Phẩm
                 await _warehouseService.AddStockTransactionAsync(new StockTransaction
                 {
                     MaterialId = item.ProductId,
-                    WarehouseId = warehouseId,
+                    WarehouseId = tpWhId,
                     Quantity = (decimal)item.ActualQty,
                     Type = "Nhập kho",
                     ReferenceCode = order.Wocode,
@@ -219,8 +229,7 @@ namespace ManufacturingERP.Services
                     TransDate = DateTime.Now
                 });
 
-                // 2. XUẤT KHO NGUYÊN LIỆU (Dựa trên BOM)
-                // Lấy thông tin vật tư để có mã MaterialCode
+                // 2. XUẤT KHO NGUYÊN LIỆU (Dựa trên BOM) từ Kho Nguyên Vật Liệu
                 var product = await _masterDataService.GetMaterialByCodeAsync(item.Product?.MaterialCode ?? "");
                 if (product != null)
                 {
@@ -230,11 +239,12 @@ namespace ManufacturingERP.Services
                         foreach (var bom in bomItems)
                         {
                             decimal requiredQty = (decimal)item.ActualQty * bom.QuantityPerUnit;
+                            var whId = int.TryParse(nvlWarehouse?.Id, out int nvlId) ? nvlId : tpWhId;
                             
                             await _warehouseService.AddStockTransactionAsync(new StockTransaction
                             {
                                 MaterialId = bom.ChildId,
-                                WarehouseId = warehouseId,
+                                WarehouseId = whId,
                                 Quantity = requiredQty,
                                 Type = "Xuất kho",
                                 ReferenceCode = order.Wocode,
@@ -271,39 +281,6 @@ namespace ManufacturingERP.Services
             return await context.Materials
                 .Where(m => m.Category == "Thành phẩm/BTP" || m.Category == "Thành phẩm")
                 .ToListAsync();
-        }
-
-        public async Task<int> DeleteOldWorkOrdersAsync(DateTime beforeDate)
-        {
-            try
-            {
-                using var context = await _contextFactory.CreateDbContextAsync();
-                
-                var ordersToDelete = await context.WorkOrders
-                    .Where(w => w.CreatedAt < beforeDate)
-                    .ToListAsync();
-
-                if (!ordersToDelete.Any()) return 0;
-
-                var orderIds = ordersToDelete.Select(w => w.Woid).ToList();
-
-                // Delete related records
-                var items = await context.WorkOrderItems.Where(i => orderIds.Contains(i.WorkOrderId)).ToListAsync();
-                var progress = await context.WorkOrderProgresses.Where(p => p.Woid != null && orderIds.Contains(p.Woid.Value)).ToListAsync();
-                var qc = await context.QualityControls.Where(q => q.Woid != null && orderIds.Contains(q.Woid.Value)).ToListAsync();
-
-                context.WorkOrderItems.RemoveRange(items);
-                context.WorkOrderProgresses.RemoveRange(progress);
-                context.QualityControls.RemoveRange(qc);
-                
-                context.WorkOrders.RemoveRange(ordersToDelete);
-
-                return await context.SaveChangesAsync();
-            }
-            catch (Exception ex)
-            {
-                return -1;
-            }
         }
 
         public async Task<(int MaterialAlerts, double TodayProductivity, decimal MonthlyRevenue)> GetDashboardStatsAsync()
@@ -356,35 +333,53 @@ namespace ManufacturingERP.Services
                 .ToListAsync();
         }
 
-        public async Task<(List<int> ProductionValues, List<int> DefectValues, List<string> Labels)> GetProductionChartDataAsync(int days)
+        public async Task<(List<int> ProductionValues, List<int> DefectValues, List<string> Labels, List<int> PlanValues)> GetProductionChartDataAsync(int days)
         {
             using var context = await _contextFactory.CreateDbContextAsync();
             
             var startDate = DateTime.Today.AddDays(-days + 1);
-            
-            // Query completed orders or progresses within the date range
+            var endDate = DateTime.Today;
+
+            // Lấy tất cả lệnh SX có hoạt động trong khoảng thời gian
             var orders = await context.WorkOrders
-                .Where(w => w.EndDate >= startDate && w.EndDate <= DateTime.Today)
+                .Include(w => w.WorkOrderItems)
+                .Where(w => w.StartDate <= endDate && (w.EndDate >= startDate || w.EndDate == null))
                 .ToListAsync();
 
             var productionValues = new List<int>();
-            var defectValues = new List<int>(); // Since we don't have DefectQty yet, mock it based on ActualQty
+            var defectValues = new List<int>();
+            var planValues = new List<int>();
             var labels = new List<string>();
 
             for (int i = 0; i < days; i++)
             {
                 var date = startDate.AddDays(i);
-                labels.Add(date.ToString("dd/MM"));
+                labels.Add(i % 7 == 0 || i == days - 1 ? date.ToString("dd/MM") : "");
                 
-                var dailyOrders = orders.Where(w => w.EndDate?.Date == date).ToList();
-                int dailyProd = dailyOrders.Sum(w => w.ActualQty ?? 0);
+                // Thực tế: sản lượng hoàn thành trong ngày
+                var dailyCompleted = orders.Where(w => w.EndDate?.Date == date).ToList();
+                int dailyProd = dailyCompleted.Sum(w => w.ActualQty ?? 0);
                 productionValues.Add(dailyProd);
                 
-                // Mock defect as ~2% of production for now until Phase 2
-                defectValues.Add((int)(dailyProd * 0.02)); 
+                // Kế hoạch: phân bổ TargetQty theo số ngày của lệnh
+                int dailyPlan = 0;
+                foreach (var order in orders)
+                {
+                    var orderStart = order.StartDate ?? startDate;
+                    var orderEnd = order.EndDate ?? endDate;
+                    if (date >= orderStart && date <= orderEnd)
+                    {
+                        int totalDays = (orderEnd - orderStart).Days + 1;
+                        if (totalDays > 0)
+                            dailyPlan += (int)Math.Ceiling((double)(order.TargetQty ?? 0) / totalDays);
+                    }
+                }
+                planValues.Add(dailyPlan);
+                
+                defectValues.Add((int)(dailyProd * 0.02));
             }
 
-            return (productionValues, defectValues, labels);
+            return (productionValues, defectValues, labels, planValues);
         }
 
 

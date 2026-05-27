@@ -14,9 +14,8 @@ namespace ManufacturingERP.Services
         Task<bool> AddWorkOrderProgressAsync(WorkOrderProgress progress);
         Task<WorkOrder?> GetWorkOrderByCodeAsync(string code);
         Task<List<Material>> GetProductsAsync();
-        Task<int> DeleteOldWorkOrdersAsync(DateTime beforeDate);
         Task<(int MaterialAlerts, double TodayProductivity, decimal MonthlyRevenue)> GetDashboardStatsAsync();
-        Task<(List<int> ProductionValues, List<int> DefectValues, List<string> Labels)> GetProductionChartDataAsync(int days);
+        Task<(List<int> ProductionValues, List<int> DefectValues, List<string> Labels, List<int> PlanValues)> GetProductionChartDataAsync(int days);
         Task<List<MaterialAvailability>> CheckMaterialAvailabilityAsync(int workOrderId);
     }
 

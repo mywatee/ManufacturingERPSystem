@@ -77,6 +77,7 @@
                                     <TextBlock Text="Danh sách Ca làm việc" FontWeight="Bold" Foreground="#1e293b" FontSize="16"/>
                                     <Button Content="+ Thêm ca" 
                                             Command="{Binding AddShiftCommand}"
+                                            Visibility="{Binding CanAddHR, Converter={StaticResource BooleanToVisibilityConverter}}"
                                             HorizontalAlignment="Right" Style="{StaticResource SecondaryButtonStyle}" Padding="12,6" FontSize="11"/>
                                 </Grid>
 
@@ -152,10 +153,12 @@
                                                         <Button Style="{StaticResource GhostButtonStyle}" Tag="{StaticResource IconEdit}" 
                                                                 Command="{Binding DataContext.EditShiftCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                                                 CommandParameter="{Binding}"
+                                                                Visibility="{Binding DataContext.CanEditHR, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BooleanToVisibilityConverter}}"
                                                                 Width="32" Height="32" Margin="4,0,0,0" ToolTip="Sửa ca"/>
                                                         <Button Style="{StaticResource GhostButtonStyle}" Tag="{StaticResource IconDelete}" 
                                                                 Command="{Binding DataContext.DeleteShiftCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                                                 CommandParameter="{Binding}"
+                                                                Visibility="{Binding DataContext.CanDeleteHR, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BooleanToVisibilityConverter}}"
                                                                 Foreground="#EF4444" Width="32" Height="32" Margin="4,0,0,0" ToolTip="Xóa ca"/>
                                                     </StackPanel>
                                                 </Grid>

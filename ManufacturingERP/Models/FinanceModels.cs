@@ -75,6 +75,7 @@ public class Invoice
     [Column(TypeName = "decimal(18,2)")]
     public decimal VatAmount { get; set; }
     
+    [NotMapped]
     public decimal RemainingAmount => TotalAmount - PaidAmount;
     
     [MaxLength(50)]
@@ -110,5 +111,6 @@ public partial class InvoiceItem : ObservableValidator
     [NotifyPropertyChangedFor(nameof(TotalPrice))]
     private decimal _unitPrice;
     
+    [NotMapped]
     public decimal TotalPrice => Quantity * UnitPrice;
 }

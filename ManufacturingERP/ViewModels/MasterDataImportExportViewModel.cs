@@ -417,8 +417,17 @@ public partial class MasterDataImportExportViewModel : ViewModelBase
             {
                 bool statusMatch = false;
                 if (SelectedStatus == "Tất cả trạng thái") statusMatch = true;
-                else if (SelectedStatus == "Sắp hết") statusMatch = (m.MinStock > 0 && 0 < m.MinStock); 
-                else if (SelectedStatus == "Hết hàng") statusMatch = (0 <= 0); 
+                else if (SelectedStatus == "Sắp hết")
+                {
+                    var currentStock = (double)(m.Inventories?.Sum(i => i.CurrentStock ?? 0) ?? 0);
+                    var minStock = m.MinStock ?? 0;
+                    statusMatch = minStock > 0 && currentStock > 0 && currentStock <= minStock;
+                }
+                else if (SelectedStatus == "Hết hàng")
+                {
+                    var currentStock = (double)(m.Inventories?.Sum(i => i.CurrentStock ?? 0) ?? 0);
+                    statusMatch = currentStock <= 0;
+                }
                 else statusMatch = (m.Status == SelectedStatus);
                 return statusMatch && (m.CreatedAt == null || (m.CreatedAt >= StartDate && m.CreatedAt <= EndDate.AddDays(1)));
             }).ToList();

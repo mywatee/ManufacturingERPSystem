@@ -236,10 +236,22 @@ public partial class CreateWorkOrderViewModel : ViewModelBase
             return;
         }
 
+        if (StartDate.Date < DateTime.Today)
+        {
+            _notificationService.ShowWarning("Ngày bắt đầu không thể ở trong quá khứ.");
+            return;
+        }
+
+        if (StartDate > EndDate)
+        {
+            _notificationService.ShowWarning("Ngày bắt đầu phải trước hoặc bằng hạn hoàn thành.");
+            return;
+        }
+
         var newOrder = new WorkOrder
         {
             Wocode = WoCode,
-            Status = "Chờ",
+            Status = "Planned",
             StartDate = StartDate,
             EndDate = EndDate,
             IsUrgent = IsUrgent,

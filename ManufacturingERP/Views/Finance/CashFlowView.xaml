@@ -31,7 +31,8 @@
                     Content="+ Tạo phiếu thu/chi" 
                     Style="{StaticResource PrimaryButtonStyle}" 
                     Padding="20,10"
-                    Command="{Binding CreateTransactionCommand}"/>
+                    Command="{Binding CreateTransactionCommand}"
+                    Visibility="{Binding CanAddFinance, Converter={StaticResource BooleanToVisibilityConverter}}"/>
         </Grid>
 
         <!-- Cash Flow KPIs -->
@@ -222,7 +223,8 @@
                                     </Button>
                                     <Button Style="{StaticResource GhostButtonStyle}" ToolTip="Xóa"
                                             Command="{Binding DataContext.DeleteTransactionCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
-                                            CommandParameter="{Binding}" Margin="4,0,0,0">
+                                            CommandParameter="{Binding}" Margin="4,0,0,0"
+                                            Visibility="{Binding DataContext.CanDeleteFinance, RelativeSource={RelativeSource AncestorType=DataGrid}, Converter={StaticResource BooleanToVisibilityConverter}}">
                                         <Path Data="{StaticResource IconDelete}" Fill="#EF4444" Width="14" Height="14" Stretch="Uniform"/>
                                     </Button>
                                 </StackPanel>

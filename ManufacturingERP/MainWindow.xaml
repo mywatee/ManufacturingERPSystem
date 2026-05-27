@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:viewmodels="clr-namespace:ManufacturingERP.ViewModels"
+        xmlns:views="clr-namespace:ManufacturingERP.Views"
         xmlns:components="clr-namespace:ManufacturingERP.Views.Components"
         mc:Ignorable="d"
         Title="Manufacturing ERP - Hệ thống điều hành sản xuất" 
@@ -126,6 +127,23 @@
                         </Button>
 
 
+                        <Button Content="Tài liệu" 
+                                Tag="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z M14 2v6h6 M16 13H8 M16 17H8 M10 9H8"
+                                Command="{Binding NavigateDocumentsCommand}"
+                                Visibility="{Binding CanViewMasterData, Converter={StaticResource BooleanToVisibilityConverter}}">
+                            <Button.Style>
+                                <Style TargetType="Button" BasedOn="{StaticResource SidebarButtonStyle}">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding NavigationService.CurrentView, Converter={StaticResource ViewModelTypeToBooleanConverter}, ConverterParameter=DocumentViewModel}" Value="True">
+                                            <Setter Property="Background" Value="#2C4263"/>
+                                            <Setter Property="Foreground" Value="White"/>
+                                            <Setter Property="FontWeight" Value="SemiBold"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Button.Style>
+                        </Button>
+
                         <Button Content="Kho bãi" 
                                 Tag="M12 3L2 12h3v8h14v-8h3L12 3zm0 13c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"
                                 Command="{Binding NavigateWarehouseCommand}"
@@ -179,11 +197,7 @@
                     </StackPanel>
                 </ScrollViewer>
 
-                <StackPanel Grid.Row="2" Margin="10,0,10,20">
-                    <Button Content="Cài đặt hệ thống" 
-                            Tag="M19.43 12.98c.04-.32.07-.64.07-.98s-.03-.66-.07-.98l2.11-1.65c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.3-.61-.22l-2.49 1c-.52-.4-1.08-.73-1.69-.98l-.38-2.65C14.46 2.18 14.25 2 14 2h-4c-.25 0-.46.18-.49.42l-.38 2.65c-.61.25-1.17.59-1.69.98l-2.49-1c-.23-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64l2.11 1.65c-.04.32-.07.65-.07.98s.03.66.07.98l-2.11 1.65c-.19.15-.24.42-.12.64l2 3.46c.12.22.39.3.61.22l2.49-1c.52.4 1.08.73 1.69.98l.38 2.65c.03.24.24.42.49.42h4c.25 0 .46-.18.49-.42l.38-2.65c.61-.25 1.17-.59 1.69-.98l2.49 1c.23.09.49 0 .61-.22l2-3.46c.12-.22.07-.49-.12-.64l-2.11-1.65zM12 15.5c-1.93 0-3.5-1.57-3.5-3.5s1.57-3.5 3.5-3.5 3.5 1.57 3.5 3.5-1.57 3.5-3.5 3.5z"
-                            Style="{StaticResource SidebarButtonStyle}"/>
-                </StackPanel>
+                <StackPanel Grid.Row="2" Margin="10,0,10,20"/>
             </Grid>
         </Border>
 
@@ -247,6 +261,16 @@
                     </Border>
 
                     <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                        <!-- Chat toggle -->
+                        <Border Height="36" CornerRadius="18" Background="#E8F4FD" Padding="12,0,14,0" Margin="0,0,10,0" Cursor="Hand"
+                                ToolTip="Trợ lý AI">
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center"
+                                        MouseLeftButtonDown="ChatIcon_MouseLeftButtonDown">
+                                <TextBlock Text="🤖" FontSize="16" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                                <TextBlock Text="AI Chat" FontSize="13" FontWeight="SemiBold" Foreground="#1565C0" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Border>
+
                         <!-- Notification Bell -->
                         <Border Width="40" Height="40" CornerRadius="20" Background="Transparent" Margin="0,0,10,0" Cursor="Hand">
                             <TextBlock Text="🔔" FontSize="18" VerticalAlignment="Center" HorizontalAlignment="Center"/>
@@ -304,18 +328,6 @@
                                         
                                         <Rectangle Height="1" Fill="{StaticResource BorderBrush}" Margin="8,4"/>
 
-                                        <Button Content="Thông tin cá nhân" 
-                                                Style="{StaticResource ProfileMenuItemStyle}"
-                                                Tag="{StaticResource IconUser}"
-                                                Command="{Binding NavigateProfileCommand}"/>
-                                        
-                                        <Button Content="Cài đặt thông báo" 
-                                                Style="{StaticResource ProfileMenuItemStyle}"
-                                                Tag="{StaticResource IconBell}"
-                                                Command="{Binding NavigateNotificationSettingsCommand}"/>
-
-                                        <Rectangle Height="1" Fill="{StaticResource BorderBrush}" Margin="8,4"/>
-
                                         <Button Content="Đăng xuất" 
                                                 Style="{StaticResource ProfileMenuItemStyle}"
                                                 Tag="{StaticResource IconLogout}"
@@ -336,6 +348,11 @@
         <components:ToastOverlayView VerticalAlignment="Top" HorizontalAlignment="Right" 
                                      Margin="0,20,20,0" Grid.ColumnSpan="2" Panel.ZIndex="9999"
                                      DataContext="{Binding NotificationService}"/>
+
+        <!-- AI Chat Panel (overlay, không làm hẹp nội dung chính) -->
+        <views:AIChatView Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Bottom" Panel.ZIndex="100" Width="380" Height="600"
+                          DataContext="{Binding AIChat}"
+                          Visibility="{Binding IsOpen, Converter={StaticResource BooleanToVisibilityConverter}}"/>
     </Grid>
 
     <Window.Resources>

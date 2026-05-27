@@ -103,8 +103,9 @@ public partial class EditEmployeeViewModel : ViewModelBase
     }
 
     [RelayCommand]
-    private void GoBack()
+    private async Task GoBack()
     {
-        _navigationService.NavigateTo<HRViewModel>();
+        var vm = _navigationService.NavigateTo<HRViewModel>();
+        await vm.LoadDataAsync();
     }
 }

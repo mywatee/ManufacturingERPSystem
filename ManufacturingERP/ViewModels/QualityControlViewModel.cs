@@ -52,6 +52,10 @@ public partial class QualityControlViewModel : ViewModelBase
     [ObservableProperty] private string _defectReasonInput = string.Empty;
     [ObservableProperty] private string _inspectorName = "Huy Hoàng";
 
+    [ObservableProperty] private bool _canAddQC;
+    [ObservableProperty] private bool _canEditQC;
+    [ObservableProperty] private bool _canDeleteQC;
+
     // Stats for Selected Item
     [ObservableProperty] private int _selectedOrderProducedQty;
     [ObservableProperty] private int _selectedOrderInternalDefects;
@@ -124,6 +128,15 @@ public partial class QualityControlViewModel : ViewModelBase
         SelectedOrderRemainingQty = 0;
     }
 
+    private async Task LoadPermissionsAsync()
+    {
+        await _accessControlService.RefreshAsync();
+        var perms = ModulePermissionStateFactory.FromAccessControl(_accessControlService, SystemModules.QualityControl);
+        CanAddQC = perms.CanAdd;
+        CanEditQC = perms.CanEdit;
+        CanDeleteQC = perms.CanDelete;
+    }
+
 
 
     public QualityControlViewModel(
@@ -147,6 +160,7 @@ public partial class QualityControlViewModel : ViewModelBase
     {
         try
         {
+            await LoadPermissionsAsync();
             // 1. Cập nhật ngày dựa trên SelectedTrendPeriod
             if (SelectedTrendPeriod != "Tùy chỉnh")
             {
@@ -180,7 +194,7 @@ public partial class QualityControlViewModel : ViewModelBase
                         Passed = r.PassedQty ?? 0,
                         Failed = r.FailedQty ?? 0,
                         SamplesUsed = (r.PassedQty ?? 0) + (r.FailedQty ?? 0),
-                        Status = (r.FailedQty ?? 0) > ((r.PassedQty ?? 0) * 0.1) ? "Không đạt" : "Đạt"
+                        Status = (r.FailedQty ?? 0) > ((r.PassedQty ?? 0) + (r.FailedQty ?? 0)) * 0.1 ? "Không đạt" : "Đạt"
                     };
                     QCRecords.Add(display);
                     _allQCRecords.Add(display);
@@ -206,10 +220,11 @@ public partial class QualityControlViewModel : ViewModelBase
             if (diffDays <= 7) { periodToQuery = "Ngày"; count = 7; } 
             else if (diffDays <= 31) { periodToQuery = "Ngày"; count = (int)diffDays + 1; }
             else if (diffDays <= 120) { periodToQuery = "Tuần"; count = (int)Math.Ceiling(diffDays / 7); }
-            else { periodToQuery = "Tháng"; count = (int)Math.Ceiling(diffDays / 30); }
+            else if (diffDays <= 540) { periodToQuery = "Tháng"; count = (int)Math.Ceiling(diffDays / 30); }
+            else { periodToQuery = "Quý"; count = (int)Math.Ceiling(diffDays / 90); }
 
 
-            var trend = await _qcService.GetDefectTrendAsync(periodToQuery, count);
+            var trend = await _qcService.GetDefectTrendAsync(periodToQuery, count, StartDate);
             App.Current.Dispatcher.Invoke(() => {
                 DefectTrendValues.Clear();
                 TotalSamplesTrendValues.Clear();
@@ -273,7 +288,7 @@ public partial class QualityControlViewModel : ViewModelBase
             return;
         }
 
-        if (string.IsNullOrEmpty(SelectedOrderId))
+        if (string.IsNullOrWhiteSpace(SelectedOrderId))
         {
             _notificationService.ShowError("Vui lòng chọn một Lệnh sản xuất.");
             return;
@@ -282,6 +297,30 @@ public partial class QualityControlViewModel : ViewModelBase
         if (!SelectedProductId.HasValue)
         {
             _notificationService.ShowError("Vui lòng chọn sản phẩm cần kiểm tra.");
+            return;
+        }
+
+        if (FailedQtyInput > 0 && string.IsNullOrWhiteSpace(DefectReasonInput))
+        {
+            _notificationService.ShowError("Vui lòng nhập lý do cho số lượng lỗi.");
+            return;
+        }
+
+        if (PassedQtyInput < 0 || FailedQtyInput < 0)
+        {
+            _notificationService.ShowError("Số lượng không thể là số âm.");
+            return;
+        }
+
+        if (PassedQtyInput == 0 && FailedQtyInput == 0)
+        {
+            _notificationService.ShowError("Vui lòng nhập số lượng ĐẠT hoặc LỖI.");
+            return;
+        }
+
+        if (PassedQtyInput + FailedQtyInput > SelectedOrderRemainingQty)
+        {
+            _notificationService.ShowError($"Số lượng kiểm tra ({PassedQtyInput + FailedQtyInput}) vượt quá số lượng còn lại ({SelectedOrderRemainingQty}).");
             return;
         }
 
@@ -305,8 +344,8 @@ public partial class QualityControlViewModel : ViewModelBase
             var success = await _qcService.AddRecordAsync(record);
             if (success)
             {
-                double total = record.PassedQty.Value + record.FailedQty.Value;
-                double rate = total > 0 ? (double)record.FailedQty.Value / total : 0;
+                double total = (record.PassedQty ?? 0) + (record.FailedQty ?? 0);
+                double rate = total > 0 ? (double)(record.FailedQty ?? 0) / total : 0;
 
                 if (rate > 0.1)
                 {

@@ -30,7 +30,6 @@ public partial class AttendanceConsoleViewModel : ViewModelBase
     [ObservableProperty] private int _pageSize = 20;
     [ObservableProperty] private int _totalCount;
     [ObservableProperty] private int _totalPages;
-    [ObservableProperty] private bool _isTableViewActive = true; // Default to Table View as requested
     [ObservableProperty] private bool _isAnySelected;
 
     private List<EmployeeAttendanceItem> _allData = new();
@@ -81,6 +80,10 @@ public partial class AttendanceConsoleViewModel : ViewModelBase
             
             ApplyFilters();
             UpdateStats();
+        }
+        catch (Exception ex)
+        {
+            _notificationService.ShowError("Lỗi khi tải dữ liệu chấm công: " + ex.Message);
         }
         finally
         {
@@ -138,9 +141,6 @@ public partial class AttendanceConsoleViewModel : ViewModelBase
     {
         if (CurrentPage > 1) CurrentPage--;
     }
-
-    [RelayCommand]
-    private void ToggleView() => IsTableViewActive = !IsTableViewActive;
 
     [RelayCommand]
     private async Task BatchMarkAttendance(string status)
@@ -255,13 +255,9 @@ public partial class AttendanceConsoleViewModel : ViewModelBase
     {
         if (item == null || item.Record == null || item.IsCheckedOut) return;
         
-        using var context = _contextFactory.CreateDbContext();
-        var record = await context.Attendances.FindAsync(item.Record.AttendanceId);
-        if (record != null)
+        var success = await _hrService.RecordAttendanceAsync(item.Employee.EmployeeId, item.Record.Status);
+        if (success)
         {
-            record.CheckOut = DateTime.Now.TimeOfDay;
-            
-            await context.SaveChangesAsync();
             _notificationService.ShowSuccess($"Đã ghi nhận ra ca cho {item.Employee.FullName}");
             await LoadDataAsync();
         }

@@ -29,11 +29,16 @@ public partial class ProductionViewModel : ViewModelBase, IDropTarget
     partial void OnSearchTextChanged(string value) => _ = LoadDataAsync();
     partial void OnSelectedStatusFilterChanged(string value) => _ = LoadDataAsync();
 
-    // Stats for Dashboard
-    [ObservableProperty] private string _runningOrders = "0";
-    [ObservableProperty] private string _materialAlerts = "0";
-    [ObservableProperty] private string _productivity = "0%";
-    [ObservableProperty] private string _monthlyRevenue = "0"; // Can be updated later
+    [ObservableProperty] private bool _isAdvancedFilterVisible;
+    [ObservableProperty] private DateTime? _filterFromDate;
+    [ObservableProperty] private DateTime? _filterToDate;
+    [ObservableProperty] private string _activityLogSearchText = string.Empty;
+    [ObservableProperty] private string _activityLogSelectedStatus = "Tất cả";
+    partial void OnActivityLogSearchTextChanged(string value) => _ = LoadActivityLogsAsync();
+    partial void OnActivityLogSelectedStatusChanged(string value) => _ = LoadActivityLogsAsync();
+    [ObservableProperty] private bool _canAddProduction;
+    [ObservableProperty] private bool _canEditProduction;
+    [ObservableProperty] private bool _canDeleteProduction;
 
     public ObservableCollection<WorkOrderDisplay> WorkOrders { get; } = new();
     public ObservableCollection<KanbanItem> KanbanOrders { get; } = new();
@@ -71,8 +76,23 @@ public partial class ProductionViewModel : ViewModelBase, IDropTarget
         _auditLogService = auditLogService;
         _authService = authService;
         
-        _ = LoadActivityLogsAsync();
-        _ = LoadDataAsync();
+        _ = InitializePermissionsAndDataAsync();
+    }
+
+    private async Task InitializePermissionsAndDataAsync()
+    {
+        await LoadPermissionsAsync();
+        await LoadActivityLogsAsync();
+        await LoadDataAsync();
+    }
+
+    private async Task LoadPermissionsAsync()
+    {
+        await _accessControlService.RefreshAsync();
+        var perms = ModulePermissionStateFactory.FromAccessControl(_accessControlService, SystemModules.Production);
+        CanAddProduction = perms.CanAdd;
+        CanEditProduction = perms.CanEdit;
+        CanDeleteProduction = perms.CanDelete;
     }
 
     private bool EnsureCanEditProduction()
@@ -89,6 +109,12 @@ public partial class ProductionViewModel : ViewModelBase, IDropTarget
     [RelayCommand]
     private async Task AddWorkOrder()
     {
+        if (!_accessControlService.HasCached(SystemModules.Production, PermissionAction.Add))
+        {
+            _notificationService.ShowError("Bạn không có quyền Thêm trong phân hệ Sản xuất.");
+            return;
+        }
+
         var vm = _navigationService.NavigateTo<CreateWorkOrderViewModel>();
         await vm.InitializeAsync();
     }
@@ -98,6 +124,15 @@ public partial class ProductionViewModel : ViewModelBase, IDropTarget
     {
         await LoadDataAsync();
     }
+
+    [RelayCommand]
+    private void ToggleAdvancedSearch()
+    {
+        IsAdvancedFilterVisible = !IsAdvancedFilterVisible;
+    }
+
+    partial void OnFilterFromDateChanged(DateTime? value) => _ = LoadDataAsync();
+    partial void OnFilterToDateChanged(DateTime? value) => _ = LoadDataAsync();
 
     [RelayCommand]
     private async Task ExportToExcel()
@@ -115,11 +150,22 @@ public partial class ProductionViewModel : ViewModelBase, IDropTarget
     {
         try
         {
+            await LoadPermissionsAsync();
             var today = DateTime.Today;
-            var startOfMonth = new DateTime(today.Year, today.Month, 1);
-            var endOfMonth = startOfMonth.AddMonths(1).AddDays(-1);
 
-            var dbOrders = await _productionService.GetFilteredWorkOrdersAsync(startOfMonth, endOfMonth, null);
+            DateTime startDate, endDate;
+            if (IsAdvancedFilterVisible && FilterFromDate.HasValue && FilterToDate.HasValue)
+            {
+                startDate = FilterFromDate.Value;
+                endDate = FilterToDate.Value;
+            }
+            else
+            {
+                startDate = new DateTime(today.Year, today.Month, 1);
+                endDate = startDate.AddMonths(1).AddDays(-1);
+            }
+
+            var dbOrders = await _productionService.GetFilteredWorkOrdersAsync(startDate, endDate, null);
             
             // If no data, fallback to recent
             if (dbOrders == null || !dbOrders.Any())
@@ -132,7 +178,6 @@ public partial class ProductionViewModel : ViewModelBase, IDropTarget
                 WorkOrders.Clear();
                 KanbanOrders.Clear();
                 
-                int runningCount = 0;
                 int passedTotal = 0;
                 int targetTotal = 0;
 
@@ -147,16 +192,16 @@ public partial class ProductionViewModel : ViewModelBase, IDropTarget
 
                     // Filter logic
                     if (SelectedStatusFilter != "Tất cả" && viStatus != SelectedStatusFilter) continue;
-                    if (!string.IsNullOrEmpty(SearchText) && 
+                    if (!string.IsNullOrWhiteSpace(SearchText) && 
                         !wo.Wocode.ToLower().Contains(SearchText.ToLower()) && 
                         !product.ToLower().Contains(SearchText.ToLower())) continue;
 
-                    var isOverdue = wo.EndDate.HasValue && wo.EndDate.Value < DateTime.Now && wo.Status != "Completed" && wo.Status != "Hoàn thành";
+                    var isOverdue = wo.EndDate.HasValue && wo.EndDate.Value < DateTime.Today && wo.Status != "Completed" && wo.Status != "Hoàn thành";
                     
                     var targetQty = wo.WorkOrderItems?.Sum(i => i.TargetQty) ?? 0;
                     var actualQty = wo.WorkOrderItems?.Sum(i => i.ActualQty) ?? 0;
                     
-                    int failedQty = 0; 
+                    int failedQty = wo.WorkOrderProgresses?.Sum(p => p.DefectQty ?? 0) ?? 0; 
                     
                     var woDisplay = new WorkOrderDisplay
                     {
@@ -188,21 +233,8 @@ public partial class ProductionViewModel : ViewModelBase, IDropTarget
                         IsOverdue = isOverdue
                     });
 
-                    if (viStatus == "Đang sản xuất") runningCount++;
                     passedTotal += actualQty;
                     targetTotal += targetQty;
-                }
-
-                RunningOrders = runningCount.ToString();
-                
-                if (targetTotal > 0)
-                {
-                    double prod = ((double)passedTotal / targetTotal) * 100;
-                    Productivity = $"{prod:F1}%";
-                }
-                else
-                {
-                    Productivity = "0%";
                 }
 
                 RefreshKanban();
@@ -248,18 +280,34 @@ public partial class ProductionViewModel : ViewModelBase, IDropTarget
             App.Current.Dispatcher.Invoke(() => ActivityLogs.Clear());
             
             // Lấy dữ liệu tiến độ thực tế từ bảng WorkOrderProgress
-            var progressList = await _productionService.GetRecentProgressAsync(15);
+            var progressList = await _productionService.GetRecentProgressAsync(50);
             
             foreach (var prog in progressList)
             {
+                var orderCode = prog.Wo?.Wocode ?? "-";
+                var stage = prog.StageName ?? "Sản xuất";
+                var operatorName = prog.RecordedBy ?? "Công nhân";
+
+                // Filter
+                if (!string.IsNullOrEmpty(ActivityLogSearchText))
+                {
+                    var search = ActivityLogSearchText.ToLower();
+                    if (!orderCode.ToLower().Contains(search) &&
+                        !operatorName.ToLower().Contains(search) &&
+                        !stage.ToLower().Contains(search))
+                        continue;
+                }
+                if (ActivityLogSelectedStatus != "Tất cả" && stage != ActivityLogSelectedStatus)
+                    continue;
+
                 var activity = new ActivityLog { 
                     Time = prog.EndTime?.ToString("HH:mm:ss") ?? prog.StartTime?.ToString("HH:mm:ss") ?? "", 
                     Date = prog.EndTime?.ToString("yyyy-MM-dd") ?? prog.StartTime?.ToString("yyyy-MM-dd") ?? "", 
                     Status = "Tiến độ",
-                    OrderId = prog.Wo?.Wocode ?? "-",
-                    Product = "-", // Có thể lấy từ WoItems nếu cần
-                    Stage = prog.StageName ?? "Sản xuất",
-                    Operator = prog.RecordedBy ?? "Công nhân",
+                    OrderId = orderCode,
+                    Product = "-",
+                    Stage = stage,
+                    Operator = operatorName,
                     Quantity = prog.ProducedQty?.ToString() ?? "0",
                     Notes = prog.Notes ?? ""
                 };
@@ -267,7 +315,10 @@ public partial class ProductionViewModel : ViewModelBase, IDropTarget
                 App.Current.Dispatcher.Invoke(() => ActivityLogs.Add(activity));
             }
         }
-        catch (Exception) { /* Silent fail */ }
+        catch (Exception ex)
+        {
+            _notificationService.ShowError("Không thể tải nhật ký hoạt động: " + ex.Message);
+        }
     }
 
     [RelayCommand]
@@ -307,6 +358,7 @@ public partial class ProductionViewModel : ViewModelBase, IDropTarget
     private async Task UpdateOrderStatusAsync(KanbanItem item, string newViStatus)
     {
         if (item == null) return;
+        if (!EnsureCanEditProduction()) return;
 
         if (newViStatus == "Đang sản xuất")
         {
@@ -395,13 +447,23 @@ public partial class ProductionViewModel : ViewModelBase, IDropTarget
 
     public async void Drop(IDropInfo dropInfo)
     {
-        if (dropInfo.Data is KanbanItem item && dropInfo.VisualTarget is System.Windows.FrameworkElement targetElement)
+        try
         {
-            string? newStatus = targetElement.Tag as string;
-            if (!string.IsNullOrEmpty(newStatus) && item.Status != newStatus)
+            if (!EnsureCanEditProduction()) return;
+
+            if (dropInfo.Data is KanbanItem item && dropInfo.VisualTarget is System.Windows.FrameworkElement targetElement)
             {
-                await UpdateOrderStatusAsync(item, newStatus);
+                string? newStatus = targetElement.Tag as string;
+                if (!string.IsNullOrEmpty(newStatus) && item.Status != newStatus)
+                {
+                    await UpdateOrderStatusAsync(item, newStatus);
+                }
             }
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Drop error: {ex.Message}");
+            _notificationService.ShowError($"Lỗi khi cập nhật trạng thái: {ex.Message}");
         }
     }
 
@@ -463,14 +525,14 @@ public partial class KanbanItem : ObservableObject
     }
 }
 
-public class WorkOrderDisplay
+public partial class WorkOrderDisplay : ObservableObject
 {
     public string Id { get; set; } = "";
     public string Product { get; set; } = "";
     public int PassedQty { get; set; }
     public int TargetQty { get; set; }
     public int FailedQty { get; set; }
-    public string Status { get; set; } = "";
+    [ObservableProperty] private string _status = "";
     public string StartDate { get; set; } = "";
     public string EndDate { get; set; } = "";
     public bool IsOverdue { get; set; }

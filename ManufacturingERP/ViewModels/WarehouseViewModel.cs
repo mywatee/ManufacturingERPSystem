@@ -57,6 +57,10 @@ public partial class WarehouseViewModel : ViewModelBase
     [ObservableProperty] private double _totalCapacitySum;
     [ObservableProperty] private double _totalUsedSum;
 
+    [ObservableProperty] private bool _canAddWarehouse;
+    [ObservableProperty] private bool _canEditWarehouse;
+    [ObservableProperty] private bool _canDeleteWarehouse;
+
     public WarehouseViewModel(
         IAccessControlService accessControlService, 
         INotificationService notificationService,
@@ -73,44 +77,64 @@ public partial class WarehouseViewModel : ViewModelBase
 
     public override async Task InitializeAsync()
     {
+        await LoadPermissionsAsync();
+        await LoadWarehouseListAsync();
         await LoadDataAsync();
+    }
+
+    private async Task LoadPermissionsAsync()
+    {
+        await _accessControlService.RefreshAsync();
+        var perms = ModulePermissionStateFactory.FromAccessControl(_accessControlService, SystemModules.Warehouse);
+        CanAddWarehouse = perms.CanAdd;
+        CanEditWarehouse = perms.CanEdit;
+        CanDeleteWarehouse = perms.CanDelete;
+    }
+
+    // Load warehouse list separately so filtering doesn't cascade ComboBox resets
+    private async Task LoadWarehouseListAsync()
+    {
+        var configs = await _warehouseService.GetWarehousesAsync();
+        await System.Windows.Application.Current.Dispatcher.InvokeAsync(() =>
+        {
+            WarehouseList.Clear();
+            WarehouseList.Add("Tất cả");
+            foreach (var c in configs)
+            {
+                WarehouseList.Add(c.Name);
+            }
+        });
     }
 
     private async Task LoadDataAsync()
     {
         try
         {
-            // Load Configurations
             var configs = await _warehouseService.GetWarehousesAsync();
-            WarehouseConfigs.Clear();
-            WarehouseList.Clear();
-            WarehouseList.Add("Tất cả");
-            
-            foreach (var c in configs) 
-            {
-                WarehouseConfigs.Add(c);
-                WarehouseList.Add(c.Name);
-            }
-            
-            SelectedWarehouseConfig = WarehouseConfigs.FirstOrDefault();
-
-
-            // Load Inventory
             var inventories = await _warehouseService.GetInventoryAsync(SelectedWarehouse);
-            _allInventories = inventories;
-            ApplyFilters();
-
-            // Load Transactions
             var transactions = await _warehouseService.GetTransactionsAsync(SelectedWarehouse);
-            Transactions.Clear();
-            foreach (var t in transactions) Transactions.Add(t);
-
-            // Load Alerts
             var alerts = await _warehouseService.GetStockAlertsAsync();
-            StockAlerts.Clear();
-            foreach (var a in alerts) StockAlerts.Add(a);
 
-            CalculateStats();
+            await System.Windows.Application.Current.Dispatcher.InvokeAsync(() =>
+            {
+                WarehouseConfigs.Clear();
+                foreach (var c in configs)
+                {
+                    WarehouseConfigs.Add(c);
+                }
+                SelectedWarehouseConfig = WarehouseConfigs.FirstOrDefault();
+
+                _allInventories = inventories;
+                ApplyFilters();
+
+                Transactions.Clear();
+                foreach (var t in transactions) Transactions.Add(t);
+
+                StockAlerts.Clear();
+                foreach (var a in alerts) StockAlerts.Add(a);
+
+                CalculateStats();
+            });
         }
         catch (Exception ex)
         {
@@ -305,6 +329,7 @@ public partial class WarehouseViewModel : ViewModelBase
                 if (success)
                 {
                     _notificationService.ShowSuccess("Đã xóa nhà kho thành công.");
+                    await LoadWarehouseListAsync();
                     await LoadDataAsync();
                 }
                 else
@@ -389,10 +414,19 @@ public partial class WarehouseViewModel : ViewModelBase
         await vm.InitializeAsync();
     }
 
+    private int _loadVersion;
+    private string _prevSelectedWarehouse = "Tất cả";
     partial void OnSelectedWarehouseChanged(string value)
     {
-        // Safe trigger for reload
-        _ = LoadDataAsync();
+        if (value == _prevSelectedWarehouse) return;
+        _prevSelectedWarehouse = value;
+        var currentVersion = ++_loadVersion;
+        _ = System.Windows.Application.Current.Dispatcher.InvokeAsync(async () =>
+        {
+            await Task.Delay(100);
+            if (currentVersion == _loadVersion)
+                await LoadDataAsync();
+        });
     }
 }
 

@@ -21,7 +21,8 @@
 
         <Button Grid.Row="0" HorizontalAlignment="Right" VerticalAlignment="Top" 
                 Content="+ Thêm nhân viên" Style="{StaticResource PrimaryButtonStyle}" Padding="20,10"
-                Command="{Binding AddEmployeeCommand}"/>
+                Command="{Binding AddEmployeeCommand}"
+                Visibility="{Binding CanAddHR, Converter={StaticResource BooleanToVisibilityConverter}}"/>
 
         <!-- Profile KPIs -->
         <Grid Grid.Row="1" Margin="0,0,0,32">
@@ -150,10 +151,12 @@
                                 <StackPanel Orientation="Horizontal">
                                     <Button Style="{StaticResource GhostButtonStyle}" Tag="{StaticResource IconEdit}" Margin="0,0,8,0"
                                             Command="{Binding DataContext.EditEmployeeCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type UserControl}}}"
-                                            CommandParameter="{Binding}"/>
+                                            CommandParameter="{Binding}"
+                                            Visibility="{Binding DataContext.CanEditHR, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type UserControl}}, Converter={StaticResource BooleanToVisibilityConverter}}"/>
                                     <Button Style="{StaticResource GhostButtonStyle}" Tag="{StaticResource IconDelete}" Foreground="#EF4444"
                                             Command="{Binding DataContext.DeleteEmployeeCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type UserControl}}}"
-                                            CommandParameter="{Binding}"/>
+                                            CommandParameter="{Binding}"
+                                            Visibility="{Binding DataContext.CanDeleteHR, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type UserControl}}, Converter={StaticResource BooleanToVisibilityConverter}}"/>
                                 </StackPanel>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>

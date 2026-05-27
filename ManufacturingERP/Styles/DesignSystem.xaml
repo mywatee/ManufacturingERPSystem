@@ -19,38 +19,19 @@
     <SolidColorBrush x:Key="BorderBrush" Color="{StaticResource BorderColor}"/>
     <SolidColorBrush x:Key="PrimaryBrush" Color="#2563EB"/>
     <SolidColorBrush x:Key="SecondaryBackgroundBrush" Color="#F9FAFB"/>
-    
-    <LinearGradientBrush x:Key="LoginBackgroundGradient" StartPoint="0,0" EndPoint="1,1">
-        <GradientStop Color="#1E3A8A" Offset="0"/>
-        <GradientStop Color="#2563EB" Offset="1"/>
-    </LinearGradientBrush>
 
     <!-- Stat Card Brushes -->
     <SolidColorBrush x:Key="BlueIconBg" Color="#EFF6FF"/>
-    <SolidColorBrush x:Key="BlueIconFg" Color="#2563EB"/>
     <SolidColorBrush x:Key="OrangeIconBg" Color="#FFF7ED"/>
-    <SolidColorBrush x:Key="OrangeIconFg" Color="#EA580C"/>
-    
+
     <!-- Semantic Brushes -->
     <SolidColorBrush x:Key="SuccessBrush" Color="#10B981"/>
-    <SolidColorBrush x:Key="SuccessBackgroundBrush" Color="#ECFDF5"/>
     <SolidColorBrush x:Key="ErrorBrush" Color="#EF4444"/>
     <SolidColorBrush x:Key="ErrorBackgroundBrush" Color="#FEF2F2"/>
-    <SolidColorBrush x:Key="WarningBrush" Color="#F59E0B"/>
-    <SolidColorBrush x:Key="WarningBackgroundBrush" Color="#FFFBEB"/>
-    <SolidColorBrush x:Key="InfoBrush" Color="#3B82F6"/>
-    <SolidColorBrush x:Key="InfoBackgroundBrush" Color="#EFF6FF"/>
     <SolidColorBrush x:Key="GreenIconBg" Color="#F0FDF4"/>
-    <SolidColorBrush x:Key="GreenIconFg" Color="#16A34A"/>
     <SolidColorBrush x:Key="PurpleIconBg" Color="#FAF5FF"/>
-    <SolidColorBrush x:Key="PurpleIconFg" Color="#9333EA"/>
     <SolidColorBrush x:Key="MutedTextBrush" Color="#64748B"/>
     <SolidColorBrush x:Key="MutedBackgroundBrush" Color="#F1F5F9"/>
-    <SolidColorBrush x:Key="KanbanHeaderPending" Color="#F59E0B"/>
-    <SolidColorBrush x:Key="KanbanHeaderProduction" Color="#2563EB"/>
-    <SolidColorBrush x:Key="KanbanHeaderPaused" Color="#EF4444"/>
-    <SolidColorBrush x:Key="KanbanHeaderCompleted" Color="#16A34A"/>
-    <SolidColorBrush x:Key="KanbanHeaderForeground" Color="#FFFFFF"/>
 
     <!-- Common Styles -->
     <Style x:Key="CardStyle" TargetType="Border">
@@ -99,13 +80,6 @@
                 <Setter Property="Background" Value="#26FFFFFF" />
             </Trigger>
         </Style.Triggers>
-    </Style>
-
-    <!-- Navigation Menu Button (Active State) -->
-    <Style x:Key="ActiveSidebarButtonStyle" TargetType="Button" BasedOn="{StaticResource SidebarButtonStyle}">
-        <Setter Property="Background" Value="#2C4263"/>
-        <Setter Property="Foreground" Value="White"/>
-        <Setter Property="FontWeight" Value="SemiBold"/>
     </Style>
 
     <!-- Badges / Tags -->
@@ -392,44 +366,6 @@
         </Style.Triggers>
     </Style>
 
-    <Style x:Key="LoginPasswordBoxStyle" TargetType="PasswordBox">
-        <Setter Property="Height" Value="45"/>
-        <Setter Property="Padding" Value="12,0"/>
-        <Setter Property="VerticalContentAlignment" Value="Center"/>
-        <Setter Property="Background" Value="White"/>
-        <Setter Property="BorderBrush" Value="#E5E7EB"/>
-        <Setter Property="BorderThickness" Value="1"/>
-        <Setter Property="FontSize" Value="14"/>
-        <Style.Resources>
-            <Style TargetType="Border">
-                <Setter Property="CornerRadius" Value="8"/>
-            </Style>
-        </Style.Resources>
-        <Style.Triggers>
-            <Trigger Property="IsFocused" Value="True">
-                <Setter Property="BorderBrush" Value="#2563EB"/>
-                <Setter Property="BorderThickness" Value="1.5"/>
-            </Trigger>
-        </Style.Triggers>
-    </Style>
-
-    <Style x:Key="LoginCardStyle" TargetType="Border">
-        <Setter Property="Background" Value="White"/>
-        <Setter Property="CornerRadius" Value="16"/>
-        <Setter Property="Padding" Value="40"/>
-        <Setter Property="Effect">
-            <Setter.Value>
-                <DropShadowEffect BlurRadius="30" ShadowDepth="5" Opacity="0.1" Color="Black"/>
-            </Setter.Value>
-        </Setter>
-    </Style>
-
-    <Style x:Key="PrimaryLoginButtonStyle" TargetType="Button" BasedOn="{StaticResource PrimaryButtonStyle}">
-        <Setter Property="Height" Value="45"/>
-        <Setter Property="FontSize" Value="16"/>
-        <Setter Property="FontWeight" Value="Bold"/>
-    </Style>
-
     <Style x:Key="GhostButtonStyle" TargetType="Button">
         <Setter Property="Background" Value="Transparent"/>
         <Setter Property="Padding" Value="8"/>
@@ -594,35 +530,6 @@
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
-    </Style>
-
-    <Style x:Key="ModernEditCheckBoxStyle" TargetType="CheckBox" BasedOn="{StaticResource ModernCheckBoxStyle}">
-        <Style.Triggers>
-            <Trigger Property="IsChecked" Value="True">
-                <Setter Property="Template">
-                    <Setter.Value>
-                        <ControlTemplate TargetType="CheckBox">
-                            <Grid x:Name="templateRoot" Background="Transparent" SnapsToDevicePixels="True">
-                                <Border x:Name="checkBoxBorder" 
-                                        Background="#F97316"
-                                        BorderBrush="#F97316" 
-                                        BorderThickness="1.5" 
-                                        CornerRadius="4"
-                                        Width="20" Height="20"
-                                        HorizontalAlignment="Left">
-                                    <Path x:Name="optionMark" 
-                                          Data="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z" 
-                                          Fill="White" 
-                                          Width="12" Height="12"
-                                          Stretch="Uniform" 
-                                          Visibility="Visible"/>
-                                </Border>
-                            </Grid>
-                        </ControlTemplate>
-                    </Setter.Value>
-                </Setter>
-            </Trigger>
-        </Style.Triggers>
     </Style>
 
     <!-- Info Bar Style -->
@@ -830,7 +737,6 @@
 
 
     <!-- UI Icons Library -->
-    <Geometry x:Key="IconSettings">M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.21.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z</Geometry>
     <Geometry x:Key="IconSearch">M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z</Geometry>
     <Geometry x:Key="IconAdd">M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z</Geometry>
     <Geometry x:Key="IconEye">M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z</Geometry>
@@ -840,13 +746,10 @@
     <Geometry x:Key="IconCalendar">M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm0-12H5V6h14v2z</Geometry>
     <Geometry x:Key="IconTimezone">M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z</Geometry>
     <Geometry x:Key="IconShield">M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z</Geometry>
-    <Geometry x:Key="IconReturn">M12.5 8c-2.65 0-5.05.99-6.9 2.6L2 7v9h9l-3.62-3.62c1.39-1.16 3.16-1.88 5.12-1.88 3.54 0 6.55 2.31 7.6 5.5l2.37-.78C21.08 11.03 17.15 8 12.5 8z</Geometry>
     <Geometry x:Key="IconUser">M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z</Geometry>
-    <Geometry x:Key="IconBell">M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 4.36 6 6.92 6 10v5l-2 2v1h16v-1l-2-2z</Geometry>
     <Geometry x:Key="IconLogout">M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z</Geometry>
     <Geometry x:Key="IconXCircle">M12 2C6.47 2 2 6.47 2 12s4.47 10 10 10 10-4.47 10-10S17.53 2 12 2zm5 13.59L15.59 17 12 13.41 8.41 17 7 15.59 10.59 12 7 8.41 8.41 7 12 10.59 15.59 7 17 8.41 13.41 12 17 15.59z</Geometry>
     <Geometry x:Key="IconTrophy">M19 5h-2V3H7v2H5c-1.1 0-2 .9-2 2v1c0 2.55 1.92 4.63 4.39 4.94A5.022 5.022 0 0 0 11 15.9V19H7v2h10v-2h-4v-3.1c2.45-.39 4.45-2.26 4.93-4.58C20.48 10.37 22 8.36 22 6V5h-3zm-12 5c-1.1 0-2-.9-2-2V7h2v3H7zm10 0V7h2v1c0 1.1-.9 2-2 2z</Geometry>
-    <Geometry x:Key="IconChartBar">M5 9.2h3V19H5zM10.6 5h2.8v14h-2.8zm5.6 8H19v6h-2.8z</Geometry>
     <Geometry x:Key="IconCheckCircle">M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z</Geometry>
     <Geometry x:Key="IconClock">M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z</Geometry>
     <Geometry x:Key="IconDollar">M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z</Geometry>
@@ -861,38 +764,6 @@
     <Geometry x:Key="IconChevronLeft">M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z</Geometry>
     <Geometry x:Key="IconChevronRight">M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z</Geometry>
     <Geometry x:Key="IconPrint">M19 8H5c-1.66 0-3 1.34-3 3v6h4v4h12v-4h4v-6c0-1.66-1.34-3-3-3zm-3 11H8v-5h8v5zm3-7c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm-1-9H6v4h12V3z</Geometry>
-
-    <!-- Rank Styles -->
-    <Style x:Key="RankGoldStyle" TargetType="Border">
-        <Setter Property="Background" Value="#FEFCE8"/>
-        <Setter Property="BorderBrush" Value="#FEF08A"/>
-        <Setter Property="BorderThickness" Value="1"/>
-        <Setter Property="CornerRadius" Value="10"/>
-        <Setter Property="Padding" Value="4"/>
-        <Style.Resources>
-            <Style TargetType="Path"><Setter Property="Fill" Value="#EAB308"/></Style>
-        </Style.Resources>
-    </Style>
-    <Style x:Key="RankSilverStyle" TargetType="Border">
-        <Setter Property="Background" Value="#F8FAFC"/>
-        <Setter Property="BorderBrush" Value="#E2E8F0"/>
-        <Setter Property="BorderThickness" Value="1"/>
-        <Setter Property="CornerRadius" Value="10"/>
-        <Setter Property="Padding" Value="4"/>
-        <Style.Resources>
-            <Style TargetType="Path"><Setter Property="Fill" Value="#64748B"/></Style>
-        </Style.Resources>
-    </Style>
-    <Style x:Key="RankBronzeStyle" TargetType="Border">
-        <Setter Property="Background" Value="#FFF7ED"/>
-        <Setter Property="BorderBrush" Value="#FED7AA"/>
-        <Setter Property="BorderThickness" Value="1"/>
-        <Setter Property="CornerRadius" Value="10"/>
-        <Setter Property="Padding" Value="4"/>
-        <Style.Resources>
-            <Style TargetType="Path"><Setter Property="Fill" Value="#EA580C"/></Style>
-        </Style.Resources>
-    </Style>
 
     <!-- Profile Dropdown Styles -->
     <Style x:Key="ProfileMenuItemStyle" TargetType="Button">

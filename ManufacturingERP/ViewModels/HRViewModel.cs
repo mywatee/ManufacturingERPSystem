@@ -56,6 +56,15 @@ public partial class EmployeeAttendanceItem : ObservableObject
             if (ScheduledShift != null && ScheduledShift.StartTime.HasValue && ScheduledShift.EndTime.HasValue)
             {
                 var now = TimeOnly.FromDateTime(DateTime.Now);
+
+                // Night shift crossing midnight (e.g., 22:00-06:00)
+                if (ScheduledShift.StartTime.Value > ScheduledShift.EndTime.Value)
+                {
+                    if (now <= ScheduledShift.EndTime.Value || now >= ScheduledShift.StartTime.Value)
+                        return "CHƯA VÀO CA";
+                    return "VẮNG MẶT";
+                }
+
                 if (now < ScheduledShift.StartTime.Value)
                     return "CHƯA ĐẾN GIỜ";
                 if (now > ScheduledShift.EndTime.Value)
@@ -115,6 +124,10 @@ public partial class HRViewModel : ViewModelBase
     [ObservableProperty] private ObservableCollection<ProductivityStats> _topPerformers = new();
     
     [ObservableProperty] private bool _isProfilesTabActive = true;
+
+    [ObservableProperty] private bool _canAddHR;
+    [ObservableProperty] private bool _canEditHR;
+    [ObservableProperty] private bool _canDeleteHR;
     [ObservableProperty] private bool _isPayrollTabActive;
     [ObservableProperty] private bool _isAttendanceTabActive;
     [ObservableProperty] private bool _isSchedulesTabActive;
@@ -465,7 +478,7 @@ public partial class HRViewModel : ViewModelBase
                     Department = g.First().Employee?.Department ?? "",
                     WorkDays = g.Count(x => x.Status == "Đúng giờ" || x.Status == "Đi muộn"),
                     LateTimes = g.Count(x => x.Status == "Đi muộn"),
-                    AbsentDays = g.Count(x => x.Status == "Nghỉ phép" || x.Status == "Vắng mặt"),
+                    AbsentDays = g.Count(x => x.Status == "Nghỉ phép" || x.Status == "Vắng"),
                     OvertimeHours = g.Sum(x => x.OvertimeHours)
                 }).ToList();
 
@@ -603,7 +616,7 @@ public partial class HRViewModel : ViewModelBase
                         if (record.Status == "Vắng") summary.AbsentDays++;
                         summary.OvertimeHours += record.OvertimeHours;
                     }
-                    else if (date <= today) // Logic: Only count absent if day has passed
+                    else if (date <= today && date.DayOfWeek != DayOfWeek.Saturday && date.DayOfWeek != DayOfWeek.Sunday)
                     {
                         summary.AbsentDays++;
                     }
@@ -611,7 +624,10 @@ public partial class HRViewModel : ViewModelBase
                 summaries.Add(summary);
             }
 
-            AttendanceSummaries = new ObservableCollection<AttendanceSummary>(summaries);
+            await System.Windows.Application.Current.Dispatcher.InvokeAsync(() =>
+            {
+                AttendanceSummaries = new ObservableCollection<AttendanceSummary>(summaries);
+            });
         }
         catch (Exception ex)
         {
@@ -670,6 +686,7 @@ public partial class HRViewModel : ViewModelBase
     {
         try 
         {
+            await LoadPermissionsAsync();
             // 1. Load Employee Profiles
             var employees = await _hrService.GetEmployeesAsync();
             
@@ -682,7 +699,10 @@ public partial class HRViewModel : ViewModelBase
             }
 
             _allEmployees = employees;
-            AllEmployeesObservable = new ObservableCollection<Employee>(employees);
+            await System.Windows.Application.Current.Dispatcher.InvokeAsync(() =>
+            {
+                AllEmployeesObservable = new ObservableCollection<Employee>(employees);
+            });
             ApplyFilters(); 
             _ = LoadSummaryDataAsync();
             await LoadShiftsAsync();
@@ -695,7 +715,10 @@ public partial class HRViewModel : ViewModelBase
             // 2. Load Payroll (Current Month)
             var now = DateTime.Now;
             var payroll = await _hrService.CalculateMonthlyPayrollAsync(now.Month, now.Year);
-            PayrollRecords = new ObservableCollection<PayrollRecord>(payroll);
+            await System.Windows.Application.Current.Dispatcher.InvokeAsync(() =>
+            {
+                PayrollRecords = new ObservableCollection<PayrollRecord>(payroll);
+            });
             
             TotalSalaryText = (payroll.Sum(p => p.TotalSalary) / 1000000m).ToString("N1") + " triệu";
             TotalProductionQty = payroll.Sum(p => p.ProductionQty);
@@ -704,7 +727,10 @@ public partial class HRViewModel : ViewModelBase
 
             // 3. Load Attendance (Today)
             var attendance = await _hrService.GetDailyAttendanceAsync(DateTime.Today);
-            AttendanceRecords = new ObservableCollection<Attendance>(attendance);
+            await System.Windows.Application.Current.Dispatcher.InvokeAsync(() =>
+            {
+                AttendanceRecords = new ObservableCollection<Attendance>(attendance);
+            });
             
             // Load Today's schedules to determine timing status
             var todaySchedules = await _hrService.GetSchedulesAsync(DateTime.Today, DateTime.Today);
@@ -720,12 +746,15 @@ public partial class HRViewModel : ViewModelBase
 
             PresentCount = attendance.Count(a => a.Status == "Đúng giờ");
             LateCount = attendance.Count(a => a.Status == "Đi muộn");
-            AbsentCount = TotalEmployees - PresentCount - LateCount;
+            AbsentCount = attendance.Count(a => a.Status == "Vắng");
 
             // 4. Load Productivity Stats
             var stats = await _hrService.GetTopPerformersAsync(now.Month, now.Year);
-            ProductivityChart = new ObservableCollection<ProductivityStats>(stats);
-            TopPerformers = new ObservableCollection<ProductivityStats>(stats.Take(3));
+            await System.Windows.Application.Current.Dispatcher.InvokeAsync(() =>
+            {
+                ProductivityChart = new ObservableCollection<ProductivityStats>(stats);
+                TopPerformers = new ObservableCollection<ProductivityStats>(stats.Take(3));
+            });
 
             // 5. Update Dates
             CurrentMonthText = $"tháng {now.Month}/{now.Year}";
@@ -856,6 +885,15 @@ public partial class HRViewModel : ViewModelBase
         }
     }
 
+    private async Task LoadPermissionsAsync()
+    {
+        await _accessControlService.RefreshAsync();
+        var perms = ModulePermissionStateFactory.FromAccessControl(_accessControlService, SystemModules.HumanResources);
+        CanAddHR = perms.CanAdd;
+        CanEditHR = perms.CanEdit;
+        CanDeleteHR = perms.CanDelete;
+    }
+
     [RelayCommand]
     private void AddEmployee()
     {
@@ -957,9 +995,14 @@ public partial class HRViewModel : ViewModelBase
             return;
         }
         
-        foreach(var record in PayrollRecords) record.Status = "Đã duyệt";
-        
         var now = DateTime.Now;
+        foreach(var record in PayrollRecords)
+        {
+            record.Status = "Đã duyệt";
+            record.ApprovedAt = now;
+            record.ApprovedBy = _authService.CurrentUser?.UserId;
+        }
+        
         bool success = await _hrService.SavePayrollAsync(PayrollRecords.ToList(), now.Month, now.Year);
         
         if (success)
@@ -986,9 +1029,11 @@ public partial class HRViewModel : ViewModelBase
         if (record != null) 
         {
             var originalStatus = record.Status;
-            record.Status = "Đã duyệt";
-            
             var now = DateTime.Now;
+            record.Status = "Đã duyệt";
+            record.ApprovedAt = now;
+            record.ApprovedBy = _authService.CurrentUser?.UserId;
+            
             bool success = await _hrService.SavePayrollAsync(PayrollRecords.ToList(), now.Month, now.Year);
             
             if (success)
@@ -1254,6 +1299,12 @@ public partial class HRViewModel : ViewModelBase
     [RelayCommand]
     private async Task AddShift()
     {
+        if (!_accessControlService.HasCached(SystemModules.HumanResources, PermissionAction.Add))
+        {
+            _notificationService.ShowError("Bạn không có quyền Thêm trong phân hệ Nhân sự & Lương.");
+            return;
+        }
+
         var dialog = new Views.Dialogs.ShiftDialog();
         dialog.Owner = System.Windows.Application.Current.MainWindow;
         
@@ -1267,6 +1318,11 @@ public partial class HRViewModel : ViewModelBase
     private async Task EditShift(Shift shift)
     {
         if (shift == null) return;
+        if (!_accessControlService.HasCached(SystemModules.HumanResources, PermissionAction.Edit))
+        {
+            _notificationService.ShowError("Bạn không có quyền Sửa trong phân hệ Nhân sự & Lương.");
+            return;
+        }
         
         var dialog = new Views.Dialogs.ShiftDialog(shift);
         dialog.Owner = System.Windows.Application.Current.MainWindow;
@@ -1347,6 +1403,11 @@ public partial class HRViewModel : ViewModelBase
     private async Task DeleteShift(Shift shift)
     {
         if (shift == null) return;
+        if (!_accessControlService.HasCached(SystemModules.HumanResources, PermissionAction.Delete))
+        {
+            _notificationService.ShowError("Bạn không có quyền Xóa trong phân hệ Nhân sự & Lương.");
+            return;
+        }
 
         bool confirm = _notificationService.Confirm(
             $"Bạn có chắc chắn muốn xóa ca làm việc '{shift.ShiftName}' không? Hành động này không thể hoàn tác.", 
@@ -1376,7 +1437,7 @@ public partial class HRViewModel : ViewModelBase
         }
         catch (Exception ex)
         {
-            _notificationService.ShowError("Không thể xóa ca làm việc này vì đang có nhân viên được phân lịch trực. Vui lòng kiểm tra lại.");
+            _notificationService.ShowError("Không thể xóa ca làm việc: " + ex.Message);
         }
     }
 

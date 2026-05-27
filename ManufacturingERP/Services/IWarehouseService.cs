@@ -7,6 +7,7 @@ namespace ManufacturingERP.Services;
 public interface IWarehouseService
 {
     Task<List<WarehouseConfig>> GetWarehousesAsync();
+    Task<Warehouse?> GetWarehouseByIdAsync(int id);
     Task<List<InventoryItemDisplay>> GetInventoryAsync(string warehouseName = "Tất cả");
     Task<List<StockTransactionDisplay>> GetTransactionsAsync(string warehouseName = "Tất cả", int limit = 100);
     Task<List<StockAlertDisplay>> GetStockAlertsAsync();
@@ -17,7 +18,7 @@ public interface IWarehouseService
     Task<List<Material>> GetAllMaterialsAsync();
     Task<bool> AddStockTransactionsAsync(List<StockTransaction> transactions);
     Task<bool> TransferStockAsync(int fromWarehouseId, int toWarehouseId, int materialId, decimal quantity, int? userId);
-    Task<bool> AdjustStockAsync(int warehouseId, int materialId, decimal actualQuantity, int? userId, string notes);
+    Task<bool> AdjustStockAsync(int warehouseId, int materialId, decimal actualQuantity, int? userId, string notes, bool isAdditive = false);
     Task<bool> CancelTransactionAsync(int transactionId, int userId);
     Task<List<StockTransaction>> GetTransactionsByReferenceAsync(string referenceCode);
 }

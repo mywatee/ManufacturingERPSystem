@@ -21,6 +21,8 @@ public partial class MainViewModel : ViewModelBase
     public INavigationService NavigationService => _navigationService;
     public INotificationService NotificationService => _notificationService;
     public User? CurrentUser => _authService.CurrentUser;
+    public AIChatViewModel AIChat { get; }
+    public DocumentViewModel DocumentVM { get; }
 
     [ObservableProperty]
     private bool _isUserLoggedIn;
@@ -46,7 +48,9 @@ public partial class MainViewModel : ViewModelBase
         INotificationService notificationService,
         ISessionMonitorService sessionMonitorService,
         ISettingsService settingsService,
-        DashboardViewModel dashboardViewModel)
+        DashboardViewModel dashboardViewModel,
+        AIChatViewModel aiChat,
+        DocumentViewModel documentVM)
     {
         _navigationService = navigationService;
         _authService = authService;
@@ -57,6 +61,8 @@ public partial class MainViewModel : ViewModelBase
         _sessionMonitorService = sessionMonitorService;
         _settingsService = settingsService;
         _dashboardViewModel = dashboardViewModel;
+        AIChat = aiChat;
+        DocumentVM = documentVM;
         
         IsUserLoggedIn = false;
         
@@ -89,7 +95,7 @@ public partial class MainViewModel : ViewModelBase
         };
 
         // Check for Auto-login
-        InitializeSession();
+        _ = InitializeSessionAsync();
     }
 
     private async Task StartSessionMonitorAsync()
@@ -98,8 +104,10 @@ public partial class MainViewModel : ViewModelBase
         _sessionMonitorService.StartMonitoring(timeoutMinutes);
     }
 
-    private async void InitializeSession()
+    private async Task InitializeSessionAsync()
     {
+        try
+        {
         if (_preferencesService.IsRememberMe && !string.IsNullOrEmpty(_preferencesService.AutoLoginToken))
         {
             // Kiểm tra Token còn hạn trong 7 ngày không
@@ -123,6 +131,12 @@ public partial class MainViewModel : ViewModelBase
         }
 
         _navigationService.NavigateTo<LoginViewModel>();
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"InitializeSession error: {ex.Message}");
+            _navigationService.NavigateTo<LoginViewModel>();
+        }
     }
 
     private async Task LoadUserPermissionsAsync()
@@ -188,6 +202,13 @@ public partial class MainViewModel : ViewModelBase
     }
 
     [RelayCommand]
+    private async Task NavigateDocuments()
+    {
+        var vm = _navigationService.NavigateTo<DocumentViewModel>();
+        await vm.InitializeAsync();
+    }
+
+    [RelayCommand]
     private void Logout()
     {
         IsProfilePopupOpen = false; // Close the popup
@@ -197,15 +218,4 @@ public partial class MainViewModel : ViewModelBase
         _navigationService.NavigateTo<LoginViewModel>();
     }
 
-    [RelayCommand]
-    private void NavigateProfile()
-    {
-        _notificationService.ShowInfo("Tính năng Thông tin cá nhân đang được phát triển.");
-    }
-
-    [RelayCommand]
-    private void NavigateNotificationSettings()
-    {
-        _notificationService.ShowInfo("Tính năng Cài đặt thông báo đang được phát triển.");
-    }
 }

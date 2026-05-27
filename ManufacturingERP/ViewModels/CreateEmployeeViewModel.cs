@@ -88,7 +88,15 @@ public partial class CreateEmployeeViewModel : ViewModelBase
                 IsActive = true
             };
 
-            await _userService.CreateUserAsync(newUser, "Nhân viên vận hành", "Staff@123");
+            try
+            {
+                await _userService.CreateUserAsync(newUser, "Nhân viên vận hành", "Staff@123");
+            }
+            catch
+            {
+                await _hrService.DeleteEmployeeAsync(createdEmployee.EmployeeId);
+                throw;
+            }
             
             _notificationService.ShowSuccess($"Đã tạo nhân viên {FullName} thành công. Tài khoản: {username}");
             GoBack();
@@ -104,9 +112,9 @@ public partial class CreateEmployeeViewModel : ViewModelBase
     }
 
     [RelayCommand]
-    private void GoBack()
+    private async Task GoBack()
     {
         var hrVm = _navigationService.NavigateTo<HRViewModel>();
-        _ = hrVm.LoadDataAsync();
+        await hrVm.LoadDataAsync();
     }
 }

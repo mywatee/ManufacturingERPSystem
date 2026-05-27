@@ -53,7 +53,6 @@ public partial class MasterDataViewModel : ViewModelBase
 
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(AddBomLineCommand))]
-    [NotifyCanExecuteChangedFor(nameof(ReleaseBomCommand))]
     [NotifyCanExecuteChangedFor(nameof(SaveRoutingCommand))]
     [NotifyCanExecuteChangedFor(nameof(ManageRoutingCommand))]
     private MaterialItem? _selectedMaterial;
@@ -63,7 +62,7 @@ public partial class MasterDataViewModel : ViewModelBase
         if (value != null)
         {
             _ = LoadBomAndRouting(value);
-            LoadMaterialHistory(value);
+            _ = LoadMaterialHistoryAsync(value);
             _ = LoadAuditLogsAsync(value.Id);
         }
     }
@@ -179,6 +178,11 @@ public partial class MasterDataViewModel : ViewModelBase
     [ObservableProperty] private bool _isRoutingVisible = false;
     [ObservableProperty] private bool _isAuditLogVisible = false;
     [ObservableProperty] private bool _isPartnersVisible = false;
+    [ObservableProperty] private bool _isWarehouseVisible = false;
+
+    [ObservableProperty] private bool _canAddMasterData;
+    [ObservableProperty] private bool _canEditMasterData;
+    [ObservableProperty] private bool _canDeleteMasterData;
 
     [RelayCommand]
     private void SwitchDetailTab(string tab)
@@ -187,10 +191,15 @@ public partial class MasterDataViewModel : ViewModelBase
         IsRoutingVisible = tab == "Routing";
         IsAuditLogVisible = tab == "Audit";
         IsPartnersVisible = tab == "Partners";
+        IsWarehouseVisible = tab == "Warehouse";
 
         if (IsPartnersVisible)
         {
             _ = LoadPartnersAsync();
+        }
+        else if (IsWarehouseVisible)
+        {
+            _ = LoadWarehousesAsync();
         }
     }
 
@@ -238,20 +247,23 @@ public partial class MasterDataViewModel : ViewModelBase
         try
         {
             var dbPartners = await _partnerService.GetAllAsync();
-            Partners.Clear();
-            foreach (var p in dbPartners)
+            await System.Windows.Application.Current.Dispatcher.InvokeAsync(() =>
             {
-                Partners.Add(new PartnerItem
+                Partners.Clear();
+                foreach (var p in dbPartners)
                 {
-                    Id = p.PartnerId.ToString(),
-                    Code = p.PartnerCode,
-                    Name = p.PartnerName,
-                    Type = p.PartnerType ?? "N/A",
-                    Phone = p.Phone ?? "N/A",
-                    Email = p.Email ?? "N/A"
-                });
-            }
-            UpdatePartnerPagination();
+                    Partners.Add(new PartnerItem
+                    {
+                        Id = p.PartnerId.ToString(),
+                        Code = p.PartnerCode,
+                        Name = p.PartnerName,
+                        Type = p.PartnerType ?? "N/A",
+                        Phone = p.Phone ?? "N/A",
+                        Email = p.Email ?? "N/A"
+                    });
+                }
+                UpdatePartnerPagination();
+            });
         }
         catch (Exception ex)
         {
@@ -264,11 +276,14 @@ public partial class MasterDataViewModel : ViewModelBase
         try
         {
             var dbWarehouses = await _warehouseService.GetWarehousesAsync();
-            Warehouses.Clear();
-            foreach (var w in dbWarehouses)
+            await System.Windows.Application.Current.Dispatcher.InvokeAsync(() =>
             {
-                Warehouses.Add(w);
-            }
+                Warehouses.Clear();
+                foreach (var w in dbWarehouses)
+                {
+                    Warehouses.Add(w);
+                }
+            });
         }
         catch (Exception ex)
         {
@@ -280,33 +295,46 @@ public partial class MasterDataViewModel : ViewModelBase
     {
         try 
         {
+            await LoadPermissionsAsync();
             var dbMaterials = await _masterDataService.GetAllMaterialsAsync();
-            Materials.Clear();
-            foreach (var m in dbMaterials)
+            await System.Windows.Application.Current.Dispatcher.InvokeAsync(() =>
             {
-                Materials.Add(new MaterialItem
+                Materials.Clear();
+                foreach (var m in dbMaterials)
                 {
-                    DbId = m.MaterialId,
-                    Id = m.MaterialCode,
-                    Name = m.MaterialName,
-                    Unit = m.Unit ?? "Cái",
-                    Category = m.Category ?? "Nguyên liệu",
-                    Status = m.Status ?? "Đang sử dụng",
-                    OnHand = (double)(m.Inventories?.Sum(i => i.CurrentStock ?? 0) ?? 0),
-                    MinStock = m.MinStock ?? 10,
-                    UnitPrice = m.UnitPrice ?? 0
-                });
-            }
-            UpdatePagination();
-            if (SelectedMaterial == null && Materials.Count > 0)
-            {
-                SelectedMaterial = Materials[0];
-            }
+                    Materials.Add(new MaterialItem
+                    {
+                        DbId = m.MaterialId,
+                        Id = m.MaterialCode,
+                        Name = m.MaterialName,
+                        Unit = m.Unit ?? "Cái",
+                        Category = m.Category ?? "Nguyên liệu",
+                        Status = m.Status ?? "Đang sử dụng",
+                        OnHand = (double)(m.Inventories?.Sum(i => i.CurrentStock ?? 0) ?? 0),
+                        MinStock = m.MinStock ?? 10,
+                        UnitPrice = m.UnitPrice ?? 0
+                    });
+                }
+                UpdatePagination();
+                if (SelectedMaterial == null && Materials.Count > 0)
+                {
+                    SelectedMaterial = Materials[0];
+                }
+            });
         }
         catch (Exception ex)
         {
             _notificationService.ShowError("Không thể tải danh sách vật tư: " + ex.Message);
         }
+    }
+
+    private async Task LoadPermissionsAsync()
+    {
+        await _accessControlService.RefreshAsync();
+        var perms = ModulePermissionStateFactory.FromAccessControl(_accessControlService, SystemModules.MasterData);
+        CanAddMasterData = perms.CanAdd;
+        CanEditMasterData = perms.CanEdit;
+        CanDeleteMasterData = perms.CanDelete;
     }
 
     private void UpdatePagination()
@@ -484,6 +512,11 @@ public partial class MasterDataViewModel : ViewModelBase
     private void DeleteRoutingStep(RoutingStepItem? step)
     {
         if (step == null) return;
+        if (!_accessControlService.HasCached(SystemModules.MasterData, PermissionAction.Edit))
+        {
+            _notificationService.ShowError("Bạn không có quyền Sửa trong phân hệ Dữ liệu gốc.");
+            return;
+        }
         if (_notificationService.Confirm($"Xác nhận xóa công đoạn {step.StepNo} - {step.StepName}?", "Xác nhận xóa"))
         {
             RoutingSteps.Remove(step);
@@ -494,6 +527,11 @@ public partial class MasterDataViewModel : ViewModelBase
     [RelayCommand]
     private void AddWarehouse()
     {
+        if (!_accessControlService.HasCached(SystemModules.MasterData, PermissionAction.Add))
+        {
+            _notificationService.ShowError("Bạn không có quyền Thêm trong phân hệ Dữ liệu gốc.");
+            return;
+        }
         var dialog = new WarehouseConfigDialog() { Owner = System.Windows.Application.Current?.MainWindow };
         if (dialog.ShowDialog() == true && dialog.NewWarehouse != null)
         {
@@ -506,14 +544,71 @@ public partial class MasterDataViewModel : ViewModelBase
         var success = await _warehouseService.AddWarehouseAsync(dbWarehouse);
         if (success)
         {
-            Warehouses.Add(new WarehouseConfig { Id = dbWarehouse.WarehouseId.ToString(), Code = dbWarehouse.Code, Name = dbWarehouse.WarehouseName, Location = dbWarehouse.Location, Capacity = (int)dbWarehouse.Capacity, Status = dbWarehouse.Status });
+            Warehouses.Add(new WarehouseConfig { Id = dbWarehouse.WarehouseId.ToString(), Code = dbWarehouse.Code, Name = dbWarehouse.WarehouseName, Location = dbWarehouse.Location, Capacity = (int)(dbWarehouse.Capacity ?? 0), Status = dbWarehouse.Status ?? "Hoạt động" });
             _notificationService.ShowSuccess($"Đã lưu nhà kho mới: {dbWarehouse.WarehouseName}");
+        }
+    }
+
+    [RelayCommand]
+    private async Task EditWarehouse(WarehouseConfig? config)
+    {
+        if (config == null) return;
+        if (!_accessControlService.HasCached(SystemModules.MasterData, PermissionAction.Edit))
+        {
+            _notificationService.ShowError("Bạn không có quyền Sửa trong phân hệ Dữ liệu gốc.");
+            return;
+        }
+        if (!int.TryParse(config.Id, out int id)) return;
+        var warehouse = await _warehouseService.GetWarehouseByIdAsync(id);
+        if (warehouse == null) return;
+
+        var dialog = new WarehouseConfigDialog(warehouse) { Owner = System.Windows.Application.Current?.MainWindow };
+        if (dialog.ShowDialog() == true && dialog.NewWarehouse != null)
+        {
+            var success = await _warehouseService.UpdateWarehouseAsync(dialog.NewWarehouse);
+            if (success)
+            {
+                config.Code = dialog.NewWarehouse.Code ?? "";
+                config.Name = dialog.NewWarehouse.WarehouseName ?? "";
+                config.Location = dialog.NewWarehouse.Location ?? "";
+                config.Capacity = (int)(dialog.NewWarehouse.Capacity ?? 0);
+                config.Status = dialog.NewWarehouse.Status ?? "Hoạt động";
+                _notificationService.ShowSuccess($"Đã cập nhật nhà kho: {config.Name}");
+            }
+        }
+    }
+
+    [RelayCommand]
+    private async Task DeleteWarehouse(WarehouseConfig? config)
+    {
+        if (config == null) return;
+        if (!_accessControlService.HasCached(SystemModules.MasterData, PermissionAction.Delete))
+        {
+            _notificationService.ShowError("Bạn không có quyền Xóa trong phân hệ Dữ liệu gốc.");
+            return;
+        }
+        if (!_notificationService.Confirm($"Bạn có chắc chắn muốn xóa nhà kho '{config.Name}'?", "Xác nhận xóa")) return;
+        if (!int.TryParse(config.Id, out int id)) return;
+        var success = await _warehouseService.DeleteWarehouseAsync(id);
+        if (success)
+        {
+            Warehouses.Remove(config);
+            _notificationService.ShowSuccess($"Đã xóa nhà kho: {config.Name}");
+        }
+        else
+        {
+            _notificationService.ShowError("Không thể xóa nhà kho. Hãy đảm bảo kho không còn tồn kho.");
         }
     }
 
     [RelayCommand]
     private void AddPartner()
     {
+        if (!_accessControlService.HasCached(SystemModules.MasterData, PermissionAction.Add))
+        {
+            _notificationService.ShowError("Bạn không có quyền Thêm trong phân hệ Dữ liệu gốc.");
+            return;
+        }
         var dialog = new Views.Dialogs.PartnerDialog() { Owner = System.Windows.Application.Current?.MainWindow };
         if (dialog.ShowDialog() == true && dialog.Partner != null)
         {
@@ -542,6 +637,11 @@ public partial class MasterDataViewModel : ViewModelBase
     private async Task OpenEditPartnerDialog(PartnerItem item)
     {
         if (!int.TryParse(item.Id, out int id)) return;
+        if (!_accessControlService.HasCached(SystemModules.MasterData, PermissionAction.Edit))
+        {
+            _notificationService.ShowError("Bạn không có quyền Sửa trong phân hệ Dữ liệu gốc.");
+            return;
+        }
         var partner = await _partnerService.GetByIdAsync(id);
         if (partner == null) return;
         var dialog = new Views.Dialogs.PartnerDialog(partner) { Owner = System.Windows.Application.Current?.MainWindow };
@@ -564,6 +664,11 @@ public partial class MasterDataViewModel : ViewModelBase
     private async Task DeletePartner(PartnerItem partner)
     {
         if (partner == null) return;
+        if (!_accessControlService.HasCached(SystemModules.MasterData, PermissionAction.Delete))
+        {
+            _notificationService.ShowError("Bạn không có quyền Xóa trong phân hệ Dữ liệu gốc.");
+            return;
+        }
         if (_notificationService.Confirm($"Bạn có chắc chắn muốn xóa đối tác {partner.Name}?", "Xác nhận xóa"))
         {
             if (int.TryParse(partner.Id, out int id))
@@ -579,12 +684,14 @@ public partial class MasterDataViewModel : ViewModelBase
     }
 
     [RelayCommand(CanExecute = nameof(CanEditSelectedMaterial))]
-    private void ReleaseBom() { _notificationService.ShowSuccess("Đã phát hành định mức thành công!"); }
-
-    [RelayCommand(CanExecute = nameof(CanEditSelectedMaterial))]
     private async Task SaveRouting()
     {
         if (SelectedMaterial == null) return;
+        if (!_accessControlService.HasCached(SystemModules.MasterData, PermissionAction.Edit))
+        {
+            _notificationService.ShowError("Bạn không có quyền Sửa trong phân hệ Dữ liệu gốc.");
+            return;
+        }
         var parent = await _masterDataService.GetMaterialByCodeAsync(SelectedMaterial.Id);
         if (parent == null) return;
         await _masterDataService.DeleteRoutingByProductIdAsync(parent.MaterialId);
@@ -601,22 +708,39 @@ public partial class MasterDataViewModel : ViewModelBase
 
     private async Task LoadBomAndRouting(MaterialItem? material)
     {
-        BomLines.Clear(); RoutingSteps.Clear(); if (material is null) return;
+        await System.Windows.Application.Current.Dispatcher.InvokeAsync(() =>
+        {
+            BomLines.Clear();
+            RoutingSteps.Clear();
+        });
+        if (material is null) return;
         try
         {
             var boms = await _masterDataService.GetBomByParentCodeAsync(material.Id);
-            foreach (var b in boms) BomLines.Add(new BomLineItem { Id = b.Bomid, ComponentId = b.ChildId ?? 0, ComponentCode = b.Child?.MaterialCode ?? "N/A", ComponentName = b.Child?.MaterialName ?? "N/A", QuantityPer = (double)b.QuantityPerUnit, Unit = b.Child?.Unit ?? "Cái" });
             var routings = await _masterDataService.GetRoutingByParentCodeAsync(material.Id);
-            foreach (var r in routings) RoutingSteps.Add(new RoutingStepItem { StepNo = r.StepNumber ?? 0, StepName = r.StepName ?? "N/A", WorkCenter = r.WorkCenter ?? "N/A", StdTimeMinutes = r.EstimatedTime ?? 0, Output = r.OutputDescription ?? "N/A" });
-            RecalculateTotalRoutingTime();
+            await System.Windows.Application.Current.Dispatcher.InvokeAsync(() =>
+            {
+                BomLines.Clear();
+                foreach (var b in boms) BomLines.Add(new BomLineItem { Id = b.Bomid, ComponentId = b.ChildId ?? 0, ComponentCode = b.Child?.MaterialCode ?? "N/A", ComponentName = b.Child?.MaterialName ?? "N/A", QuantityPer = (double)b.QuantityPerUnit, Unit = b.Child?.Unit ?? "Cái" });
+                foreach (var r in routings) RoutingSteps.Add(new RoutingStepItem { StepNo = r.StepNumber ?? 0, StepName = r.StepName ?? "N/A", WorkCenter = r.WorkCenter ?? "N/A", StdTimeMinutes = r.EstimatedTime ?? 0, Output = r.OutputDescription ?? "N/A" });
+                RecalculateTotalRoutingTime();
+            });
         }
-        catch { }
+        catch (Exception ex)
+        {
+            _notificationService.ShowError("Không thể tải BOM/Quy trình: " + ex.Message);
+        }
     }
 
     [RelayCommand(CanExecute = nameof(CanEditSelectedMaterial))]
     private async Task AddBomLine()
     {
         if (SelectedMaterial == null) return;
+        if (!_accessControlService.HasCached(SystemModules.MasterData, PermissionAction.Edit))
+        {
+            _notificationService.ShowError("Bạn không có quyền Sửa trong phân hệ Dữ liệu gốc.");
+            return;
+        }
         var materials = await _masterDataService.GetAllMaterialsAsync();
         var dialog = new Views.Dialogs.AddBomDialog(materials) { Owner = System.Windows.Application.Current?.MainWindow, ExistingChildIds = BomLines.Select(b => b.ComponentId).ToHashSet() };
         if (dialog.ShowDialog() == true && dialog.SelectedItems.Any())
@@ -637,6 +761,11 @@ public partial class MasterDataViewModel : ViewModelBase
     private async Task EditBomLine(BomLineItem item)
     {
         if (item == null || SelectedMaterial == null) return;
+        if (!_accessControlService.HasCached(SystemModules.MasterData, PermissionAction.Edit))
+        {
+            _notificationService.ShowError("Bạn không có quyền Sửa trong phân hệ Dữ liệu gốc.");
+            return;
+        }
         var dialog = new EditBomDialog(item.ComponentCode, item.ComponentName, item.QuantityPer, item.Unit) { Owner = System.Windows.Application.Current?.MainWindow };
         if (dialog.ShowDialog() == true)
         {
@@ -649,13 +778,18 @@ public partial class MasterDataViewModel : ViewModelBase
     private async Task DeleteBomLine(BomLineItem item)
     {
         if (item == null) return;
+        if (!_accessControlService.HasCached(SystemModules.MasterData, PermissionAction.Edit))
+        {
+            _notificationService.ShowError("Bạn không có quyền Sửa trong phân hệ Dữ liệu gốc.");
+            return;
+        }
         if (_notificationService.Confirm("Xóa linh kiện khỏi định mức?", "Xác nhận"))
         {
             if (await _masterDataService.DeleteBomItemAsync(item.Id)) { BomLines.Remove(item); _ = LoadAuditLogsAsync(SelectedMaterial?.Id); }
         }
     }
 
-    private async void LoadMaterialHistory(MaterialItem? material)
+    private async Task LoadMaterialHistoryAsync(MaterialItem? material)
     {
         MaterialHistory.Clear(); if (material == null) return;
         try
@@ -663,7 +797,10 @@ public partial class MasterDataViewModel : ViewModelBase
             var transactions = await _warehouseService.GetTransactionsAsync();
             foreach (var t in transactions.Where(t => t.MaterialCode == material.Id)) MaterialHistory.Add(new InventoryHistoryItem { Date = DateTime.TryParse(t.TransactionDate, out var dt) ? dt : DateTime.Now, Type = t.Type, Quantity = t.Quantity, Warehouse = t.Warehouse, Reference = t.ReferenceDoc, User = t.TransBy });
         }
-        catch { }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"LoadMaterialHistory error: {ex.Message}");
+        }
     }
 
     private void RecalculateTotalRoutingTime() => TotalRoutingTime = RoutingSteps.Sum(s => s.StdTimeMinutes);

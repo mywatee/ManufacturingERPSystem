@@ -47,7 +47,8 @@
                                FontSize="14" Foreground="#64748B"/>
                 </StackPanel>
 
-                <Button Grid.Column="5" Command="{Binding CreateOutboundCommand}" Background="#F8FAFC" BorderBrush="#E2E8F0" BorderThickness="1" Foreground="#475569" Padding="20,10">
+                <Button Grid.Column="5" Command="{Binding CreateOutboundCommand}" Background="#F8FAFC" BorderBrush="#E2E8F0" BorderThickness="1" Foreground="#475569" Padding="20,10"
+                        Visibility="{Binding CanAddWarehouse, Converter={StaticResource BooleanToVisibilityConverter}}">
                     <Button.Resources><Style TargetType="Border"><Setter Property="CornerRadius" Value="10"/></Style></Button.Resources>
                     <StackPanel Orientation="Horizontal">
                         <TextBlock Text="&#xE118;" FontFamily="Segoe MDL2 Assets" VerticalAlignment="Center" Margin="0,0,10,0" FontSize="14"/>
@@ -55,7 +56,8 @@
                     </StackPanel>
                 </Button>
 
-                <Button Grid.Column="7" Command="{Binding CreateInboundCommand}" Background="#2563EB" Foreground="White" Padding="20,10">
+                <Button Grid.Column="7" Command="{Binding CreateInboundCommand}" Background="#2563EB" Foreground="White" Padding="20,10"
+                        Visibility="{Binding CanAddWarehouse, Converter={StaticResource BooleanToVisibilityConverter}}">
                     <Button.Resources><Style TargetType="Border"><Setter Property="CornerRadius" Value="10"/></Style></Button.Resources>
                     <StackPanel Orientation="Horizontal">
                         <TextBlock Text="&#xE109;" FontFamily="Segoe MDL2 Assets" VerticalAlignment="Center" Margin="0,0,10,0" FontSize="14"/>
@@ -195,7 +197,8 @@
                             </StackPanel>
                         </Button>
 
-                        <Button Grid.Column="5" Command="{Binding CreateAdjustmentCommand}" Style="{StaticResource SecondaryButtonStyle}" Padding="15,8">
+                        <Button Grid.Column="5" Command="{Binding CreateAdjustmentCommand}" Style="{StaticResource SecondaryButtonStyle}" Padding="15,8"
+                                Visibility="{Binding CanEditWarehouse, Converter={StaticResource BooleanToVisibilityConverter}}">
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock Text="&#xE12F;" FontFamily="Segoe MDL2 Assets" VerticalAlignment="Center" Margin="0,0,8,0" FontSize="12"/>
                                 <TextBlock Text="Kiểm kê" VerticalAlignment="Center"/>
@@ -371,7 +374,9 @@
                             <TextBlock Text="Quản lý phiếu nhập/xuất kho" FontSize="18" FontWeight="Bold" Foreground="#1e3a5f"/>
                             <TextBlock Text="Theo dõi và quản lý các giao dịch xuất nhập tồn" FontSize="14" Foreground="#64748B"/>
                         </StackPanel>
-                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                            <ComboBox ItemsSource="{Binding WarehouseList}" SelectedItem="{Binding SelectedWarehouse}" 
+                                      MinWidth="180" Height="32" Margin="0,0,12,0"/>
                             <Button Style="{StaticResource PrimaryButtonStyle}" Margin="0,0,12,0" Command="{Binding CreateInboundCommand}">
                                 <StackPanel Orientation="Horizontal">
                                     <Border Width="20" Height="20" Background="#3B82F6" CornerRadius="10" Margin="0,0,8,0">
@@ -620,7 +625,8 @@
                             <TextBlock Text="Cấu hình nhà kho" FontSize="18" FontWeight="Bold" Foreground="#1e3a5f"/>
                             <TextBlock Text="Quản lý danh sách kho và theo dõi tỷ lệ lấp đầy" FontSize="14" Foreground="#64748B"/>
                         </StackPanel>
-                        <Button HorizontalAlignment="Right" Style="{StaticResource PrimaryButtonStyle}" Background="#1E293B" BorderBrush="#1E293B" Command="{Binding CreateWarehouseCommand}">
+                        <Button HorizontalAlignment="Right" Style="{StaticResource PrimaryButtonStyle}" Background="#1E293B" BorderBrush="#1E293B" Command="{Binding CreateWarehouseCommand}"
+                                Visibility="{Binding CanAddWarehouse, Converter={StaticResource BooleanToVisibilityConverter}}">
                             <StackPanel Orientation="Horizontal">
                                 <Path Data="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h4v2z" Fill="White" Width="14" Height="14" Stretch="Uniform" Margin="0,0,8,0"/>
                                 <TextBlock Text="Thêm nhà kho mới" VerticalAlignment="Center" Foreground="White" FontWeight="SemiBold"/>
@@ -755,13 +761,15 @@
                                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                                                 <Button Style="{StaticResource IconButtonStyle}" Margin="0,0,4,0"
                                                         Command="{Binding DataContext.EditWarehouseCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                                        CommandParameter="{Binding}">
+                                                        CommandParameter="{Binding}"
+                                                        Visibility="{Binding DataContext.CanEditWarehouse, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BooleanToVisibilityConverter}}">
                                                     <Path Data="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" 
                                                           Fill="#64748B" Width="14" Height="14" Stretch="Uniform"/>
                                                 </Button>
                                                 <Button Style="{StaticResource IconButtonStyle}"
                                                         Command="{Binding DataContext.DeleteWarehouseCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                                        CommandParameter="{Binding}">
+                                                        CommandParameter="{Binding}"
+                                                        Visibility="{Binding DataContext.CanDeleteWarehouse, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BooleanToVisibilityConverter}}">
                                                     <Path Data="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z" 
                                                           Fill="#EF4444" Width="14" Height="14" Stretch="Uniform"/>
                                                 </Button>
@@ -922,13 +930,15 @@
                                                     </Button>
                                                     <Button Style="{StaticResource IconButtonStyle}" ToolTip="Sửa" Margin="4,0"
                                                             Command="{Binding DataContext.EditWarehouseCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                                            CommandParameter="{Binding}">
+                                                            CommandParameter="{Binding}"
+                                                            Visibility="{Binding DataContext.CanEditWarehouse, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BooleanToVisibilityConverter}}">
                                                         <Path Data="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" 
                                                               Fill="#64748B" Width="14" Height="14" Stretch="Uniform"/>
                                                     </Button>
                                                     <Button Style="{StaticResource IconButtonStyle}" ToolTip="Xóa"
                                                             Command="{Binding DataContext.DeleteWarehouseCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                                            CommandParameter="{Binding}">
+                                                            CommandParameter="{Binding}"
+                                                            Visibility="{Binding DataContext.CanDeleteWarehouse, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BooleanToVisibilityConverter}}">
                                                         <Path Data="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z" 
                                                               Fill="#EF4444" Width="14" Height="14" Stretch="Uniform"/>
                                                     </Button>

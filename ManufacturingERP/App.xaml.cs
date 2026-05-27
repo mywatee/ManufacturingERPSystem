@@ -21,7 +21,7 @@ namespace ManufacturingERP
                 {
                     // Database Context Factory
                     services.AddDbContextFactory<ManufacturingContext>(options =>
-                        options.UseSqlServer("Server=.\\SQLEXPRESS;Database=ManufacturingERP;Trusted_Connection=True;TrustServerCertificate=True;"),
+                        options.UseSqlServer(ConnectionStrings.Default),
                         ServiceLifetime.Singleton);
 
                     // Services
@@ -43,8 +43,16 @@ namespace ManufacturingERP
                     services.AddSingleton<ISessionMonitorService, SessionMonitorService>();
                     services.AddSingleton<IWarehouseService, WarehouseService>();
                     services.AddSingleton<IQualityControlService, QualityControlService>();
+                    services.AddSingleton<IBackupService, BackupService>();
                     services.AddSingleton<IHRService, HRService>();
                     services.AddSingleton<IFinanceService, FinanceService>();
+                    services.AddSingleton<IAIChatService, AIChatService>();
+                    services.AddSingleton<AIChatViewModel>();
+                    services.AddSingleton<IEmbeddingService, EmbeddingService>();
+                    services.AddSingleton<IDocumentProcessingService, DocumentProcessingService>();
+                    services.AddSingleton<IRagService, RagService>();
+                    services.AddSingleton<IDocumentManagementService, DocumentManagementService>();
+                    services.AddSingleton<DocumentSeeder>();
 
                     // Password Hashing
                     services.AddSingleton<IPasswordHasher, BCryptHasher>();
@@ -80,6 +88,7 @@ namespace ManufacturingERP
                     services.AddTransient<EditEmployeeViewModel>();
                     services.AddTransient<AttendanceConsoleViewModel>();
                     services.AddTransient<ScheduleImportExportViewModel>();
+                    services.AddSingleton<DocumentViewModel>();
 
                     
                     // Windows

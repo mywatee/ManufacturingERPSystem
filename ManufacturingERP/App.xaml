@@ -24,6 +24,7 @@
             <core:BooleanToStringConverter x:Key="BooleanToStringConverter"/>
             <core:GreaterThanZeroToVisibilityConverter x:Key="GreaterThanZeroToVisibilityConverter"/>
             <core:MultiBindingConverter x:Key="GlobalMultiBindingConverter"/>
+            <core:MessageToSegmentsConverter x:Key="MessageToSegmentsConverter"/>
 
 
             <DataTemplate DataType="{x:Type viewmodels:DashboardViewModel}">
@@ -124,6 +125,10 @@
 
             <DataTemplate DataType="{x:Type viewmodels:CreateInvoiceViewModel}">
                 <views:CreateInvoiceView/>
+            </DataTemplate>
+
+            <DataTemplate DataType="{x:Type viewmodels:DocumentViewModel}">
+                <views:DocumentView/>
             </DataTemplate>
         </ResourceDictionary>
 

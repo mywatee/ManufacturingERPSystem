@@ -31,6 +31,7 @@ public class FinanceService : IFinanceService
         using var context = await _contextFactory.CreateDbContextAsync();
         return await context.Invoices
             .Include(i => i.Partner)
+            .Include(i => i.Items)
             .Where(i => i.Type == type)
             .OrderByDescending(i => i.IssueDate)
             .ToListAsync();
@@ -60,7 +61,18 @@ public class FinanceService : IFinanceService
         var dbInvoice = await context.Invoices.Include(i => i.Items).FirstOrDefaultAsync(i => i.InvoiceId == invoice.InvoiceId);
         if (dbInvoice == null) return false;
 
-        context.Entry(dbInvoice).CurrentValues.SetValues(invoice);
+        dbInvoice.InvoiceCode = invoice.InvoiceCode;
+        dbInvoice.Type = invoice.Type;
+        dbInvoice.PartnerId = invoice.PartnerId;
+        dbInvoice.IssueDate = invoice.IssueDate;
+        dbInvoice.DueDate = invoice.DueDate;
+        dbInvoice.TotalAmount = invoice.TotalAmount;
+        dbInvoice.PaidAmount = invoice.PaidAmount;
+        dbInvoice.VatRate = invoice.VatRate;
+        dbInvoice.VatAmount = invoice.VatAmount;
+        dbInvoice.Status = invoice.Status;
+        dbInvoice.Reference = invoice.Reference;
+        dbInvoice.Note = invoice.Note;
         context.InvoiceItems.RemoveRange(dbInvoice.Items);
         dbInvoice.Items = invoice.Items;
 
@@ -72,9 +84,10 @@ public class FinanceService : IFinanceService
     public async Task<bool> DeleteInvoiceAsync(int invoiceId)
     {
         using var context = await _contextFactory.CreateDbContextAsync();
-        var invoice = await context.Invoices.FindAsync(invoiceId);
+        var invoice = await context.Invoices.Include(i => i.Items).FirstOrDefaultAsync(i => i.InvoiceId == invoiceId);
         if (invoice == null) return false;
 
+        context.InvoiceItems.RemoveRange(invoice.Items);
         context.Invoices.Remove(invoice);
         bool success = await context.SaveChangesAsync() > 0;
         if (success) await _auditLogService.LogActionAsync("XÓA HÓA ĐƠN", $"Đã xóa hóa đơn: {invoice.InvoiceCode}", "Invoices");
@@ -129,7 +142,9 @@ public class FinanceService : IFinanceService
             .Where(p => p.StartTime >= filterStart && p.StartTime <= filterEnd && p.EndTime != null)
             .ToListAsync();
             
-        double totalLaborHoursInMonth = allProgressInMonth.Sum(p => (p.EndTime.Value - p.StartTime.Value).TotalHours);
+        double totalLaborHoursInMonth = allProgressInMonth
+            .Where(p => p.StartTime != null)
+            .Sum(p => (p.EndTime.Value - p.StartTime.Value).TotalHours);
         
         // Calculate Overhead per Hour
         decimal overheadRatePerHour = totalLaborHoursInMonth > 0 

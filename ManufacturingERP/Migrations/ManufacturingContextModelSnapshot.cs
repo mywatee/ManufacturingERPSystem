@@ -158,6 +158,91 @@ namespace ManufacturingERP.Migrations
                     b.ToTable("BOM", (string)null);
                 });
 
+            modelBuilder.Entity("ManufacturingERP.Models.Document", b =>
+                {
+                    b.Property<int>("DocumentId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("DocumentId"));
+
+                    b.Property<string>("Category")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<int>("ChunkCount")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ContentType")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("FileName")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("FilePath")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<long>("FileSize")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("OriginalFileName")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime>("UploadedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("(getdate())");
+
+                    b.Property<int>("UploadedByUserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("DocumentId");
+
+                    b.HasIndex("UploadedByUserId");
+
+                    b.ToTable("Documents", (string)null);
+                });
+
+            modelBuilder.Entity("ManufacturingERP.Models.DocumentChunk", b =>
+                {
+                    b.Property<int>("ChunkId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ChunkId"));
+
+                    b.Property<int>("ChunkIndex")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("DocumentId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("EmbeddingJson")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("ChunkId");
+
+                    b.HasIndex("DocumentId");
+
+                    b.ToTable("DocumentChunks", (string)null);
+                });
+
             modelBuilder.Entity("ManufacturingERP.Models.Employee", b =>
                 {
                     b.Property<int>("EmployeeId")
@@ -197,9 +282,15 @@ namespace ManufacturingERP.Migrations
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
 
+                    b.Property<decimal?>("PiecesRate")
+                        .HasColumnType("decimal(18,2)");
+
                     b.Property<string>("Position")
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
+
+                    b.Property<int?>("ProductivityThreshold")
+                        .HasColumnType("int");
 
                     b.Property<string>("Status")
                         .IsRequired()
@@ -273,6 +364,9 @@ namespace ManufacturingERP.Migrations
                         .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
+
+                    b.Property<bool>("IsOverhead")
+                        .HasColumnType("bit");
 
                     b.Property<string>("Method")
                         .IsRequired()
@@ -357,8 +451,11 @@ namespace ManufacturingERP.Migrations
                     b.Property<int>("PartnerId")
                         .HasColumnType("int");
 
+                    b.Property<string>("Reference")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
                     b.Property<string>("Status")
-                        .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
@@ -370,11 +467,46 @@ namespace ManufacturingERP.Migrations
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
 
+                    b.Property<decimal>("VatAmount")
+                        .HasColumnType("decimal(18, 2)");
+
+                    b.Property<decimal>("VatRate")
+                        .HasColumnType("decimal(18, 2)");
+
                     b.HasKey("InvoiceId");
 
                     b.HasIndex("PartnerId");
 
                     b.ToTable("Invoices");
+                });
+
+            modelBuilder.Entity("ManufacturingERP.Models.InvoiceItem", b =>
+                {
+                    b.Property<int>("InvoiceItemId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("InvoiceItemId"));
+
+                    b.Property<int>("InvoiceId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ProductName")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<decimal>("Quantity")
+                        .HasColumnType("decimal(18, 2)");
+
+                    b.Property<decimal>("UnitPrice")
+                        .HasColumnType("decimal(18, 2)");
+
+                    b.HasKey("InvoiceItemId");
+
+                    b.HasIndex("InvoiceId");
+
+                    b.ToTable("InvoiceItems", (string)null);
                 });
 
             modelBuilder.Entity("ManufacturingERP.Models.Material", b =>
@@ -569,6 +701,62 @@ namespace ManufacturingERP.Migrations
                     b.ToTable("PasswordResetRequests");
                 });
 
+            modelBuilder.Entity("ManufacturingERP.Models.Payroll", b =>
+                {
+                    b.Property<int>("PayrollId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PayrollId"));
+
+                    b.Property<DateTime?>("ApprovedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("ApprovedBy")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("AttendanceBonus")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("BasicSalary")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("EmployeeId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Month")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ProductionQty")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("QualityBonus")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<decimal>("TotalSalary")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("UnitPrice")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("Year")
+                        .HasColumnType("int");
+
+                    b.HasKey("PayrollId");
+
+                    b.HasIndex("EmployeeId");
+
+                    b.ToTable("Payrolls", (string)null);
+                });
+
             modelBuilder.Entity("ManufacturingERP.Models.QualityControl", b =>
                 {
                     b.Property<int>("Qcid")
@@ -721,12 +909,31 @@ namespace ManufacturingERP.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ShiftId"));
 
+                    b.Property<TimeOnly?>("BreakEndTime")
+                        .HasColumnType("time");
+
+                    b.Property<TimeOnly?>("BreakStartTime")
+                        .HasColumnType("time");
+
+                    b.Property<string>("ColorHex")
+                        .HasMaxLength(7)
+                        .HasColumnType("nvarchar(7)");
+
                     b.Property<TimeOnly?>("EndTime")
                         .HasColumnType("time");
 
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
+
+                    b.Property<string>("ShiftCode")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("ShiftName")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<TimeOnly?>("StartTime")
                         .HasColumnType("time");
@@ -843,7 +1050,8 @@ namespace ManufacturingERP.Migrations
                         .HasDefaultValueSql("(getdate())");
 
                     b.Property<int?>("EmployeeId")
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("EmployeeId");
 
                     b.Property<int>("FailedLoginAttempts")
                         .HasColumnType("int");
@@ -875,7 +1083,7 @@ namespace ManufacturingERP.Migrations
                     b.HasIndex(new[] { "Username" }, "UQ__Users__536C85E418C8924B")
                         .IsUnique();
 
-                    b.ToTable("Users");
+                    b.ToTable("Users", (string)null);
                 });
 
             modelBuilder.Entity("ManufacturingERP.Models.Warehouse", b =>
@@ -1168,6 +1376,30 @@ namespace ManufacturingERP.Migrations
                     b.Navigation("Parent");
                 });
 
+            modelBuilder.Entity("ManufacturingERP.Models.Document", b =>
+                {
+                    b.HasOne("ManufacturingERP.Models.User", "UploadedBy")
+                        .WithMany()
+                        .HasForeignKey("UploadedByUserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("FK_Documents_Users");
+
+                    b.Navigation("UploadedBy");
+                });
+
+            modelBuilder.Entity("ManufacturingERP.Models.DocumentChunk", b =>
+                {
+                    b.HasOne("ManufacturingERP.Models.Document", "Document")
+                        .WithMany("Chunks")
+                        .HasForeignKey("DocumentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("FK_DocumentChunks_Documents");
+
+                    b.Navigation("Document");
+                });
+
             modelBuilder.Entity("ManufacturingERP.Models.EmployeeSchedule", b =>
                 {
                     b.HasOne("ManufacturingERP.Models.Employee", null)
@@ -1220,6 +1452,17 @@ namespace ManufacturingERP.Migrations
                     b.Navigation("Partner");
                 });
 
+            modelBuilder.Entity("ManufacturingERP.Models.InvoiceItem", b =>
+                {
+                    b.HasOne("ManufacturingERP.Models.Invoice", "Invoice")
+                        .WithMany("Items")
+                        .HasForeignKey("InvoiceId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Invoice");
+                });
+
             modelBuilder.Entity("ManufacturingERP.Models.Notification", b =>
                 {
                     b.HasOne("ManufacturingERP.Models.User", "Recipient")
@@ -1252,6 +1495,17 @@ namespace ManufacturingERP.Migrations
                     b.Navigation("Admin");
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("ManufacturingERP.Models.Payroll", b =>
+                {
+                    b.HasOne("ManufacturingERP.Models.Employee", "Employee")
+                        .WithMany()
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Employee");
                 });
 
             modelBuilder.Entity("ManufacturingERP.Models.QualityControl", b =>
@@ -1417,6 +1671,11 @@ namespace ManufacturingERP.Migrations
                         .HasConstraintName("FK__UserRoles__UserI__6477ECF3");
                 });
 
+            modelBuilder.Entity("ManufacturingERP.Models.Document", b =>
+                {
+                    b.Navigation("Chunks");
+                });
+
             modelBuilder.Entity("ManufacturingERP.Models.Employee", b =>
                 {
                     b.Navigation("Attendances");
@@ -1424,6 +1683,11 @@ namespace ManufacturingERP.Migrations
                     b.Navigation("Schedules");
 
                     b.Navigation("UserAccount");
+                });
+
+            modelBuilder.Entity("ManufacturingERP.Models.Invoice", b =>
+                {
+                    b.Navigation("Items");
                 });
 
             modelBuilder.Entity("ManufacturingERP.Models.Material", b =>

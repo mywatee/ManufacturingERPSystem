@@ -131,7 +131,7 @@ public partial class CreateWarehouseViewModel : ViewModelBase
         {
             WarehouseCode = $"WH-{DateTime.Now:MMdd-HHmm}";
         }
-        else if (WarehouseCode.StartsWith("WH-"))
+        else if (!string.IsNullOrEmpty(WarehouseCode) && WarehouseCode.StartsWith("WH-"))
         {
             WarehouseCode = "";
         }

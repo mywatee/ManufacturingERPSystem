@@ -196,4 +196,65 @@ public class UserManagementService : IUserManagementService
         context.Users.Remove(dbUser);
         await context.SaveChangesAsync();
     }
+
+    public async Task<Role> CreateRoleAsync(string roleName)
+    {
+        if (string.IsNullOrWhiteSpace(roleName))
+            throw new ArgumentException("Tên vai trò không được trống.");
+
+        using var context = await _contextFactory.CreateDbContextAsync();
+        var exists = await context.Roles.AnyAsync(r => r.RoleName == roleName);
+        if (exists)
+            throw new InvalidOperationException("Vai trò này đã tồn tại.");
+
+        var role = new Role { RoleName = roleName.Trim() };
+        context.Roles.Add(role);
+        await context.SaveChangesAsync();
+        return role;
+    }
+
+    public async Task<bool> RenameRoleAsync(int roleId, string newName)
+    {
+        if (string.IsNullOrWhiteSpace(newName))
+            throw new ArgumentException("Tên vai trò không được trống.");
+
+        using var context = await _contextFactory.CreateDbContextAsync();
+        var role = await context.Roles.FirstOrDefaultAsync(r => r.RoleId == roleId);
+        if (role == null) return false;
+
+        var exists = await context.Roles.AnyAsync(r => r.RoleName == newName && r.RoleId != roleId);
+        if (exists)
+            throw new InvalidOperationException("Tên vai trò này đã tồn tại.");
+
+        role.RoleName = newName.Trim();
+        await context.SaveChangesAsync();
+        return true;
+    }
+
+    public async Task<bool> DeleteRoleAsync(int roleId)
+    {
+        using var context = await _contextFactory.CreateDbContextAsync();
+        var role = await context.Roles
+            .Include(r => r.Users)
+            .FirstOrDefaultAsync(r => r.RoleId == roleId);
+        if (role == null) return false;
+
+        if (role.Users.Any())
+            throw new InvalidOperationException("Không thể xóa vai trò này vì còn người dùng đang được gán. Vui lòng chuyển đổi vai trò của người dùng trước.");
+
+        var perms = await context.RolePermissions.Where(p => p.RoleId == roleId).ToListAsync();
+        context.RolePermissions.RemoveRange(perms);
+        context.Roles.Remove(role);
+        await context.SaveChangesAsync();
+        return true;
+    }
+
+    public async Task<List<Role>> GetAllRolesAsync()
+    {
+        using var context = await _contextFactory.CreateDbContextAsync();
+        return await context.Roles
+            .AsNoTracking()
+            .OrderBy(r => r.RoleName)
+            .ToListAsync();
+    }
 }

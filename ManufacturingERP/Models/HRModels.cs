@@ -5,6 +5,7 @@ namespace ManufacturingERP.Models;
 public class PayrollRecord
 {
     public int EmployeeId { get; set; }
+    public string EmployeeCode { get; set; } = string.Empty;
     public string Name { get; set; } = string.Empty;
     public string Department { get; set; } = string.Empty;
     public int ProductionQty { get; set; }
@@ -15,6 +16,8 @@ public class PayrollRecord
     public decimal QualityBonus { get; set; }
     public decimal TotalSalary => BasicSalary + ProductionSalary + AttendanceBonus + QualityBonus;
     public string Status { get; set; } = "Chưa duyệt";
+    public DateTime? ApprovedAt { get; set; }
+    public int? ApprovedBy { get; set; }
 }
 
 public class AttendanceSummary

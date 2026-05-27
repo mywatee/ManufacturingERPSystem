@@ -242,7 +242,8 @@
                                     <TextBlock Text="Nhập/Xuất Excel" VerticalAlignment="Center"/>
                                 </StackPanel>
                             </Button>
-                            <Button Style="{StaticResource PrimaryButtonStyle}" Height="38" Padding="16,0" Command="{Binding AddMaterialCommand}">
+                            <Button Style="{StaticResource PrimaryButtonStyle}" Height="38" Padding="16,0" Command="{Binding AddMaterialCommand}"
+                                    Visibility="{Binding CanAddMasterData, Converter={StaticResource BooleanToVisibilityConverter}}">
                                 <StackPanel Orientation="Horizontal">
                                     <TextBlock Text="+ " FontSize="16" FontWeight="Bold" VerticalAlignment="Center"/>
                                     <TextBlock Text="Thêm vật tư mới" VerticalAlignment="Center"/>
@@ -457,10 +458,12 @@
                                                 <Button Style="{StaticResource ActionButtonStyle}" Command="{Binding DataContext.ViewMaterialDetailsCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}">
                                                     <TextBlock Text="&#xE71D;" FontFamily="Segoe MDL2 Assets" Foreground="#64748B" FontSize="14"/>
                                                 </Button>
-                                                <Button Style="{StaticResource ActionButtonStyle}" Command="{Binding DataContext.EditMaterialCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}">
+                                                <Button Style="{StaticResource ActionButtonStyle}" Command="{Binding DataContext.EditMaterialCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}"
+                                                        Visibility="{Binding DataContext.CanEditMasterData, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BooleanToVisibilityConverter}}">
                                                     <TextBlock Text="&#xE70F;" FontFamily="Segoe MDL2 Assets" Foreground="#2563EB" FontSize="14"/>
                                                 </Button>
-                                                <Button Style="{StaticResource ActionButtonStyle}" Command="{Binding DataContext.DeleteMaterialCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}">
+                                                <Button Style="{StaticResource ActionButtonStyle}" Command="{Binding DataContext.DeleteMaterialCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}"
+                                                        Visibility="{Binding DataContext.CanDeleteMasterData, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BooleanToVisibilityConverter}}">
                                                     <TextBlock Text="&#xE74D;" FontFamily="Segoe MDL2 Assets" Foreground="#EF4444" FontSize="14"/>
                                                 </Button>
                                             </StackPanel>
@@ -565,10 +568,23 @@
                                         </Style>
                                     </Button.Style>
                                 </Button>
+                                <Button Content="Kho bãi" Margin="20,0,0,0"
+                                        Command="{Binding SwitchDetailTabCommand}" CommandParameter="Warehouse">
+                                    <Button.Style>
+                                        <Style TargetType="Button" BasedOn="{StaticResource TabButtonStyle}">
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsWarehouseVisible}" Value="True">
+                                                    <Setter Property="Foreground" Value="#2563EB"/>
+                                                    <Setter Property="BorderBrush" Value="#2563EB"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Button.Style>
+                                </Button>
                             </StackPanel>
 
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,0,12">
-                                <Button Content="+ Linh kiện" Background="#334155" Height="34" Padding="12,0" 
+                                <Button Content="+ Linh kiện" Background="#334155" Height="34" Padding="12,0"
                                         Command="{Binding AddBomLineCommand}">
                                     <Button.Style>
                                         <Style TargetType="Button" BasedOn="{StaticResource PrimaryButtonStyle}">
@@ -578,6 +594,7 @@
                                                     <MultiDataTrigger.Conditions>
                                                         <Condition Binding="{Binding IsBomVisible}" Value="True"/>
                                                         <Condition Binding="{Binding SelectedMaterial.CanHaveStructure}" Value="True"/>
+                                                        <Condition Binding="{Binding CanEditMasterData}" Value="True"/>
                                                     </MultiDataTrigger.Conditions>
                                                     <Setter Property="Visibility" Value="Visible"/>
                                                 </MultiDataTrigger>
@@ -595,6 +612,7 @@
                                                     <MultiDataTrigger.Conditions>
                                                         <Condition Binding="{Binding IsRoutingVisible}" Value="True"/>
                                                         <Condition Binding="{Binding SelectedMaterial.CanHaveStructure}" Value="True"/>
+                                                        <Condition Binding="{Binding CanEditMasterData}" Value="True"/>
                                                     </MultiDataTrigger.Conditions>
                                                     <Setter Property="Visibility" Value="Visible"/>
                                                 </MultiDataTrigger>
@@ -707,10 +725,6 @@
                                 </TextBlock>
                             </StackPanel>
 
-                            <Button Grid.Row="1" Content="Phát hành định mức" Style="{StaticResource PrimaryButtonStyle}" 
-                                    HorizontalAlignment="Right" Width="160" Height="38" Margin="0,16,0,0" 
-                                    Command="{Binding ReleaseBomCommand}"
-                                    ToolTip="Xác nhận và khóa bộ định mức này. Sau khi phát hành, BOM sẽ được dùng để tính toán nguyên vật liệu trong lệnh sản xuất."/>
                         </Grid>
 
                         <!-- ROUTING TAB -->
@@ -1020,6 +1034,7 @@
 
                                 <Button Grid.Column="1" HorizontalAlignment="Right"
                                         Background="#2563EB" Height="38" Padding="16,0" 
+                                        Visibility="{Binding CanAddMasterData, Converter={StaticResource BooleanToVisibilityConverter}}"
                                         Command="{Binding AddPartnerCommand}"
                                         Style="{StaticResource PrimaryButtonStyle}">
                                     <StackPanel Orientation="Horizontal">
@@ -1127,6 +1142,121 @@
                                 <TextBlock Text="Chưa có dữ liệu đối tác" FontSize="16" FontWeight="SemiBold" Foreground="#475569" HorizontalAlignment="Center"/>
                                 <TextBlock Text="Nhấn nút '+ Thêm đối tác mới' để thêm mới" FontSize="13" Foreground="#94A3B8" HorizontalAlignment="Center" Margin="0,4,0,0"/>
                             </StackPanel>
+                        </Grid>
+
+                        <!-- WAREHOUSE TAB -->
+                        <Grid Visibility="{Binding IsWarehouseVisible, Converter={StaticResource BoolToVis}}">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+
+                            <Grid Grid.Row="0" Margin="0,0,0,16">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+
+                                <Button Grid.Column="1" HorizontalAlignment="Right"
+                                        Background="#2563EB" Height="38" Padding="16,0"
+                                        Command="{Binding AddWarehouseCommand}"
+                                        Style="{StaticResource PrimaryButtonStyle}">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="+ " FontSize="16" FontWeight="Bold" VerticalAlignment="Center"/>
+                                        <TextBlock Text="Thêm nhà kho" VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                </Button>
+                            </Grid>
+
+                            <DataGrid Grid.Row="1" Style="{StaticResource ModernDataGrid}" ItemsSource="{Binding Warehouses}"
+                                      AutoGenerateColumns="False" IsReadOnly="True" MinRowHeight="65"
+                                      ScrollViewer.HorizontalScrollBarVisibility="Auto">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="Mã" Binding="{Binding Code}" Width="100">
+                                        <DataGridTextColumn.ElementStyle>
+                                            <Style TargetType="TextBlock">
+                                                <Setter Property="VerticalAlignment" Value="Center"/>
+                                                <Setter Property="Padding" Value="12,0"/>
+                                            </Style>
+                                        </DataGridTextColumn.ElementStyle>
+                                    </DataGridTextColumn>
+                                    <DataGridTemplateColumn Header="Tên nhà kho" Width="200">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <StackPanel VerticalAlignment="Center" Margin="12,8">
+                                                    <TextBlock Text="{Binding Name}" FontWeight="Bold" Foreground="#1E293B" FontSize="14"/>
+                                                    <TextBlock Text="{Binding Location}" FontSize="12" Foreground="#64748B" Margin="0,4,0,0"/>
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+                                    <DataGridTextColumn Header="Người quản lý" Binding="{Binding Manager}" Width="150">
+                                        <DataGridTextColumn.ElementStyle>
+                                            <Style TargetType="TextBlock">
+                                                <Setter Property="VerticalAlignment" Value="Center"/>
+                                                <Setter Property="Padding" Value="12,0"/>
+                                            </Style>
+                                        </DataGridTextColumn.ElementStyle>
+                                    </DataGridTextColumn>
+                                    <DataGridTextColumn Header="Công suất" Binding="{Binding Capacity, StringFormat={}{0} m²}" Width="120">
+                                        <DataGridTextColumn.ElementStyle>
+                                            <Style TargetType="TextBlock">
+                                                <Setter Property="VerticalAlignment" Value="Center"/>
+                                                <Setter Property="Padding" Value="12,0"/>
+                                            </Style>
+                                        </DataGridTextColumn.ElementStyle>
+                                    </DataGridTextColumn>
+                                    <DataGridTemplateColumn Header="Trạng thái" Width="120">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <Border Padding="8,4" CornerRadius="12" HorizontalAlignment="Left" Margin="4,8">
+                                                    <Border.Style>
+                                                        <Style TargetType="Border">
+                                                            <Setter Property="Background" Value="#DCFCE7"/>
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding Status}" Value="Bảo trì">
+                                                                    <Setter Property="Background" Value="#FEE2E2"/>
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </Border.Style>
+                                                    <TextBlock Text="{Binding Status}" FontSize="11" FontWeight="SemiBold" Foreground="#15803D">
+                                                        <TextBlock.Style>
+                                                            <Style TargetType="TextBlock">
+                                                                <Style.Triggers>
+                                                                    <DataTrigger Binding="{Binding Status}" Value="Bảo trì">
+                                                                        <Setter Property="Foreground" Value="#B91C1C"/>
+                                                                    </DataTrigger>
+                                                                </Style.Triggers>
+                                                            </Style>
+                                                        </TextBlock.Style>
+                                                    </TextBlock>
+                                                </Border>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+                                    <DataGridTemplateColumn Header="Thao tác" Width="100">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="4,0">
+                                                    <Button Style="{StaticResource ActionButtonStyle}"
+                                                            ToolTip="Chỉnh sửa"
+                                                            Command="{Binding DataContext.EditWarehouseCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                            CommandParameter="{Binding}">
+                                                        <TextBlock Text="&#xE70F;" FontFamily="Segoe MDL2 Assets" Foreground="#2563EB" FontSize="14"/>
+                                                    </Button>
+                                                    <Button Style="{StaticResource ActionButtonStyle}"
+                                                            ToolTip="Xóa"
+                                                            Command="{Binding DataContext.DeleteWarehouseCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                            CommandParameter="{Binding}">
+                                                        <TextBlock Text="&#xE74D;" FontFamily="Segoe MDL2 Assets" Foreground="#EF4444" FontSize="14"/>
+                                                    </Button>
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+                                </DataGrid.Columns>
+                            </DataGrid>
                         </Grid>
                     </Grid>
                 </Grid>

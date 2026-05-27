@@ -1,3 +1,4 @@
+using System;
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -12,6 +13,7 @@ using ManufacturingERP.Views.Dialogs;
 using ManufacturingERP.Models;
 using System.Windows;
 using Microsoft.Win32;
+using System.Windows.Threading;
 
 namespace ManufacturingERP.ViewModels;
 
@@ -22,6 +24,7 @@ public partial class DashboardViewModel : ViewModelBase
     private readonly IActivityService _activityService;
     private readonly IFileService _fileService;
     private readonly INotificationService _notificationService;
+    private readonly IQualityControlService _qualityControlService;
 
 
 
@@ -41,6 +44,7 @@ public partial class DashboardViewModel : ViewModelBase
     // Tables
     public ObservableCollection<UrgentOrder> UrgentOrders { get; } = new();
     public ObservableCollection<RecentActivity> Activities { get; } = new();
+    public ObservableCollection<DefectStatItem> DefectReasonStats { get; } = new();
 
     [ObservableProperty]
     private string _selectedDefectTitle = "Chưa có dữ liệu";
@@ -48,27 +52,40 @@ public partial class DashboardViewModel : ViewModelBase
     [ObservableProperty]
     private double _selectedDefectValue = 0;
 
+    [ObservableProperty]
+    private string _qcSummaryText = "Chưa có dữ liệu kiểm tra QC";
+
+    private int _qcTotalSamples = 0;
+    private readonly DispatcherTimer _autoRefreshTimer;
+
     public DashboardViewModel(
         IProductionService productionService, 
         INavigationService navigationService, 
         IActivityService activityService, 
         INotificationService notificationService, 
-        IFileService fileService)
+        IFileService fileService,
+        IQualityControlService qualityControlService)
     {
         _productionService = productionService;
         _navigationService = navigationService;
         _activityService = activityService;
         _notificationService = notificationService;
         _fileService = fileService;
+        _qualityControlService = qualityControlService;
 
         
         LoadMockData();
+
+        _autoRefreshTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(30) };
+        _autoRefreshTimer.Tick += async (s, e) => await LoadDashboardDataAsync();
+
         _ = LoadDashboardDataAsync();
     }
 
     public async Task InitializeAsync()
     {
         await LoadDashboardDataAsync();
+        if (!_autoRefreshTimer.IsEnabled) _autoRefreshTimer.Start();
     }
 
     public async Task LogActivityAsync(string type, string content)
@@ -99,42 +116,101 @@ public partial class DashboardViewModel : ViewModelBase
         else
             MonthlyRevenue = $"{stats.MonthlyRevenue:N0} đ";
 
-        // Load Chart Data
-        var chartData = await _productionService.GetProductionChartDataAsync(7);
+        // Load Chart Data (Production)
+        var chartData = await _productionService.GetProductionChartDataAsync(30);
         ProductionLabels = chartData.Labels.ToArray();
-        
+
+        var lineColor = System.Windows.Media.Color.FromRgb(37, 99, 235);
+        var planLineColor = System.Windows.Media.Color.FromRgb(239, 68, 68);
+
         ProductionSeries = new SeriesCollection
         {
             new LineSeries
             {
                 Title = "Sản lượng đạt",
                 Values = new ChartValues<int>(chartData.ProductionValues),
-                Stroke = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(37, 99, 235)),
+                Stroke = new System.Windows.Media.SolidColorBrush(lineColor),
                 Fill = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(50, 37, 99, 235)),
-                PointGeometrySize = 10
+                PointGeometrySize = 8,
+                StrokeThickness = 2.5
+            },
+            new LineSeries
+            {
+                Title = "Kế hoạch",
+                Values = new ChartValues<int>(chartData.PlanValues),
+                Stroke = new System.Windows.Media.SolidColorBrush(planLineColor),
+                StrokeDashArray = new System.Windows.Media.DoubleCollection { 6, 3 },
+                StrokeThickness = 2,
+                PointGeometrySize = 0
             }
         };
 
-        int totalDefect = chartData.DefectValues.Sum();
-        int totalProd = chartData.ProductionValues.Sum();
-        
-        DefectSeries = new SeriesCollection
+        // Load QC Statistics
+        int qcPassed = 0, qcFailed = 0;
+        var qcDefectStats = new List<(string Category, int Count)>();
+        try
         {
-            new PieSeries
+            var startDate = DateTime.Now.AddMonths(-1);
+            var endDate = DateTime.Now;
+            var qcStats = await _qualityControlService.GetStatisticsAsync(startDate, endDate);
+            qcPassed = qcStats.Passed;
+            qcFailed = qcStats.Failed;
+            qcDefectStats = qcStats.DefectStats;
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Dashboard QC stats error: {ex.Message}");
+        }
+
+        // QC Pie Chart
+        _qcTotalSamples = qcPassed + qcFailed;
+        if (_qcTotalSamples > 0)
+        {
+            DefectSeries = new SeriesCollection
             {
-                Title = "Sản phẩm lỗi",
-                Values = new ChartValues<int> { totalDefect },
-                Fill = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(239, 68, 68)),
-                DataLabels = true
-            },
-            new PieSeries
+                new PieSeries
+                {
+                    Title = "Đạt QC",
+                    Values = new ChartValues<int> { qcPassed },
+                    Fill = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(34, 197, 94)),
+                    DataLabels = true
+                },
+                new PieSeries
+                {
+                    Title = "Lỗi QC",
+                    Values = new ChartValues<int> { qcFailed },
+                    Fill = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(239, 68, 68)),
+                    DataLabels = true
+                }
+            };
+            SelectedDefectTitle = "Tổng mẫu";
+            SelectedDefectValue = _qcTotalSamples;
+            QcSummaryText = $"Tổng: {qcPassed:N0} đạt / {qcFailed:N0} lỗi";
+        }
+        else
+        {
+            DefectSeries = new SeriesCollection();
+            SelectedDefectTitle = "Chưa có dữ liệu";
+            SelectedDefectValue = 0;
+            QcSummaryText = "Chưa có dữ liệu kiểm tra QC";
+        }
+
+        // Load Defect Reason Statistics
+        DefectReasonStats.Clear();
+        var realDefects = qcDefectStats
+            .Where(d => d.Category != "Đạt chuẩn")
+            .ToList();
+        int totalRealDefects = realDefects.Sum(d => d.Count);
+        foreach (var stat in realDefects)
+        {
+            double percentage = totalRealDefects > 0 ? (double)stat.Count / totalRealDefects * 100 : 0;
+            DefectReasonStats.Add(new DefectStatItem
             {
-                Title = "Sản phẩm đạt",
-                Values = new ChartValues<int> { totalProd },
-                Fill = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(34, 197, 94)),
-                DataLabels = true
-            }
-        };
+                Reason = stat.Category,
+                Count = stat.Count,
+                Percentage = percentage
+            });
+        }
 
         // Update Table
         UrgentOrders.Clear();
@@ -194,6 +270,20 @@ public partial class DashboardViewModel : ViewModelBase
     }
 
     [RelayCommand]
+    private async Task RefreshDashboard()
+    {
+        if (!_autoRefreshTimer.IsEnabled) _autoRefreshTimer.Start();
+        await LoadDashboardDataAsync();
+        _notificationService.ShowSuccess("Đã làm mới dữ liệu");
+    }
+
+    [RelayCommand]
+    private void ViewMaterialAlerts()
+    {
+        _navigationService.NavigateTo<WarehouseViewModel>();
+    }
+
+    [RelayCommand]
     private async Task AddWorkOrder()
     {
         _navigationService.NavigateTo<CreateWorkOrderViewModel>();
@@ -232,8 +322,8 @@ public partial class DashboardViewModel : ViewModelBase
     {
         if (point == null)
         {
-            SelectedDefectTitle = "Sản phẩm lỗi";
-            SelectedDefectValue = 100;
+            SelectedDefectTitle = "Tổng mẫu";
+            SelectedDefectValue = _qcTotalSamples;
             return;
         }
 
@@ -308,4 +398,12 @@ public class RecentActivity
     public string? Content { get; set; }
     public string? User { get; set; }
     public string? Time { get; set; }
+}
+
+public class DefectStatItem
+{
+    public string Reason { get; set; } = "";
+    public int Count { get; set; }
+    public double Percentage { get; set; }
+    public string PercentageDisplay => $"{Percentage:N1}%";
 }

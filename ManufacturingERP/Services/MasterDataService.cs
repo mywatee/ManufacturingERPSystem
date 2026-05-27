@@ -24,7 +24,6 @@ public interface IMasterDataService
     // Routing Methods
     Task<List<Routing>> GetRoutingByParentCodeAsync(string parentCode);
     Task<bool> AddRoutingStepAsync(Routing step);
-    Task<bool> UpdateRoutingStepAsync(Routing step);
     Task<bool> DeleteRoutingByProductIdAsync(int productId);
     Task<List<Bom>> GetAllBomsAsync();
     Task<List<Routing>> GetAllRoutingsAsync();
@@ -293,21 +292,6 @@ public class MasterDataService : IMasterDataService
         try
         {
             context.Boms.Update(bom);
-            await context.SaveChangesAsync();
-            return true;
-        }
-        catch (Exception)
-        {
-            return false;
-        }
-    }
-
-    public async Task<bool> UpdateRoutingStepAsync(Routing step)
-    {
-        using var context = await _contextFactory.CreateDbContextAsync();
-        try
-        {
-            context.Routings.Update(step);
             await context.SaveChangesAsync();
             return true;
         }

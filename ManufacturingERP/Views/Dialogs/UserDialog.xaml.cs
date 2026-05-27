@@ -78,8 +78,6 @@ namespace ManufacturingERP.Views.Dialogs
             User.Employee.Phone = phone;
             SelectedRole = RoleComboBox.SelectedItem?.ToString() ?? "Nhân viên vận hành";
             
-            // For new users, we'll set a default password that they should change
-            User.PasswordHash = "123456"; // This will be hashed in the ViewModel
             User.IsActive = true;
             
             DialogResult = true;

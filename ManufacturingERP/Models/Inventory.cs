@@ -13,7 +13,7 @@ public partial class Inventory
 
     public DateTime? LastUpdated { get; set; }
 
-    public int? WarehouseId { get; set; }
+    public int WarehouseId { get; set; }
 
     public virtual Material Material { get; set; } = null!;
 

@@ -35,6 +35,10 @@ public partial class WorkOrderDetailViewModel : ViewModelBase
     private readonly IAuthService _authService;
     private readonly IMasterDataService _masterDataService;
     private readonly IUserManagementService _userManagementService;
+    private readonly IAccessControlService _accessControlService;
+
+    [ObservableProperty] private bool _canEditProduction;
+    [ObservableProperty] private bool _canDeleteProduction;
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(TotalTargetQty))]
@@ -102,12 +106,19 @@ public partial class WorkOrderDetailViewModel : ViewModelBase
     public string UrgentText => (Order?.IsUrgent ?? false) ? "Khẩn cấp" : "Bình thường";
     public Brush UrgentColor => (Order?.IsUrgent ?? false) ? new SolidColorBrush(Color.FromRgb(220, 38, 38)) : new SolidColorBrush(Color.FromRgb(22, 163, 74));
 
-    public bool CanStart => Order?.Status == "Planned" || Order?.Status == "Chờ duyệt" || Order?.Status == "Chờ" || Order?.Status == "Paused" || Order?.Status == "Tạm dừng";
-    public bool CanPause => Order?.Status == "Running" || Order?.Status == "Đang sản xuất";
-    public bool CanComplete => Order?.Status == "Running" || Order?.Status == "Đang sản xuất" || Order?.Status == "Paused" || Order?.Status == "Tạm dừng";
-    public bool CanEdit => Order?.Status == "Planned" || Order?.Status == "Chờ duyệt" || Order?.Status == "Chờ";
-    public bool CanCancel => Order?.Status == "Planned" || Order?.Status == "Chờ duyệt" || Order?.Status == "Chờ" || Order?.Status == "Paused" || Order?.Status == "Tạm dừng" || Order?.Status == "Running" || Order?.Status == "Đang sản xuất";
-    public bool CanRecord => Order?.Status == "Running" || Order?.Status == "Đang sản xuất";
+    public bool CanStart => IsOrderStartableByStatus && CanEditProduction;
+    public bool CanPause => IsOrderPausableByStatus && CanEditProduction;
+    public bool CanComplete => IsOrderCompletableByStatus && CanEditProduction;
+    public bool CanEdit => IsOrderEditableByStatus && CanEditProduction;
+    public bool CanCancel => IsOrderCancellableByStatus && CanDeleteProduction;
+    public bool CanRecord => IsOrderRecordableByStatus && CanEditProduction;
+
+    private bool IsOrderStartableByStatus => Order?.Status == "Planned" || Order?.Status == "Chờ duyệt" || Order?.Status == "Chờ" || Order?.Status == "Paused" || Order?.Status == "Tạm dừng";
+    private bool IsOrderPausableByStatus => Order?.Status == "Running" || Order?.Status == "Đang sản xuất";
+    private bool IsOrderCompletableByStatus => Order?.Status == "Running" || Order?.Status == "Đang sản xuất" || Order?.Status == "Paused" || Order?.Status == "Tạm dừng";
+    private bool IsOrderEditableByStatus => Order?.Status == "Planned" || Order?.Status == "Chờ duyệt" || Order?.Status == "Chờ";
+    private bool IsOrderCancellableByStatus => Order?.Status == "Planned" || Order?.Status == "Chờ duyệt" || Order?.Status == "Chờ" || Order?.Status == "Paused" || Order?.Status == "Tạm dừng" || Order?.Status == "Running" || Order?.Status == "Đang sản xuất";
+    private bool IsOrderRecordableByStatus => Order?.Status == "Running" || Order?.Status == "Đang sản xuất";
 
     public int TotalTargetQty => Order?.WorkOrderItems?.Sum(i => i.TargetQty) ?? 0;
     public int TotalActualQty => Order?.WorkOrderItems?.Sum(i => i.ActualQty) ?? 0;
@@ -121,7 +132,8 @@ public partial class WorkOrderDetailViewModel : ViewModelBase
         IAuditLogService auditLogService,
         IAuthService authService,
         IMasterDataService masterDataService,
-        IUserManagementService userManagementService)
+        IUserManagementService userManagementService,
+        IAccessControlService accessControlService)
     {
         _navigationService = navigationService;
         _productionService = productionService;
@@ -130,9 +142,31 @@ public partial class WorkOrderDetailViewModel : ViewModelBase
         _authService = authService;
         _masterDataService = masterDataService;
         _userManagementService = userManagementService;
+        _accessControlService = accessControlService;
         
         // Load default stages initially
         foreach (var stage in _defaultStages) StageOptions.Add(stage);
+    }
+
+    private void NotifyActionPermissions()
+    {
+        OnPropertyChanged(nameof(CanStart));
+        OnPropertyChanged(nameof(CanPause));
+        OnPropertyChanged(nameof(CanComplete));
+        OnPropertyChanged(nameof(CanEdit));
+        OnPropertyChanged(nameof(CanCancel));
+        OnPropertyChanged(nameof(CanRecord));
+    }
+
+    partial void OnCanEditProductionChanged(bool value) => NotifyActionPermissions();
+    partial void OnCanDeleteProductionChanged(bool value) => NotifyActionPermissions();
+
+    private async Task LoadPermissionsAsync()
+    {
+        await _accessControlService.RefreshAsync();
+        var perms = ModulePermissionStateFactory.FromAccessControl(_accessControlService, SystemModules.Production);
+        CanEditProduction = perms.CanEdit;
+        CanDeleteProduction = perms.CanDelete;
     }
 
     public async Task LoadOrder(string orderId)
@@ -140,6 +174,7 @@ public partial class WorkOrderDetailViewModel : ViewModelBase
         IsLoading = true;
         try
         {
+            await LoadPermissionsAsync();
             var fullOrder = await _productionService.GetWorkOrderByCodeAsync(orderId);
             if (fullOrder != null)
             {
@@ -149,12 +184,7 @@ public partial class WorkOrderDetailViewModel : ViewModelBase
                 OnPropertyChanged(nameof(DateRangeText));
                 OnPropertyChanged(nameof(UrgentText));
                 OnPropertyChanged(nameof(UrgentColor));
-                OnPropertyChanged(nameof(CanStart));
-                OnPropertyChanged(nameof(CanPause));
-                OnPropertyChanged(nameof(CanComplete));
-                OnPropertyChanged(nameof(CanEdit));
-                OnPropertyChanged(nameof(CanCancel));
-                OnPropertyChanged(nameof(CanRecord));
+                NotifyActionPermissions();
                 OnPropertyChanged(nameof(TotalTargetQty));
                 OnPropertyChanged(nameof(TotalActualQty));
             }
@@ -186,6 +216,11 @@ public partial class WorkOrderDetailViewModel : ViewModelBase
     private async Task EditOrder()
     {
         if (Order == null) return;
+        if (!_accessControlService.HasCached(SystemModules.Production, PermissionAction.Edit))
+        {
+            _notificationService.ShowError("Bạn không có quyền Sửa trong phân hệ Sản xuất.");
+            return;
+        }
         
         var products = await _productionService.GetProductsAsync();
         ProductList.Clear();
@@ -203,6 +238,11 @@ public partial class WorkOrderDetailViewModel : ViewModelBase
     private async Task SaveEdit()
     {
         if (Order == null) return;
+        if (!_accessControlService.HasCached(SystemModules.Production, PermissionAction.Edit))
+        {
+            _notificationService.ShowError("Bạn không có quyền Sửa trong phân hệ Sản xuất.");
+            return;
+        }
 
         if (!int.TryParse(EditQuantity, out int qty) || qty <= 0)
         {
@@ -211,6 +251,10 @@ public partial class WorkOrderDetailViewModel : ViewModelBase
         }
 
         Order.TargetQty = qty;
+        if (Order.WorkOrderItems != null && Order.WorkOrderItems.Any())
+        {
+            Order.WorkOrderItems.First().TargetQty = qty;
+        }
         Order.EndDate = EditEndDate;
         Order.IsUrgent = EditIsUrgent;
         
@@ -239,6 +283,11 @@ public partial class WorkOrderDetailViewModel : ViewModelBase
     private void RecordProgress()
     {
         if (Order == null) return;
+        if (!_accessControlService.HasCached(SystemModules.Production, PermissionAction.Edit))
+        {
+            _notificationService.ShowError("Bạn không có quyền Sửa trong phân hệ Sản xuất.");
+            return;
+        }
         
         RecordSelectedProduct = Order.WorkOrderItems?.FirstOrDefault();
         RecordActualQty = "0";
@@ -298,7 +347,10 @@ public partial class WorkOrderDetailViewModel : ViewModelBase
                 RecordWorkerList.Add(new WorkerProgressItem(currentUser, RecordStartTime, RecordEndTime));
             }
         }
-        catch { }
+        catch (Exception ex)
+        {
+            _notificationService.ShowError("Không thể tải danh sách nhân viên: " + ex.Message);
+        }
     }
 
     partial void OnRecordSelectedProductChanged(WorkOrderItem? value)
@@ -341,18 +393,26 @@ public partial class WorkOrderDetailViewModel : ViewModelBase
     private async Task SaveRecord()
     {
         if (Order == null) return;
+        if (!_accessControlService.HasCached(SystemModules.Production, PermissionAction.Edit))
+        {
+            _notificationService.ShowError("Bạn không có quyền Sửa trong phân hệ Sản xuất.");
+            return;
+        }
 
         if (!int.TryParse(RecordActualQty, out int actualQty)) actualQty = 0;
         if (!int.TryParse(RecordFailedQty, out int failedQty)) failedQty = 0;
 
-        if (RecordSelectedStage == "(Chưa thiết lập quy trình)" || string.IsNullOrEmpty(RecordSelectedStage))
+        if (RecordSelectedStage == "(Chưa thiết lập quy trình)" || string.IsNullOrWhiteSpace(RecordSelectedStage))
         {
             _notificationService.ShowError("Vui lòng thiết lập quy trình công nghệ cho sản phẩm này trong mục 'Dữ liệu gốc' trước khi ghi nhận tiến độ.");
             return;
         }
 
         if (actualQty <= 0 && failedQty <= 0)
-
+        {
+            _notificationService.ShowError("Vui lòng nhập số lượng ĐẠT hoặc LỖI trước khi ghi nhận tiến độ.");
+            return;
+        }
 
         // Kiểm tra vượt định mức
         if (actualQty > 0)
@@ -449,6 +509,11 @@ public partial class WorkOrderDetailViewModel : ViewModelBase
     private async Task StartOrder()
     {
         if (Order == null) return;
+        if (!_accessControlService.HasCached(SystemModules.Production, PermissionAction.Edit))
+        {
+            _notificationService.ShowError("Bạn không có quyền Sửa trong phân hệ Sản xuất.");
+            return;
+        }
         Order.Status = "Running";
         if (await _productionService.UpdateWorkOrderAsync(Order))
         {
@@ -466,6 +531,11 @@ public partial class WorkOrderDetailViewModel : ViewModelBase
     private async Task PauseOrder()
     {
         if (Order == null) return;
+        if (!_accessControlService.HasCached(SystemModules.Production, PermissionAction.Edit))
+        {
+            _notificationService.ShowError("Bạn không có quyền Sửa trong phân hệ Sản xuất.");
+            return;
+        }
         Order.Status = "Paused";
         if (await _productionService.UpdateWorkOrderAsync(Order))
         {
@@ -483,6 +553,11 @@ public partial class WorkOrderDetailViewModel : ViewModelBase
     private async Task CompleteOrder()
     {
         if (Order == null) return;
+        if (!_accessControlService.HasCached(SystemModules.Production, PermissionAction.Edit))
+        {
+            _notificationService.ShowError("Bạn không có quyền Sửa trong phân hệ Sản xuất.");
+            return;
+        }
 
         int target = TotalTargetQty;
         int actual = TotalActualQty;
@@ -510,6 +585,11 @@ public partial class WorkOrderDetailViewModel : ViewModelBase
     private async Task CancelOrder()
     {
         if (Order == null) return;
+        if (!_accessControlService.HasCached(SystemModules.Production, PermissionAction.Delete))
+        {
+            _notificationService.ShowError("Bạn không có quyền Xóa trong phân hệ Sản xuất.");
+            return;
+        }
 
         bool confirm = _notificationService.Confirm(
             $"Bạn có chắc chắn muốn hủy lệnh sản xuất {Order.Wocode}? Thao tác này không thể hoàn tác.",

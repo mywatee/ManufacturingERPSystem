@@ -34,6 +34,7 @@ public partial class FinanceViewModel : ViewModelBase
     private readonly IPartnerService _partnerService;
     private readonly INavigationService _navigationService;
     private readonly IFileService _fileService;
+    private readonly IAccessControlService _accessControlService;
 
     // Debt Management Data
     [ObservableProperty] private ObservableCollection<Invoice> _accountsPayable = new();
@@ -171,13 +172,18 @@ public partial class FinanceViewModel : ViewModelBase
     public List<string> ProductGroups { get; private set; } = new() { "Tất cả nhóm" };
     [ObservableProperty] private string _selectedProductGroup = "Tất cả nhóm";
 
+    [ObservableProperty] private bool _canAddFinance;
+    [ObservableProperty] private bool _canEditFinance;
+    [ObservableProperty] private bool _canDeleteFinance;
+
     public FinanceViewModel(
         IDbContextFactory<ManufacturingContext> contextFactory, 
         IFinanceService financeService,
         INotificationService notificationService,
         IPartnerService partnerService,
         INavigationService navigationService,
-        IFileService fileService)
+        IFileService fileService,
+        IAccessControlService accessControlService)
     {
         _contextFactory = contextFactory;
         _financeService = financeService;
@@ -185,6 +191,7 @@ public partial class FinanceViewModel : ViewModelBase
         _partnerService = partnerService;
         _navigationService = navigationService;
         _fileService = fileService;
+        _accessControlService = accessControlService;
 
         // Subscribe to refresh message
         WeakReferenceMessenger.Default.Register<InvoiceCreatedMessage>(this, (r, m) =>
@@ -227,6 +234,10 @@ public partial class FinanceViewModel : ViewModelBase
 
     public override async Task InitializeAsync()
     {
+        await _accessControlService.RefreshAsync();
+        CanAddFinance = _accessControlService.HasCached(SystemModules.Finance, PermissionAction.Add);
+        CanEditFinance = _accessControlService.HasCached(SystemModules.Finance, PermissionAction.Edit);
+        CanDeleteFinance = _accessControlService.HasCached(SystemModules.Finance, PermissionAction.Delete);
         await LoadDataAsync();
     }
 
@@ -236,17 +247,14 @@ public partial class FinanceViewModel : ViewModelBase
         {
             _allAP = (await _financeService.GetInvoicesAsync("AP")).ToList();
             _allAR = (await _financeService.GetInvoicesAsync("AR")).ToList();
-
-            ApplyFilters();
-
             _allTX = (await _financeService.GetTransactionsAsync()).ToList();
 
-            ApplyFilters();
             var now = DateTime.Now;
             var flow = await _financeService.GetMonthlyCashFlowAsync(now.Month, now.Year);
             TotalInflow = (flow.Inflow / 1000000m).ToString("N1") + "M";
             TotalOutflow = (flow.Outflow / 1000000m).ToString("N1") + "M";
             NetCashFlow = ((flow.Inflow - flow.Outflow) / 1000000m).ToString("N1") + "M";
+            ApplyFilters();
             
             await RefreshMonthlyOverheadAsync();
             await RefreshCostAnalysisAsync();
@@ -606,14 +614,6 @@ public partial class FinanceViewModel : ViewModelBase
         TotalReceivable = (filteredAR.Sum(a => a.RemainingAmount) / 1000000m).ToString("N1") + "M";
         OverduePayable = (filteredAP.Where(a => a.Status == "Quá hạn").Sum(a => a.RemainingAmount) / 1000000m).ToString("N1") + "M";
         OverdueReceivable = (filteredAR.Where(a => a.Status == "Quá hạn").Sum(a => a.RemainingAmount) / 1000000m).ToString("N1") + "M";
-
-        // Cash Flow KPIs based on filtered transactions
-        var inflow = filteredTX.Where(t => t.Type == "Thu").Sum(t => t.Amount);
-        var outflow = filteredTX.Where(t => t.Type == "Chi").Sum(t => t.Amount);
-        
-        TotalInflow = (inflow / 1000000m).ToString("N1") + "M";
-        TotalOutflow = (outflow / 1000000m).ToString("N1") + "M";
-        NetCashFlow = ((inflow - outflow) / 1000000m).ToString("N1") + "M";
     }
 
     [RelayCommand]
@@ -822,6 +822,12 @@ public partial class FinanceViewModel : ViewModelBase
     [RelayCommand]
     public async Task CreateInvoice()
     {
+        if (!_accessControlService.HasCached(SystemModules.Finance, PermissionAction.Add))
+        {
+            _notificationService.ShowError("Bạn không có quyền Thêm trong phân hệ Tài chính.");
+            return;
+        }
+
         var vm = _navigationService.NavigateTo<CreateInvoiceViewModel>();
         await vm.InitializeAsync();
     }
@@ -830,6 +836,12 @@ public partial class FinanceViewModel : ViewModelBase
     public async Task EditInvoiceAsync(Invoice invoice)
     {
         if (invoice == null) return;
+        if (!_accessControlService.HasCached(SystemModules.Finance, PermissionAction.Edit))
+        {
+            _notificationService.ShowError("Bạn không có quyền Sửa trong phân hệ Tài chính.");
+            return;
+        }
+
         var vm = _navigationService.NavigateTo<CreateInvoiceViewModel>();
         await vm.InitializeForEditAsync(invoice);
     }
@@ -845,6 +857,12 @@ public partial class FinanceViewModel : ViewModelBase
     [RelayCommand]
     public async Task CreateTransactionAsync()
     {
+        if (!_accessControlService.HasCached(SystemModules.Finance, PermissionAction.Add))
+        {
+            _notificationService.ShowError("Bạn không có quyền Thêm trong phân hệ Tài chính.");
+            return;
+        }
+
         var vm = App.Current.Dispatcher.Invoke(() => ((App)App.Current).Services.GetRequiredService<CreateFinancialTransactionViewModel>());
         await vm.InitializeAsync();
 
@@ -862,6 +880,11 @@ public partial class FinanceViewModel : ViewModelBase
     public async Task PayInvoiceAsync(Invoice invoice)
     {
         if (invoice == null) return;
+        if (!_accessControlService.HasCached(SystemModules.Finance, PermissionAction.Edit))
+        {
+            _notificationService.ShowError("Bạn không có quyền Sửa trong phân hệ Tài chính.");
+            return;
+        }
 
         try
         {
@@ -883,8 +906,11 @@ public partial class FinanceViewModel : ViewModelBase
                 var dbInvoice = await context.Invoices.FindAsync(invoice.InvoiceId);
                 if (dbInvoice != null)
                 {
-                    dbInvoice.PaidAmount = dbInvoice.TotalAmount;
-                    dbInvoice.Status = "Đã thanh toán";
+                    dbInvoice.PaidAmount += transaction.Amount;
+                    if (dbInvoice.PaidAmount >= dbInvoice.TotalAmount)
+                        dbInvoice.Status = "Đã thanh toán";
+                    else
+                        dbInvoice.Status = "Một phần";
                     await context.SaveChangesAsync();
                 }
 
@@ -902,6 +928,11 @@ public partial class FinanceViewModel : ViewModelBase
     public async Task DeleteInvoiceAsync(Invoice invoice)
     {
         if (invoice == null) return;
+        if (!_accessControlService.HasCached(SystemModules.Finance, PermissionAction.Delete))
+        {
+            _notificationService.ShowError("Bạn không có quyền Xóa trong phân hệ Tài chính.");
+            return;
+        }
 
         var message = $"CẢNH BÁO: Hóa đơn {invoice.InvoiceCode} sẽ bị xóa vĩnh viễn khỏi hệ thống.\nCác báo cáo tài chính liên quan sẽ bị thay đổi.\n\nBạn có thực sự muốn thực hiện không?";
         
@@ -947,6 +978,11 @@ public partial class FinanceViewModel : ViewModelBase
     public async Task DeleteTransactionAsync(FinancialTransaction transaction)
     {
         if (transaction == null) return;
+        if (!_accessControlService.HasCached(SystemModules.Finance, PermissionAction.Delete))
+        {
+            _notificationService.ShowError("Bạn không có quyền Xóa trong phân hệ Tài chính.");
+            return;
+        }
 
         var message = $"Bạn có chắc chắn muốn xóa giao dịch {transaction.TransactionCode}?\n" +
                       $"Số tiền: {transaction.Amount:N0} đ\nMô tả: {transaction.Description}";
